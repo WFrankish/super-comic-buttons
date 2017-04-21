@@ -70,8 +70,8 @@ function parseHTML(html, id, root){
     var start = or($(selector, html).get(0) || $(html).filter(selector).get(0));
     var img = findFirstImage(start);
     var url = or(img.src, "");
-    // lousy parsing sticks the web extension's url on this if it's relative;
-    return new FeedItem("No title", new Date(), url.replace(ourUrl, root));
+    // lousy parsing sticks the web extension's url on this if it's relative, so remove it
+    return [new FeedItem("No title found", new Date(), url.replace(ourUrl, root))];
 }
 
 function findFirstImage(start){
