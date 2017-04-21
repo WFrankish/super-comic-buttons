@@ -1,0 +1,40 @@
+{
+  "manifest_version": 2,
+  "name": "Super Comic Buttons",
+  "version": "0.1",
+  "description": "Tracks the updates of your favourite webcomics (or anything with an rss feed)",
+  "homepage_url": "https://github.com/WFrankish/super-comic-buttons.git",
+  
+  "background": {
+    "page": "background.html"
+  },
+  
+  "browser_action": {
+    "default_title": "Super Comic Button",
+    "default_icon": {
+      "16": "button/icon_d-16.png",
+      "32": "button/icon_d-32.png",
+      "64": "button/icon_d-64.png",
+      "256": "button/icon_d-256.png"
+    }
+  },
+  
+  "icons": {
+  "48": "icons/icon-48.png",
+  "96": "icons/icon-96.png",
+  "192": "icons/icon-192.png"
+  },
+  
+  "options_ui": {
+    "chrome_style": true,
+    "page": "options.html"
+  },
+  
+  "permissions": [
+    "notifications",
+    "storage",
+    "tabs",
+    "http://*/",
+	"https://*/"
+  ]
+}
