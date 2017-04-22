@@ -50,19 +50,18 @@ function foos(){
 		feed.then(function(res){
 			out.push(res);
 		});
-		console.log(`done for ${feeds[i]}`);
 	}
+	console.log("done");
 	return out;
 }
 
 function foo(url){
-    var resp = sendGetRequest(url);
-    var xml = resp.then(handleResponse);
-    return xml.then(function(data){
-		var feed = new Feed();
-        feed.consume(data.splice(5));
-		feed.updateUnread();
-        feed.consume(data);
+    var feed = new Feed({url});
+	var success = read(feed);
+	return success.then(data => {
+		if(data){
+			console.log(`done for ${url}`);
+		}
 		return feed;
-    });
+	})
 }

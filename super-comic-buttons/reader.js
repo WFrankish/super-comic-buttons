@@ -1,17 +1,31 @@
 "use strict";
 
+function read(feed){
+	var resp = sendGetRequest(feed.url);
+    var xml = resp.then(handleResponse)
+    var success = xml.then(
+		data => {
+			feed.consume(data);
+			return true;
+		},
+		function(xhr, text, err){
+	   	   var e = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${text}`;
+		   // TODO: log these somewhere more useful
+		   console.log(e);
+		   return false;
+	   }
+	);
+	return success;
+}
+
 function sendGetRequest(url){
     return $.ajax({
-       url: url,
-       error: onError
+       url: url
+	   // TODO: Is there a fix here for slightly dodgy xml?
+	   // I found one with '&hellip;' that won't parse via ajax, but firefox's built in thing still manages...
     });
 }
 
-function onError(xhr){
-    var err = `${xhr.status}:  ${xhr.statusText}`;
-    console.log(err);
-    throw err;
-}
 
 function handleResponse(data){
     if($.isXMLDoc(data)){
@@ -41,10 +55,10 @@ function parseRss(rss){
         var titleElem = or(item.getElementsByTagName("title")[0]);
         var title = or(titleElem.textContent, "No title");
         var dateElem = or(item.getElementsByTagName("pubDate")[0]);
-        var date = dateElem ? new Date(dateElem.textContent) : null;
+        var feedDate = dateElem ? new Date(dateElem.textContent) : null;
         var linkElem = or(item.getElementsByTagName("link")[0]);
         var link = or(linkElem.textContent, "No link");
-        out.push(new FeedItem(title, date, link));
+        out.push(new FeedItem({title, feedDate, link}));
     }
     return out;
 }
@@ -57,10 +71,10 @@ function parseAtom(atom){
         var titleElem = or(entry.getElementsByTagName("title")[0]);
         var title = or(titleElem.textContent, "No title");
         var dateElem = or(entry.getElementsByTagName("updated")[0]);
-        var date = dateElem ? new Date(dateElem.textContent) : null;
+        var feedDate = dateElem ? new Date(dateElem.textContent) : null;
         var linkElem = or(entry.getElementsByTagName("link")[0]);
         var link = or(linkElem.attributes["href"].nodeValue,"No link");
-        out.push(new FeedItem(title, date, link));
+        out.push(new FeedItem({title, feedDate, link}));
     }
     return out;
 }
@@ -71,7 +85,8 @@ function parseHTML(html, id, root){
     var img = findFirstImage(start);
     var url = or(img.src, "");
     // lousy parsing sticks the web extension's url on this if it's relative, so remove it
-    return [new FeedItem("No title found", new Date(), url.replace(ourUrl, root))];
+	var link = url.replace(ourUrl, root);
+    return [new FeedItem({link})];
 }
 
 function findFirstImage(start){
