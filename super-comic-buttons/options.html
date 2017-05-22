@@ -2,44 +2,45 @@
 <html lang="en-UK">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Super Comic Buttons: Options</title>
-	<link rel="stylesheet" href="options.css" />
-	<script src="jquery-3.1.1.min.js"></script>
-	<script src="options.js"></script>
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Comic Buttons: Options</title>
+  <link rel="stylesheet" href="options.css" />
+  <script src="jquery-3.1.1.min.js"></script>
+  <script src="options.js"></script>
+  <script src="notifications.js"></script>
+  </head>
 
 <body>
-	<div class="row">
-		<div class="col-f"></div>
-		<div class="col-l pad">
-			<p>Should stored data and options use Firefox Sync?</p>
-		</div>
-		<form>
-			<div class="col-r padradio">
-				<input id="localStoreRadio" name="mode" type="radio" checked></input>
-				<label for="localStoreRadio"><span><span></span></span>Do not use Firefox Sync</label>
-				<input id="syncStoreRadio" name="mode" type="radio"></input>
-				<label for="syncStoreRadio"><span><span></span></span>Use Firefox Sync</label>
-			</div>
-		</form>
-		<div class="col-f"></div>
-		<div class="col-l pad">
-			<p>
-				Should this program notify you of errors?<br/>
-				<small>Error information is not likely to be useful</small>
-			</p>
-			
-		</div>
-		<form>
-			<div class="col-r padradio">
-				<input id="noErrorRadio" name="mode" type="radio" checked></input>
-				<label for="noErrorRadio"><span><span></span></span>Do not notify me of errors</label>
-				<input id="yesErrorRadio" name="mode" type="radio"></input>
-				<label for="yesErrorRadio"><span><span></span></span>Notify me of errors</label>
-			</div>
-		</form>
-		<div class="col-f"></div>
-	</div>
+  <div class="row">
+    <div class="col-f"></div>
+    <div class="col-l pad">
+      <p>Should stored data and options use Firefox Sync?</p>
+    </div>
+    <form>
+      <div class="col-r padradio">
+        <input id="localStoreRadio" name="mode" type="radio" checked></input>
+        <label for="localStoreRadio"><span><span></span></span>Do not use Firefox Sync</label>
+        <input id="syncStoreRadio" name="mode" type="radio"></input>
+        <label for="syncStoreRadio"><span><span></span></span>Use Firefox Sync</label>
+      </div>
+    </form>
+    <div class="col-f"></div>
+    <div class="col-l pad">
+      <p>
+        Should this program notify you of errors when a feed cannot be read?<br/>
+        <small>This error information is not likely to be useful</small>
+      </p>
+      
+    </div>
+    <form>
+      <div class="col-r padradio">
+        <input id="noErrorRadio" name="mode" type="radio" checked></input>
+        <label for="noErrorRadio"><span><span></span></span>Do not notify me of errors</label>
+        <input id="yesErrorRadio" name="mode" type="radio"></input>
+        <label for="yesErrorRadio"><span><span></span></span>Notify me of errors</label>
+      </div>
+    </form>
+    <div class="col-f"></div>
+  </div>
 </body>

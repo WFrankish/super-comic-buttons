@@ -3,17 +3,22 @@
 // the url of this extension
 var ourUrl;
 
+// stored variables
+var lastSaved;
+var useSync;
+var notifyMe;
+var storage;
 
 // some rss feeds
 
 // I've been committing my taste in webcomics to github haven't I
 var feeds = [
-	new Feed({name: "mspa", url: "http://www.mspaintadventures.com/rss/rss.xml"}), // example with lots of items
-	new Feed({name: "oots", url: "http://www.giantitp.com/comics/oots.rss"}), // example with no dates
-	new Feed({name: "megatokyo", url: "http://www.megatokyo.com/rss/"}), // example that currently has bad xml
-	new Feed({name: "zero punctuation", url: "http://www.escapistmagazine.com/rss/videos/list/1.xml"}), // example sometimes with items in the future
-	new Feed({name: "monster pulse", url: "http://www.monster-pulse.com/", id: "cc-comic", overideLink: "http://www.monster-pulse.com/"}), // html example, no root
-	new Feed({name: "nuzlocke", url: "http://nuzlocke.com/pokemonhardmode.php", id: "cg_img", root: "http://nuzlocke.com/", overideLink: "http://nuzlocke.com/pokemonhardmode.php"}) // html example with root
+  new Feed({name: "mspa", url: "http://www.mspaintadventures.com/rss/rss.xml"}), // example with lots of items
+  new Feed({name: "oots", url: "http://www.giantitp.com/comics/oots.rss"}), // example with no dates
+  new Feed({name: "megatokyo", url: "http://www.megatokyo.com/rss/"}), // example that currently has bad xml
+  new Feed({name: "zero punctuation", url: "http://www.escapistmagazine.com/rss/videos/list/1.xml"}), // example sometimes with items in the future
+  new Feed({name: "monster pulse", url: "http://www.monster-pulse.com/", id: "cc-comic", overideLink: "http://www.monster-pulse.com/"}), // html example, no root
+  new Feed({name: "nuzlocke", url: "http://nuzlocke.com/pokemonhardmode.php", id: "cg_img", root: "http://nuzlocke.com/", overideLink: "http://nuzlocke.com/pokemonhardmode.php"}) // html example with root
 ]
 
 /*var feeds = [
@@ -50,27 +55,27 @@ var feeds = [
 
 // onload
 $(function(){
-    ourUrl = browser.runtime.getURL("");
+  ourUrl = browser.runtime.getURL("");
 });
 
 function foos(){
-	var out = [];
-	for (let i in feeds){
-		var feed = foo(feeds[i]);
-		feed.then(function(res){
-			out.push(res);
-		});
-	}
-	console.log("done");
-	return out;
+  var out = [];
+  for (let i in feeds){
+    var feed = foo(feeds[i]);
+    feed.then(function(res){
+      out.push(res);
+    });
+  }
+  console.log("done");
+  return out;
 }
 
 function foo(feed){
-	var success = read(feed);
-	return success.then(data => {
-		if(data){
-			console.log(`done for ${feed.name}`);
-		}
-		return feed;
-	})
+  var success = read(feed);
+  return success.then(data => {
+    if(data){
+      console.log(`done for ${feed.name}`);
+    }
+    return feed;
+  })
 }
