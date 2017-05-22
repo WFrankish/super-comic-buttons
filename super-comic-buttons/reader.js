@@ -2,7 +2,7 @@
 
 function read(feed){
 	var resp = sendGetRequest(feed.url);
-    var xml = resp.then(handleResponse)
+    var xml = resp.then(data => handleResponse(data, feed));
     var success = xml.then(
 		data => {
 			feed.consume(data);
@@ -27,11 +27,11 @@ function sendGetRequest(url){
 }
 
 
-function handleResponse(data){
+function handleResponse(data, feed){
     if($.isXMLDoc(data)){
         return parseXml(data);
     }else{
-        return parseHTML(data, id, root);
+        return parseHTML(data, feed.id, feed.root);
     }
 };
 
