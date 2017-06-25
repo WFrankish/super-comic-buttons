@@ -5,7 +5,11 @@ var lastSaved;
 var useSync;
 var notifyMe;
 var storage;
-var version;
+const version = 1.0;
+
+// other variables
+var outOfSync = false;
+const epoch = new Date(0);
 
 // initialisation
 $(document).ready(restoreOptions);
@@ -20,91 +24,127 @@ function restoreOptions(){
   */
 }
 
-// save variables to storage
-function saveOptions(){
-  browser.storage.local.set({
-    useSync,
-    notifyMe,
-    lastSaved : new Date(),
-    version : 1.0,
-    storage
+// load these bits of data, with the following defaults if null
+function loadLocalMetadata(){
+  return browser.storage.local.get({
+    version : version,
+    lastSaved : epoch;
   });
-  if(useSync){
-    // get sync version and date
-    let gettingItems = browser.storage.sync.get({
-      version : 1.0,
-      lastSaved : new Date(0);
-    });
-    gettingItems.then(item => {
-      if(item.version > version){
-        notifyError("Sync error", "The stored data is for a later version of this program");
-      }
-      if(item.lastSaved > lastSaved){
-        // TODO ask
-        return;
-      }
-      browser.storage.sync.set({
-        version : 1.0,
-        lastSaved : new Date(),
-        storage
-      });
-    }, error => {
-      if(notifyMe){
-        notifyError("Sync error", error);
-      }
-    });
-    var syncVersion;
-    var syncDate;
+}
+
+function loadSyncMetadata(){
+  return browser.storage.sync.get({
+    version : version,
+    lastSaved : epoch;
+  });
+}
+
+// save variables to storage
+function saveOptions(force){
+  var now = new Date();
+  var metadata = loadLocalMetadata();
+  metadata.then(item => {   
+    if(useSync){
+      saveToSync(force, now, item.lastSaved);
+    }
+    // always save to local
+    saveToLocal(now);
+    lastSaved = now;
   }
 }
 
+function saveToLocal(now){
+  browser.storage.local.set({
+    useSync,
+    notifyMe,
+    lastSaved : now,
+    version,
+    storage
+  });
+}
+
+function saveToSync(force, now, lastSavedLocal){
+  if(outOfSync && !force){
+    notifyError("Sync save error", "The local and sync data are out of sync, please visit the options page to resolve");
+    return;
+  }
+  // get sync version and date
+  var gettingItems = loadSyncMetadata();
+  gettingItems.then(item => {
+    if(item.version > version){
+      notifyError("Sync save error", "The stored data is for a later version of this program, please update this addon.");
+      return;
+    }
+    if((item.lastSaved > lastSavedLocal) && !force){
+      outOfSync = true;
+      notifyError("Sync save error", "Sync data is newer then load data, please visit the options page to resolve");
+      return;
+    }
+    browser.storage.sync.set({
+      version,
+      lastSaved : now,
+      storage
+    });
+  }, error => {
+    notifyError("Sync save error", error);
+  });
+}
+
+
 // load variables from storage
-function loadOptions(){
-  /*chrome.storage.local.get("always", (res) => {
-    if(res != null && Array.isArray(res.always)){
-      always = res.always;
-    } else {
-      always = [];
+function loadOptions(force){
+  var promise = loadFromLocal();
+  promise.then(_ => {
+    if(useSync){
+      loadFromSync(force);
     }
   });
-  chrome.storage.local.get("block", (res) => {
-    if(res != null && Array.isArray(res.block)){
-      block = res.block;
-    } else {
-      block = [];
-    }
-  });
-  chrome.storage.local.get("allow", (res) => {
-    if(res != null && Array.isArray(res.allow)){
-      allow = res.allow;
-    } else {
-      console.log(res);
-      allow = [];
-    }
-  });
-  chrome.storage.local.get("inBlockOnlyMode", (res) => {
-    switchMode(res == null || res.inBlockOnlyMode);
-  });
-  chrome.runtime.getBackgroundPage((page) => {
-    alwaysTemp = page.alwaysTemp;
-    blockTemp = page.blockTemp;
-    allowTemp = page.allowTemp;
-    populateAlways();
-    populateConditional(inBlockOnlyMode);
-    if(!page.running){
-      $("#startStopButton").val("Start Work Mode");
-    } else {
-      $("#startStopButton").val("Stop Work Mode");
-    }
-    $("#startStopButton").unbind("click");
-    $("#startStopButton").click(startStop);
-  });*/
 }
 
-function syncSaveOptions(){
-  
+function loadFromLocal(){
+  var loaded = browser.storage.local.get({
+    useSync : false,
+    notifyMe : false,
+    lastSaved : epoch,
+    version : version,
+    storage : null
+  });
+  var promise = loaded.then(item => {
+    lastSaved = item.lastSaved;
+    useSync = item.useSync;
+    notifyMe = item.notifyMe;
+    storage = item.storage;
+  });
+  return promise;
 }
 
-function syncLoadOptions(){
-  
+function loadFromSync(force){
+  if(outOfSync && !force){
+    notifyError("Sync load error", "The local and sync data are out of sync, please visit the options page to resolve");
+    return;
+  }
+  // get local version and date
+  var metadata = loadLocalMetadata();
+  metadata.then(item => {
+    if(item.version > version){
+      notifyError("Sync load error", "The stored data is for a later version of this program, please update this addon");
+      return;
+    }
+    if(lastSaved > item.lastSaved && !force){
+      notifyError("Sync load error", "Local data is newer then sync data, please visit options page to resolve");
+      outOfSync = true;
+      return;
+    }
+    var loaded = browser.storage.sync.get({
+      version : version,
+      lastSaved : epoch,
+      storage
+    });
+    loaded.then(item => {
+      lastSaved = item.lastSaved,
+      storage = item.storage;
+    });
+  }, error => {
+    notifyError("Sync load error", error);
+  });
 }
