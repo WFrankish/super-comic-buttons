@@ -10,8 +10,9 @@ function read(feed){
 		},
 		function(xhr, text, err){
 	   	   var e = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${text}`;
-		   // TODO: log these somewhere more useful
-		   notifyError(feed.title, e);
+		   if(browser.extension.getBackgroundPage().notifyMe){
+        notifyError(feed.title, e);
+       }
 		   return false;
 	   }
 	);
