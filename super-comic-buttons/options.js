@@ -13,8 +13,7 @@ var forceInfoText;
 $(document).ready(init);
 
 function init(){
-  outOfSync = false;
-  syncPending = false;
+  bg.outOfSync = false;
   syncStoreRadio = $("#syncStoreRadio");
   localStoreRadio = $("#localStoreRadio");
   noErrorRadio = $("#noErrorRadio");
@@ -38,7 +37,7 @@ function restoreOptions(){
   forceInfoText.removeClass("warning");
   var data = loadOptions(false);
   data.then(_ => {
-    if(useSync){
+    if(bg.useSync){
       syncStoreRadio.click();
       localStoreRadio.change(switchSyncOption);
       syncStoreRadio.change(switchSyncOption);
@@ -53,7 +52,7 @@ function restoreOptions(){
       forceSaveButton.prop("disabled", true);
       forceLoadButton.prop("disabled", true);
     }
-    if(notifyMe){
+    if(bg.notifyMe){
       yesErrorRadio.click();
       yesErrorRadio.change(switchErrorOption);
       noErrorRadio.change(switchErrorOption);
@@ -62,7 +61,7 @@ function restoreOptions(){
       noErrorRadio.change(switchErrorOption);
       yesErrorRadio.change(switchErrorOption);
     }
-    if(outOfSync){
+    if(bg.outOfSync){
       forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
       forceInfoText.addClass("warning");
     }
@@ -70,9 +69,9 @@ function restoreOptions(){
 }
 
 function switchSyncOption(){
-  if(useSync || syncPending){
-    useSync = false;
-    outOfSync = false;
+  if(bg.useSync || syncPending){
+    bg.useSync = false;
+    bg.outOfSync = false;
     var promise = saveOptions(false);
     promise.then(_ => {
       restoreOptions();
@@ -89,7 +88,7 @@ function switchSyncOption(){
 }
 
 function switchErrorOption(){
-  notifyMe = !notifyMe;
+  bg.notifyMe = !bg.notifyMe;
   var promise = saveOptions(false);
   promise.then(_ => {
     restoreOptions();
@@ -97,7 +96,7 @@ function switchErrorOption(){
 }
 
 function forceLoad(){
-  useSync = true;
+  bg.useSync = true;
   var promise = loadOptions(true);
   promise.then(_ => {
     restoreOptions();
@@ -105,7 +104,7 @@ function forceLoad(){
 }
 
 function forceSave(){
-  useSync = true;
+  bg.useSync = true;
   var promise = saveOptions(true);
   promise.then(_ => {
     restoreOptions();

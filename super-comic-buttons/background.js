@@ -8,6 +8,12 @@ var lastSaved;
 var useSync;
 var notifyMe;
 var storage;
+const version = 1.0;
+
+// other variables
+var outOfSync;
+const epoch = new Date(0);
+var syncPending;
 
 // some rss feeds
 
@@ -56,6 +62,7 @@ var feeds = [
 // onload
 $(function(){
   ourUrl = browser.runtime.getURL("");
+  loadOptions();
 });
 
 function foos(){

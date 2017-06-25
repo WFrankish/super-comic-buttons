@@ -1,29 +1,24 @@
 "use strict";
-
-// stored variables
-var lastSaved;
-var useSync;
-var notifyMe;
-var storage;
-const version = 1.0;
-
-// other variables
-var outOfSync;
-const epoch = new Date(0);
+var bg;
 var syncPending;
+
+$(document).ready(function(){
+  bg = browser.extension.getBackgroundPage();
+  syncPending = false;
+});
 
 // load these bits of data, with the following defaults if null
 function loadLocalMetadata(){
   return browser.storage.local.get({
-    version : version,
-    lastSaved : epoch
+    version : bg.version,
+    lastSaved : bg.epoch
   });
 }
 
 function loadSyncMetadata(){
   return browser.storage.sync.get({
-    version : version,
-    lastSaved : epoch
+    version : bg.version,
+    lastSaved : bg.epoch
   });
 }
 
@@ -32,47 +27,47 @@ function saveOptions(force = false){
   var now = new Date();
   var metadata = loadLocalMetadata();
   var promise = metadata.then(item => {   
-    if(useSync){
+    if(bg.useSync){
       saveToSync(force, now, item.lastSaved);
     }
     // always save to local
     saveToLocal(now);
-    lastSaved = now;
+    bg.lastSaved = now;
   });
   return promise;
 }
 
 function saveToLocal(now){
   browser.storage.local.set({
-    useSync,
-    notifyMe,
+    useSync : bg.useSync,
+    notifyMe : bg.notifyMe,
     lastSaved : now,
-    version,
-    storage
+    version : bg.version,
+    storage : bg.storage
   });
 }
 
 function saveToSync(force, now, lastSavedLocal){
-  if(outOfSync && !force){
+  if(bg.outOfSync && !force){
     notifyError("Sync save error", "The local and sync data are out of sync, please visit the options page to resolve");
     return;
   }
   // get sync version and date
   var gettingItems = loadSyncMetadata();
   gettingItems.then(item => {
-    if(item.version > version){
+    if(item.version > bg.version){
       notifyError("Sync save error", "The stored data is for a later version of this program, please update this addon.");
       return;
     }
     if((item.lastSaved > lastSavedLocal) && !force){
-      outOfSync = true;
+      bg.outOfSync = true;
       notifyError("Sync save error", "Sync data is newer then load data, please visit the options page to resolve");
       return;
     }
     browser.storage.sync.set({
-      version,
+      version : bg.version,
       lastSaved : now,
-      storage
+      storage : bg.storage
     });
   }, error => {
     notifyError("Sync save error", error.message);
@@ -83,7 +78,7 @@ function saveToSync(force, now, lastSavedLocal){
 function loadOptions(force = false){
   var local = loadFromLocal();
   var promise = local.then(_ => {
-    if(useSync){
+    if(bg.useSync){
       loadFromSync(force);
     }
   });
@@ -94,45 +89,44 @@ function loadFromLocal(){
   var loaded = browser.storage.local.get({
     useSync : false,
     notifyMe : false,
-    lastSaved : epoch,
-    version : version,
+    lastSaved : bg.epoch,
+    version : bg.version,
     storage : null
   });
   var promise = loaded.then(item => {
-    lastSaved = item.lastSaved;
-    useSync = item.useSync;
-    notifyMe = item.notifyMe;
-    storage = item.storage;
+    bg.lastSaved = item.lastSaved;
+    bg.useSync = item.useSync;
+    bg.notifyMe = item.notifyMe;
+    bg.storage = item.storage;
   });
   return promise;
 }
 
 function loadFromSync(force){
-  if(outOfSync && !force){
+  if(bg.outOfSync && !force){
     notifyError("Sync load error", "The local and sync data are out of sync, please visit the options page to resolve");
     return;
   }
   // get local version and date
   var metadata = loadLocalMetadata();
   metadata.then(item => {
-    if(item.version > version){
+    if(item.version > bg.version){
       notifyError("Sync load error", "The stored data is for a later version of this program, please update this addon");
       return;
     }
-    if(lastSaved > item.lastSaved && !force){
+    if(bg.lastSaved > item.lastSaved && !force){
       notifyError("Sync load error", "Local data is newer then sync data, please visit options page to resolve");
-      outOfSync = true;
+      bg.outOfSync = true;
       return;
     }
     var loaded = browser.storage.sync.get({
-      version : version,
-      lastSaved : epoch,
+      version : bg.version,
+      lastSaved : bg.epoch,
       storage : null
     });
     loaded.then(item => {
-      console.log(item);
-      lastSaved = item.lastSaved,
-      storage = item.storage;
+      bg.lastSaved = item.lastSaved,
+      bg.storage = item.storage;
     });
   }, error => {
     notifyError("Sync load error", error.message);
