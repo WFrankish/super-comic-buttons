@@ -74,6 +74,12 @@ input[type=button]:hover{
 input[type=button]:active{
   background-color: #dadada;
 }
+
+input[type=button]:disabled{
+  background-color: #dadada;
+  color: #c1c1c1;
+}
+
 input[type=text]{
   color: #333;
   background-color: #ffffff;
@@ -119,4 +125,7 @@ input[type=radio]:checked + label > span > span{
   border-radius : 1.25em;
   margin: 0.25em;
   background : #178ce5;
+}
+.glow{
+  border : 2px solid #178ce5;
 }
