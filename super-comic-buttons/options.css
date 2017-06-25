@@ -126,6 +126,6 @@ input[type=radio]:checked + label > span > span{
   margin: 0.25em;
   background : #178ce5;
 }
-.glow{
-  border : 2px solid #178ce5;
+.warning{
+  color: #ff0000;
 }
