@@ -28,14 +28,14 @@ function restoreOptions(){
 function loadLocalMetadata(){
   return browser.storage.local.get({
     version : version,
-    lastSaved : epoch;
+    lastSaved : epoch
   });
 }
 
 function loadSyncMetadata(){
   return browser.storage.sync.get({
     version : version,
-    lastSaved : epoch;
+    lastSaved : epoch
   });
 }
 
@@ -50,7 +50,7 @@ function saveOptions(force){
     // always save to local
     saveToLocal(now);
     lastSaved = now;
-  }
+  });
 }
 
 function saveToLocal(now){
@@ -93,12 +93,13 @@ function saveToSync(force, now, lastSavedLocal){
 
 // load variables from storage
 function loadOptions(force){
-  var promise = loadFromLocal();
-  promise.then(_ => {
+  var local = loadFromLocal();
+  var promise = local.then(_ => {
     if(useSync){
       loadFromSync(force);
     }
   });
+  return promise;
 }
 
 function loadFromLocal(){
