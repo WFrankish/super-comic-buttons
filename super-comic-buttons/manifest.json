@@ -28,6 +28,7 @@
   
   "options_ui": {
     "chrome_style": true,
+    "browser_style": true,
     "page": "options.html"
   },
   
