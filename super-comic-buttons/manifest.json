@@ -48,6 +48,6 @@
       "256": "button/menu-256.png"
     },
     "default_title": "Super Comic Buttons: Menu",
-    "default_panel": "sidebar.html"
+    "default_panel": "menu.html"
   }
 }

@@ -13,7 +13,7 @@ const version = 1.0;
 // other variables
 var outOfSync;
 const epoch = new Date(0);
-var syncPending;
+var active = false;
 
 // some rss feeds
 
@@ -64,6 +64,16 @@ $(function(){
   ourUrl = browser.runtime.getURL("");
   loadOptions();
 });
+
+function activate(){
+  // TODO
+  active = true;
+}
+
+function deactivate(){
+  // TODO
+  active = false;
+}
 
 function foos(){
   var out = [];
