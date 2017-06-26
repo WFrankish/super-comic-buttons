@@ -12,11 +12,12 @@
   "browser_action": {
     "default_title": "Super Comic Button",
     "default_icon": {
-      "16": "button/icon_d-16.png",
-      "32": "button/icon_d-32.png",
-      "64": "button/icon_d-64.png",
-      "256": "button/icon_d-256.png"
-    }
+      "16": "button/disabled-16.png",
+      "32": "button/disabled-32.png",
+      "64": "button/disabled-64.png",
+      "256": "button/disabled-256.png"
+    },
+    "default_popup": "popup.html"
   },
   
   "icons": {
@@ -36,5 +37,16 @@
     "tabs",
     "http://*/",
 	"https://*/"
-  ]
+  ],
+
+  "sidebar_action": {
+    "default_icon": {
+      "16": "button/menu-16.png",
+      "32": "button/menu-32.png",
+      "64": "button/menu-64.png",
+      "256": "button/menu-256.png"
+    },
+    "default_title": "Super Comic Buttons: Menu",
+    "default_panel": "sidebar.html"
+  }
 }
