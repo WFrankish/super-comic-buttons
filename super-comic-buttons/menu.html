@@ -12,5 +12,61 @@
 </head>
 
 <body>
-  
+  <div class="row padall fullscreenOnly">
+    <h1>Super Comic Buttons: Menu</h1>
+  </div>
+  <div>
+  <div id="feedList"></div>
+  </div>
+  <form class="light">
+    <div class="row padall">
+      <div class="col-1">
+        <label for="nameText">Name</label>
+      </div>
+      <div class="col-2">
+        <input id="nameText" type="text"/>
+      </div>
+      <div class="col-1">
+        <label for="urlText">Url</label>
+      </div>
+      <div class="col-3">
+        <input id="urlText" type="text"/>
+      </div>
+      <div class="col-1">
+        <label for="typeRadio">Type</label>
+      </div>
+      <div class="typeRadio">
+        <div class="col-2">
+          <label for="xmlType">rss or atom</label>
+          <input id="xmlType" name="type" type="radio"/>
+        </div>
+        <div class="col-2">
+          <label for="domType">html</label>
+          <input id="domType" name="type" type="radio"/>
+        </div>
+      </div>
+    </div>
+    <div class="row padall" id="specialRow">
+      <p class="col-6">
+        explanation todo
+      </p>
+      <div class="col-1">
+        <label for="idText">Id</label>
+      </div>
+      <div class="col-2">
+        <input id="idText" type="text"/>
+      </div>
+      <div class="col-1">
+        <label for="rootText">Root</label>
+      </div>
+      <div class="col-2">
+        <input id="rootText" type="text"/>
+      </div>
+    </div>
+    <div class="row paddall">
+      <div class="col-2">
+        <input type="button" id="createNewButton" value="Create"/>
+      </div>
+    </div>
+  </form>
 </body>
