@@ -25,10 +25,10 @@ function refresh(){
     $("#toggleButton").val("Activate!");
     browser.browserAction.setIcon({ 
       path : {
-        "16": "button/disabled-16.png",
-        "32": "button/disabled-32.png",
-        "64": "button/disabled-64.png",
-        "256": "button/disabled-256.png"
+        "16": "button/icon-16.png",
+        "32": "button/icon-32.png",
+        "64": "button/icon-64.png",
+        "256": "button/icon-256.png"
       }
     });
   }
