@@ -1,0 +1,26 @@
+body{
+  background-color: #5888c8;
+}
+
+div, .light{
+  background-color: #90a8e0;
+  border: 1px solid #90a8e0;
+  border-radius: 0.2em;
+  padding: 0.2em;
+}
+
+input[type=button]{
+  border: 1px solid #2060a8;
+  background-color: #5888c8;
+  width: 6em;
+  height: 2em;
+  margin: 0.2em;
+  border-radius: 0.2em;
+  color: #083860
+}
+
+input[type=button]:disabled{
+  background-color: #909090;
+  border-color: #484848;
+  color: #484848;
+}
