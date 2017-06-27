@@ -7,6 +7,9 @@ $(function(){
   $("#menuButton").click(openMenu);
   $("#optionsButton").click(openOptions);
   $("#toggleButton").click(toggleActivate);
+  $("#readOneButton").click(bg.readOne);
+  $("#readAllButton").click(bg.readAll);
+  bg.addEventListener('unreadNoChange', refresh);
   refresh();
 });
 
@@ -32,6 +35,16 @@ function refresh(){
       }
     });
   }
+  if(bg.unreadNo > 0){
+    $("#readOneButton").prop("disabled", false);   
+  } else {
+    $("#readOneButton").prop("disabled", true);  
+  }
+  if(bg.unreadNo > 1){
+    $("#readAllButton").prop("disabled", false);  
+  } else {
+    $("#readAllButton").prop("disabled", true);  
+  }
 }
 
 function toggleActivate(){
@@ -43,7 +56,6 @@ function openMenu(){
   if(browser.sidebarAction && false){
     // If sidebars are supported (firefox, but not chrome)
     browser.sidebarAction.getPanel({}).then(url => {
-      console.log(url);
       // can't (yet?) open sidebar programatically, so open it in a new tab
       browser.tabs.create({url : url});
     });

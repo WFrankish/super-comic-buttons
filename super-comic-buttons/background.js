@@ -14,6 +14,10 @@ const version = 1.0;
 var outOfSync;
 const epoch = new Date(0);
 var active = false;
+var unreadNo = 0;
+
+// events
+var unreadNoChange = new Event('unreadNoChange');
 
 // some rss feeds
 
@@ -73,6 +77,18 @@ function activate(){
 function deactivate(){
   // TODO
   active = false;
+}
+
+function readOne(){
+  unreadNo--;
+  dispatchEvent(unreadNoChange);
+  // TODO
+}
+
+function readAll(){
+  unreadNo = 0;
+  dispatchEvent(unreadNoChange);
+  // TODO
 }
 
 function foos(){
