@@ -12,6 +12,10 @@ p{
   padding: 0;
   margin: 0;
 }
+.centre{
+  margin: auto;
+  text-align: center;
+}
 .padall{
   padding-top: 0.625em;
   padding-left: 0.625em;
@@ -61,6 +65,7 @@ input[type=text], .button{
   width: 100%;
 }
 @media only screen and (min-width: 600px) {
+  .col-m-0 {visibility: hidden;}
   .col-m-1 {width: 8.3333333333%;}
   .col-m-2 {width: 16.666666666%;}
   .col-m-3 {width: 25%;}
@@ -73,9 +78,10 @@ input[type=text], .button{
   .col-m-10 {width: 83.33333333%;}
   .col-m-11 {width: 96.66666666%;}
   .col-m-12 {width: 100%;}
-  .fullscreenOnly{visibility: visible;}
+  .fullscreenOnly{visibility: inherit;}
 }
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 1000px) {
+  .col-0 {visibility: hidden;}
   .col-1 {width: 8.3333333333%;}
   .col-2 {width: 16.666666666%;}
   .col-3 {width: 25%;}
