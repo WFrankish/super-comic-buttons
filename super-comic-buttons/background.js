@@ -91,6 +91,11 @@ function readAll(){
   // TODO
 }
 
+function createNewFeed(feed){
+  console.log(feed);
+  // TODO
+}
+
 function foos(){
   var out = [];
   for (let i in feeds){

@@ -35,7 +35,7 @@ class Feed{
 		if(overrideLink) this.overrideLink = overrideLink;
 		if(id) this.id = id;
 		if(root) this.root = root;
-        this.recent = new MyArray(...recent);
+    this.recent = new MyArray(...recent);
 		this.unreadLink = unreadLink;
 		this.unread = unread;
 		this.count = count;
