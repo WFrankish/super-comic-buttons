@@ -18,6 +18,7 @@ var unreadNo = 0;
 
 // events
 var unreadNoChange = new Event('unreadNoChange');
+var reloaded = new Event('reloaded');
 
 // some rss feeds
 
@@ -66,8 +67,22 @@ var feeds = [
 // onload
 $(function(){
   ourUrl = browser.runtime.getURL("");
+  addEventListener('reloaded', onReload);
   loadOptions();
 });
+
+function onReload(){
+  if(!storage){
+    storage = new MyArray();
+  } else {
+    var temp = [];
+    for (let i in storage){
+      var feed = new Feed(storage[i]);
+      temp.push(feed);
+    }
+    storage = new MyArray(...temp);
+  }
+}
 
 function activate(){
   // TODO
@@ -92,14 +107,13 @@ function readAll(){
 }
 
 function createNewFeed(feed){
-  console.log(feed);
-  // TODO
+  storage.push(feed);
 }
 
 function foos(){
   var out = [];
-  for (let i in feeds){
-    var feed = foo(feeds[i]);
+  for (let i in storage){
+    var feed = foo(storage[i]);
     feed.then(function(res){
       out.push(res);
     });

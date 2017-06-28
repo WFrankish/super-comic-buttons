@@ -42,8 +42,8 @@ class Feed{
 		this.averageGap = averageGap;
 		this.dayMap = dayMap;
 		this.hourMap = hourMap;
-		this.firstRecord = firstRecord;
-		this.lastRecord = lastRecord;
+		this.firstRecord = new Date(firstRecord);
+		this.lastRecord = new Date(lastRecord);
     }
 
 	// getters

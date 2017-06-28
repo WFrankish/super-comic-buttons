@@ -78,11 +78,16 @@ function saveToSync(force, now, lastSavedLocal){
 function loadOptions(force = false){
   var local = loadFromLocal();
   var promise = local.then(_ => {
+    var inner = Promise.resolve();
     if(bg.useSync){
-      loadFromSync(force);
+      inner = loadFromSync(force);
     }
+    return inner;
   });
-  return promise;
+  var promise2 = promise.then(_ => {
+    bg.dispatchEvent(bg.reloaded);
+  });
+  return promise2;
 }
 
 function loadFromLocal(){
@@ -105,29 +110,30 @@ function loadFromLocal(){
 function loadFromSync(force){
   if(bg.outOfSync && !force){
     notifyError("Sync load error", "The local and sync data are out of sync, please visit the options page to resolve");
-    return;
+    return Promise.resolve();
   }
   // get local version and date
   var metadata = loadLocalMetadata();
   metadata.then(item => {
     if(item.version > bg.version){
       notifyError("Sync load error", "The stored data is for a later version of this program, please update this addon");
-      return;
+      return Promise.resolve();
     }
     if(bg.lastSaved > item.lastSaved && !force){
       notifyError("Sync load error", "Local data is newer then sync data, please visit options page to resolve");
       bg.outOfSync = true;
-      return;
+      return Promise.resolve();
     }
     var loaded = browser.storage.sync.get({
       version : bg.version,
       lastSaved : bg.epoch,
       storage : null
     });
-    loaded.then(item => {
+    var promise = loaded.then(item => {
       bg.lastSaved = item.lastSaved,
       bg.storage = item.storage;
     });
+    return promise;
   }, error => {
     notifyError("Sync load error", error.message);
   });
