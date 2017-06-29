@@ -77,13 +77,13 @@ function switchSyncOption(){
       restoreOptions();
     });
   } else {
-      syncPending = true;
-      forceSaveButton.prop("disabled", false);
-      forceLoadButton.click(forceLoad);
-      forceLoadButton.prop("disabled", false);
-      forceSaveButton.click(forceSave);
-      forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
-      forceInfoText.addClass("warning");
+    syncPending = true;
+    forceSaveButton.prop("disabled", false);
+    forceLoadButton.click(forceLoad);
+    forceLoadButton.prop("disabled", false);
+    forceSaveButton.click(forceSave);
+    forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
+    forceInfoText.addClass("warning");
   }
 }
 
