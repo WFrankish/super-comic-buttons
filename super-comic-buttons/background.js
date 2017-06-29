@@ -82,6 +82,8 @@ function onReload(){
     }
     storage = new MyArray(...temp);
   }
+  unreadNo = storage.count(f => f.unread > 0);
+  dispatchEvent(unreadNoChange);
 }
 
 function activate(){
@@ -94,13 +96,13 @@ function deactivate(){
   active = false;
 }
 
-function readOne(){
+function openOne(){
   unreadNo--;
   dispatchEvent(unreadNoChange);
   // TODO
 }
 
-function readAll(){
+function openAll(){
   unreadNo = 0;
   dispatchEvent(unreadNoChange);
   // TODO
@@ -108,6 +110,7 @@ function readAll(){
 
 function createNewFeed(feed){
   storage.push(feed);
+  notify
 }
 
 function foos(){

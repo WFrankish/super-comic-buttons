@@ -130,6 +130,21 @@ class Feed{
 			return old;
 		}
 	}
+  
+  open(){
+    if(this.unread > 0){
+      var link = this.latestLink;
+      var numNew = this.unread;
+      this.updateUnread();
+      this.unread = 0;
+      var promise = browser.tabs.create({ url: link });
+      promise.then(tab => {
+        browser.tabs.executeScript(tab.id, 
+          {code : `document.title = "${numNew} new update${numNew > 0 ? "s" : ""} - ${this.name}";`}
+        );
+      });
+    }
+  }
 
 	toSource(){
 		return `(new Feed(${super.toSource()}))`;

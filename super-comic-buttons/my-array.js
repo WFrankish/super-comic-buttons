@@ -19,11 +19,11 @@ class MyArray extends Array{
 		return filtered.length;
 	}
 	first(func){
-		var filtered = this.select(func);
+		var filtered = this.where(func);
 		return filtered[0];
 	}
 	last(func){
-		var filtered = this.select(func);
+		var filtered = this.where(func);
 		return filtered[filtered.length -1];
 	}
 	// select and where are already implemented as map and filter, but when I realised

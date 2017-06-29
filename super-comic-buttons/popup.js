@@ -7,8 +7,8 @@ $(function(){
   $("#menuButton").click(openMenu);
   $("#optionsButton").click(openOptions);
   $("#toggleButton").click(toggleActivate);
-  $("#readOneButton").click(bg.readOne);
-  $("#readAllButton").click(bg.readAll);
+  $("#readOneButton").click(bg.openOne);
+  $("#readAllButton").click(bg.openAll);
   bg.addEventListener('unreadNoChange', refresh);
   refresh();
 });
