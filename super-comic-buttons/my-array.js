@@ -48,4 +48,14 @@ class MyArray extends Array{
 		});
 		return res;
 	}
+  shuffled(){
+    var res = new MyArray(...this);
+    for(var i = res.length - 1; i > 0; i--){
+      var j = Math.trunc(Math.random() * (i+1));
+      var temp = res[i];
+      res[i] = res[j];
+      res[j] = temp;
+    }
+    return res;
+  }
 }

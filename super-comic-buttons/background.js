@@ -106,9 +106,12 @@ function deactivate(){
 }
 
 function openOne(){
-  unreadNo--;
-  dispatchEvent(unreadNoChange);
-  // TODO
+  var possibles = storage.where(f => f.unread > 0).shuffled();
+  if(possibles.length > 0){
+    possibles[0].open();
+    save();
+  }
+  
 }
 
 function openAll(){
