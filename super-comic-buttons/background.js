@@ -68,8 +68,17 @@ var feeds = [
 $(function(){
   ourUrl = browser.runtime.getURL("");
   addEventListener('reloaded', onReload);
-  loadOptions();
+  load();
 });
+
+function load(){
+  return loadOptions();
+}
+
+function save(){
+  var promise = saveOptions();
+  promise.then(_ => onReload());
+}
 
 function onReload(){
   if(!storage){
@@ -103,14 +112,13 @@ function openOne(){
 }
 
 function openAll(){
-  unreadNo = 0;
-  dispatchEvent(unreadNoChange);
-  // TODO
+  storage.forEach(feed => feed.open());
+  save();
 }
 
 function createNewFeed(feed){
   storage.push(feed);
-  notify
+  save();
 }
 
 function foos(){

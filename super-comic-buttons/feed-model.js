@@ -140,7 +140,7 @@ class Feed{
       var promise = browser.tabs.create({ url: link });
       promise.then(tab => {
         browser.tabs.executeScript(tab.id, 
-          {code : `document.title = "${numNew} new update${numNew > 0 ? "s" : ""} - ${this.name}";`}
+          {code : `document.title = "${numNew} new update${numNew > 1 ? "s" : ""} - ${this.name}";`}
         );
       });
     }
