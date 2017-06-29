@@ -22,8 +22,8 @@ var reloaded = new Event('reloaded');
 
 // some rss feeds
 
-// I've been committing my taste in webcomics to github haven't I
-var feeds = [
+// Maybe I'll put some recommendations for webcomics in the wiki
+var demoFeeds = [
   new Feed({name: "mspa", url: "http://www.mspaintadventures.com/rss/rss.xml"}), // example with lots of items
   new Feed({name: "oots", url: "http://www.giantitp.com/comics/oots.rss"}), // example with no dates
   new Feed({name: "megatokyo", url: "http://www.megatokyo.com/rss/"}), // example that currently has bad xml
@@ -32,8 +32,13 @@ var feeds = [
   new Feed({name: "nuzlocke", url: "http://nuzlocke.com/pokemonhardmode.php", id: "cg_img", root: "http://nuzlocke.com/", overideLink: "http://nuzlocke.com/pokemonhardmode.php"}) // html example with root
 ]
 
-/*var feeds = [
-"http://www.mspaintadventures.com/rss/rss.xml",
+function demo(){
+  demoFeeds.forEach(feed => storage.push(feed));
+  moreDemoFeeds.forEach(url => storage.push(new Feed({name: url, url: url})));
+  saveOptions();
+}
+
+var moreDemoFeeds = [
 "http://paradoxspace.com/rss.atom",
 "http://www.gunnerkrigg.com/rss.xml",
 "http://xkcd.com/rss.xml",
@@ -51,18 +56,16 @@ var feeds = [
 "http://thepunchlineismachismo.com/feed",
 "http://trenchescomic.com/feed",
 "http://campcomic.com/rss",
-"http://www.giantitp.com/comics/oots.rss",
 "http://www.beyondthecanopy.com/feed/",
 "http://nedroid.com/feed/",
 "http://feeds.feedburner.com/rsspect/fJur?format=xml",
 "http://www.megatokyo.com/rss/",
 "http://www.harkavagrant.com/rssfeed.php",
-"http://www.escapistmagazine.com/rss/videos/list/1.xml",
 "http://sssscomic.com/ssss-feed.xml",
 "http://www.kiwiblitz.com/rss.php",
 "http://badmachinery.com/index.xml",
 "http://www.sleeplessdomain.com/rss.php",
-];*/
+];
 
 // onload
 $(function(){
