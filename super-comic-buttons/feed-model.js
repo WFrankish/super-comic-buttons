@@ -139,6 +139,7 @@ class Feed{
       this.unread = 0;
       var promise = browser.tabs.create({ url: link });
       promise.then(tab => {
+        // TODO: some sites will override this
         browser.tabs.executeScript(tab.id, 
           {code : `document.title = "${numNew} new update${numNew > 1 ? "s" : ""} - ${this.name}";`}
         );
