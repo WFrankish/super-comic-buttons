@@ -95,3 +95,6 @@ input[type=text], .button{
   .col-11 {width: 96.66666666%;}
   .col-12 {width: 100%;}
 }
+input[type=text].invalid {
+  border: 1px red solid;
+}

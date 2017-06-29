@@ -19,10 +19,13 @@ $(init);
 function init(){
   bg = browser.extension.getBackgroundPage();
   getElements();
-  xmlTypeRadio.click();
-  xmlTypeRadio.change(toggleExtraRow);
-  domTypeRadio.change(toggleExtraRow);
-  toggleExtraRow();
+  nameText.on("input", refreshCreateForm);
+  urlText.on("input", refreshCreateForm);
+  idText.on("input", refreshCreateForm);
+  overrideText.on("input", refreshCreateForm);
+  xmlTypeRadio.change(refreshCreateForm);
+  domTypeRadio.change(refreshCreateForm);
+  refreshCreateForm();
   createNewButton.click(createNewFeed);
 };
 
@@ -40,12 +43,47 @@ function getElements(){
   createNewButton = $("#createNewButton");
 };
 
-function toggleExtraRow(){
+function refreshCreateForm(){
+  var validated = true;
+  if(nameText.val()){
+    nameText.removeClass("invalid");
+    validated = validated && true;
+  } else {
+    nameText.addClass("invalid");
+    validated = false;
+  }
+  if(urlText.val()){
+    urlText.removeClass("invalid");
+    validated = validated && true;
+  } else {
+    urlText.addClass("invalid");
+    validated = false;
+  }
+  validated = urlText.val() && validated;
   var htmlMode = domTypeRadio.is(":checked");
   if(htmlMode){
     specialRow.show();
+    if(idText.val()){
+      idText.removeClass("invalid");
+      validated = validated && true;
+    } else {
+      idText.addClass("invalid");
+      validated = false;
+    }
+    if(overrideText.val()){
+      overrideText.removeClass("invalid");
+      validated = validated && true;
+    } else {
+      overrideText.addClass("invalid");
+      validated = false;
+    }
   } else {
     specialRow.hide();
+  }
+  if(validated){
+    createNewButton.prop("disabled", false);
+  } else {
+    createNewButton.prop("disabled", true);
   }
 };
 
@@ -67,4 +105,9 @@ function createNewFeed(){
     feed = new Feed({name: name, url: url});
   }
   bg.createNewFeed(feed);
+  nameText.val("");
+  urlText.val("");
+  idText.val("");
+  rootText.val("");
+  overrideText.val("");
 }
