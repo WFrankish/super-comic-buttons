@@ -95,17 +95,20 @@ function onReload(){
     storage = new MyArray(...temp);
   }
   unreadNo = storage.count(f => f.unread > 0);
+  refreshBadge();
   dispatchEvent(unreadNoChange);
 }
 
 function activate(){
   // TODO
   active = true;
+  refreshBadge();
 }
 
 function deactivate(){
   // TODO
   active = false;
+  refreshBadge();
 }
 
 function openOne(){
@@ -148,4 +151,13 @@ function readSingle(feed, force = false){
 function readThis(feed){
   var promise = readSingle(feed, true);
   promise.then(_ => save());
+}
+
+function refreshBadge(){
+  if(active){
+    browser.browserAction.setBadgeText({text: unreadNo.toString()});
+    browser.browserAction.setBadgeBackgroundColor({color: "#ff000022"})
+  } else {
+    browser.browserAction.setBadgeText({text: ""});
+  }
 }

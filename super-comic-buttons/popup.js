@@ -48,7 +48,11 @@ function refresh(){
 }
 
 function toggleActivate(){
-  bg.active = !bg.active;
+  if(bg.active){
+    bg.deactivate();
+  } else {
+    bg.activate();
+  }
   refresh();
 }
 

@@ -170,7 +170,6 @@ class FeedItem{
 		// if the feed has no date or its date is set to the future, override it
 		var now = new Date();
     var nDate = new Date(date);
-    console.log(feedDate);
 		if(!isNaN(nDate.getDate())){
 			this.date = nDate;
 		}
