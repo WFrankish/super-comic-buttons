@@ -35,7 +35,10 @@ class Feed{
 		if(overrideLink) this.overrideLink = overrideLink;
 		if(id) this.id = id;
 		if(root) this.root = root;
-    this.recent = new MyArray(...recent);
+    this.recent = new MyArray();
+    recent.forEach(item => {
+      this.recent.push(new FeedItem(item));
+    });
 		this.unreadLink = unreadLink;
 		this.unread = unread;
 		this.count = count;
@@ -162,19 +165,21 @@ class FeedItem{
 			link // string - link to page
 		} = {}){
 		this.title = title;
-		this.feedDate = feedDate;
+		this.feedDate = new Date(feedDate);
 		this.link = link;
 		// if the feed has no date or its date is set to the future, override it
 		var now = new Date();
-		if(date instanceof Date){
-			this.date = date;
+    var nDate = new Date(date);
+    console.log(feedDate);
+		if(!isNaN(nDate.getDate())){
+			this.date = nDate;
 		}
-		 else if(feedDate instanceof Date && feedDate < now){
-			this.date = feedDate;
+		 else if(!isNaN(this.feedDate.getDate()) && this.feedDate < now){
+			this.date = this.feedDate;
 		} else {
 			this.date = now;
 		}
-    }
+  }
 	equals(that){
 		if (typeof that != "object"){
 			return false;

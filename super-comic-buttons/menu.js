@@ -28,6 +28,7 @@ function init(){
   refreshFeedList();
   refreshCreateForm();
   createNewButton.click(createNewFeed);
+  bg.addEventListener('unreadNoChange', refreshFeedList);
 };
 
 function getElements(){
@@ -47,23 +48,42 @@ function getElements(){
 function refreshFeedList(){
   feedListDiv.empty();
   var panels = [];
-  bg.storage.forEach(feed => panels.push(createFeedPanel(feed)));
+  var feeds = new MyArray(...bg.storage);
+  feeds.sort(function(a, b){
+    var lastA = a.recent.last();
+    var lastB = b.recent.last();
+    var numA = lastA == null ? 0 : lastA.date;
+    var numB = lastB == null ? 0 : lastB.date;
+    return numB - numA;
+  })
+  feeds.forEach(feed => panels.push(createFeedPanel(feed)));
   feedListDiv.append(...panels);
 }
 
 function createFeedPanel(feed){
   var panel = $("<div>", {class: "col-4 col-m-6 padall"});
-  var subPanel = $("<div>", {class: "light"});
+  var subPanel = $("<div>", {class: "light row"});
   panel.append(subPanel);
   var row1 = $("<div>", {class: "row"});
   subPanel.append(row1);
-  var name = $("<span>", {text: feed.name, class: "col-4 col-m-4 truncate padall"});
-  var unreadNo = $("<span>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-4 truncate padall"});
-  var timeSinceString = feed.recent.any() ? asTimeString(new Date() - feed.recent[0].date, 1) + " ago" : "unknown";
-  var timeSince = $("<span>", {text: "last: " + timeSinceString, class: "col-4 col-m-4 truncate padall"});
+  var name = $("<div>", {text: feed.name, class: "col-6 col-m-4 truncate padall"});
+  var unreadNo = $("<div>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-4 truncate padall"});
+  var openButton = $("<input>", {type: "button", value: "Open!"});
+  openButton.click(_ => bg.openThis(feed));
   row1.append(name);
   row1.append(unreadNo);
-  row1.append(timeSince);
+  row1.append(openButton);
+  var row2 = $("<div>", {class: "row"});
+  subPanel.append(row2);
+  var lastReadString = feed.lastRecord > new Date(0) ? asTimeString(new Date() - feed.lastRecord, 1) + " ago" : "never";
+  var lastRead = $("<div>", {text: "read: " + lastReadString, class: "col-5 col-m-4 truncate padall"});
+  var lastUpdateString = feed.recent.any() ? asTimeString(new Date() - feed.recent.last().date, 1) + " ago" : "unknown";
+  var lastUpdate = $("<div>", {text: "updated: " + lastUpdateString, class: "col-5 col-m-4 truncate padall"});
+  var readButton = $("<input>", {type: "button", value: "Read!"});
+  readButton.click(_ => bg.readThis(feed));
+  row2.append(lastRead);
+  row2.append(lastUpdate);
+  row2.append(readButton);
   return panel;
 }
 

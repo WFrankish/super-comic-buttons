@@ -111,8 +111,7 @@ function deactivate(){
 function openOne(){
   var possibles = storage.where(f => f.unread > 0).shuffled();
   if(possibles.length > 0){
-    possibles[0].open();
-    save();
+    openThis(possibles[0]);
   }
   
 }
@@ -122,29 +121,31 @@ function openAll(){
   save();
 }
 
+function openThis(feed){
+  feed.open();
+  save();
+}
+
 function createNewFeed(feed){
   storage.push(feed);
   save();
 }
 
-function foos(){
+function readAll(force = false){
   var out = [];
   for (let i in storage){
-    var feed = foo(storage[i]);
-    feed.then(function(res){
-      out.push(res);
-    });
+    var promise = readSingle(storage[i]);
+    out.push(promise);
   }
-  console.log("done");
-  return out;
+  Promise.all(out).then(_ => save());
 }
 
-function foo(feed){
-  var success = read(feed);
-  return success.then(data => {
-    if(data){
-      console.log(`done for ${feed.name}`);
-    }
-    return feed;
-  })
+function readSingle(feed, force = false){
+  var promise = read(feed);
+  return promise;
+}
+
+function readThis(feed){
+  var promise = readSingle(feed, true);
+  promise.then(_ => save());
 }

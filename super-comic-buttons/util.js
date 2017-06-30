@@ -30,7 +30,6 @@ function pluralise(num, string, plural = string+"s"){
 
 // returns a number in milliseconds as a time, to specified precision
 function asTimeString(num, level){
-  console.log(num);
 	const sec = 1000;
 	const min = 60*sec;
 	const hour = 60*min;

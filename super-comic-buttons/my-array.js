@@ -58,4 +58,7 @@ class MyArray extends Array{
     }
     return res;
   }
+  toSource(){
+		return `(new Feed(${super.toSource()}))`;
+	}
 }
