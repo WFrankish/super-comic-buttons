@@ -25,6 +25,7 @@ function init(){
   overrideText.on("input", refreshCreateForm);
   xmlTypeRadio.change(refreshCreateForm);
   domTypeRadio.change(refreshCreateForm);
+  refreshFeedList();
   refreshCreateForm();
   createNewButton.click(createNewFeed);
 };
@@ -42,6 +43,29 @@ function getElements(){
   overrideText = $("#overrideText");
   createNewButton = $("#createNewButton");
 };
+
+function refreshFeedList(){
+  feedListDiv.empty();
+  var panels = [];
+  bg.storage.forEach(feed => panels.push(createFeedPanel(feed)));
+  feedListDiv.append(...panels);
+}
+
+function createFeedPanel(feed){
+  var panel = $("<div>", {class: "col-4 col-m-6 padall"});
+  var subPanel = $("<div>", {class: "light"});
+  panel.append(subPanel);
+  var row1 = $("<div>", {class: "row"});
+  subPanel.append(row1);
+  var name = $("<span>", {text: feed.name, class: "col-4 col-m-4 truncate padall"});
+  var unreadNo = $("<span>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-4 truncate padall"});
+  var timeSinceString = feed.recent.any() ? asTimeString(new Date() - feed.recent[0].date, 1) + " ago" : "unknown";
+  var timeSince = $("<span>", {text: "last: " + timeSinceString, class: "col-4 col-m-4 truncate padall"});
+  row1.append(name);
+  row1.append(unreadNo);
+  row1.append(timeSince);
+  return panel;
+}
 
 function refreshCreateForm(){
   var validated = true;

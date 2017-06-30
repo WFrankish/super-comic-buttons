@@ -58,7 +58,13 @@ input[type=text], .button{
   float: left;
 }
 .fullscreenOnly{
-  visibility: hidden;
+  display: none;
+}
+.truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Mobile Screens */
 [class*="col-"] {
@@ -78,7 +84,9 @@ input[type=text], .button{
   .col-m-10 {width: 83.33333333%;}
   .col-m-11 {width: 96.66666666%;}
   .col-m-12 {width: 100%;}
-  .fullscreenOnly{visibility: inherit;}
+  .fullscreenOnly{
+    display: block;
+  }
 }
 @media only screen and (min-width: 1000px) {
   .col-0 {visibility: hidden;}

@@ -30,6 +30,7 @@ function pluralise(num, string, plural = string+"s"){
 
 // returns a number in milliseconds as a time, to specified precision
 function asTimeString(num, level){
+  console.log(num);
 	const sec = 1000;
 	const min = 60*sec;
 	const hour = 60*min;
@@ -39,55 +40,60 @@ function asTimeString(num, level){
 	var res = [];
 	if(num >= year){
 		var years = Math.trunc(num / year);
-		res.push(pluralise(years, "year"));
-		num = num % year;
+    if(years > 0){
+      res.push(pluralise(years, "year"));
+      num = num % year;
+      level--;
+    }
 	}
 	if(num >= week && level > 0){
 		var weeks = Math.trunc(num / week);
-		res.push(pluralise(weeks, "week"));
-		num = num % week;
+    if(weeks > 0){
+      res.push(pluralise(weeks, "week"));
+      num = num % week;
+      level--
+    }
 	}
-	if(num >= day && level > 1){
+	if(num >= day && level > 0){
 		var days = Math.trunc(num / day);
-		res.push(pluralise(days, "day"));
-		num = num % day;
+    if(days > 0){
+      res.push(pluralise(days, "day"));
+      num = num % day;
+      level--;
+    }
 	}
-	if(num >= hour && level > 2){
+	if(num >= hour && level > 0){
 		var hours = Math.trunc(num / hour);
-		res.push(pluralise(hours, "hour"));
-		num = num % hour;
+    if(hours > 0){
+      res.push(pluralise(hours, "hour"));
+      num = num % hour;
+      level--;
+    }
 	}
-	if(num >= min && level > 3){
+	if(num >= min && level > 0){
 		var mins = Math.trunc(num / min);
-		res.push(pluralise(mins, "minute"));
-		num = num % min;
+    if(mins > 0){
+      res.push(pluralise(mins, "minute"));
+      num = num % min;
+      level--;
+    }
 	}
-	if(num >= sec && level > 4){
+	if(num >= sec && level > 0){
 		var secs = Math.trunc(num / sec);
-		res.push(pluralise(secs, "second"));
-		num = num % sec;
+    if(secs > 0){
+      res.push(pluralise(secs, "second"));
+      num = num % sec;
+      level--;
+    }
 	}
-	if(level > 6){
-		res.push(pluralise(num, "millisecond"));
+	if(level > 0){
+    if(num > 0){
+      res.push(pluralise(num, "millisecond"));
+    }
 	}
 	if(res.length > 0){
 		return res.join(", ");
 	} else {
-		if(level == 0){
-			return "no years";
-		}
-		if(level == 1){
-			return "no weeks";
-		}
-		if(level == 2){
-			return "no days";
-		}
-		if(level == 3){
-			return "no minutes";
-		}
-		if(level == 4){
-			return "no seconds";
-		}
 		return "no time";
 	}
 
