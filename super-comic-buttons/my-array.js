@@ -48,6 +48,14 @@ class MyArray extends Array{
 		});
 		return res;
 	}
+  remove(item){
+    for(var i = 0; i < this.length; i++){
+      if(item == this[i]){
+        this.splice(i,1);
+        return;
+      }
+    }
+  }
   shuffled(){
     var res = new MyArray(...this);
     for(var i = res.length - 1; i > 0; i--){

@@ -153,6 +153,16 @@ function readThis(feed){
   promise.then(_ => save());
 }
 
+function toggleActiveness(feed){
+  feed.enabled = !feed.enabled;
+  save();
+}
+
+function deleteThis(feed){
+  storage.remove(feed);
+  save();
+}
+
 function refreshBadge(){
   if(active){
     browser.browserAction.setBadgeText({text: unreadNo.toString()});

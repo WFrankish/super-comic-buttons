@@ -72,6 +72,9 @@ function createFeedPanel(feed){
   var openButton = $("<input>", {type: "button", value: "Open!"});
   openButton.click(_ => bg.openThis(feed));
   openDiv.append(openButton);
+  if(feed.unread > 0){
+    openButton.addClass("attention");
+  }
   row1.append(name);
   row1.append(unreadNo);
   row1.append(openDiv);
@@ -97,11 +100,11 @@ function createFeedPanel(feed){
   subPanel.append(row4);
   var editDiv = $("<div>", { class: "col-5 col-m-4"});
   var editButton = $("<input>", {type: "button", value: "Edit"});
-  editButton.click(_ => editMode(feed));
+  editButton.click(event => editMode(feed, event));
   editDiv.append(editButton);
   var activateDiv = $("<div>", { class: "col-5 col-m-4"});
   var activateButton;
-  if(feed.active){
+  if(feed.enabled){
     activateButton = $("<input>", {type: "button", value: "Deactivate"});
   } else {
     activateButton = $("<input>", {type: "button", value: "Activate"});
@@ -109,8 +112,8 @@ function createFeedPanel(feed){
   activateButton.click(_ => bg.toggleActiveness(feed));
   activateDiv.append(activateButton);
   var deleteDiv = $("<div>", { class: "col-2 col-m-4"});
-  var deleteButton = $("<input>", {type: "button", value: "Delete"});
-  deleteButton.click(_ => confirmDelete(feed));
+  var deleteButton = $("<input>", {type: "button", value: "Delete?"});
+  deleteButton.click(event => confirmDelete(feed, event));
   deleteDiv.append(deleteButton);
   row4.append(editDiv);
   row4.append(activateDiv);
@@ -187,10 +190,14 @@ function createNewFeed(){
   overrideText.val("");
 }
 
-function editMode(feed){
-  
+function editMode(feed, event){
+  console.log(event);
 };
 
-function confirmDelete(feed){
-  
+function confirmDelete(feed, event){
+  var button = $(event.target)
+  button.addClass("attention");
+  button.val("Delete!!");
+  button.unbind("click");
+  button.click(_ => bg.deleteThis(feed));
 };

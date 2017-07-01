@@ -28,7 +28,7 @@ p{
   border-radius: 0.2em;
   padding: 0.2em;
 }
-input[type=button], .button{
+input[type=button]{
   border: 1px solid #2060a8;
   background-color: #5888c8;
   width: 6em;
@@ -42,7 +42,12 @@ input[type=button]:disabled{
   border-color: #484848;
   color: #484848;
 }
-input[type=text], .button{
+input[type=button].attention{
+  background-color: #f85048;
+  border-color: #c83838;
+  color: #902010;
+}
+input[type=text]{
   border: 0px;
   width: 100%;
 }
