@@ -41,7 +41,7 @@ input[type=button]:disabled{
   border-color: #484848;
   color: #484848;
 }
-input[type=button].attention{
+input[type=button].attention:not(:disabled){
   background-color: #f85048;
   border-color: #c83838;
   color: #902010;

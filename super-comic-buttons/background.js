@@ -24,17 +24,17 @@ var reloaded = new Event('reloaded');
 
 // Maybe I'll put some recommendations for webcomics in the wiki
 var demoFeeds = [
-  new Feed({name: "mspa", url: "http://www.mspaintadventures.com/rss/rss.xml"}), // example with lots of items
-  new Feed({name: "oots", url: "http://www.giantitp.com/comics/oots.rss"}), // example with no dates
-  new Feed({name: "megatokyo", url: "http://www.megatokyo.com/rss/"}), // example that currently has bad xml
-  new Feed({name: "zero punctuation", url: "http://www.escapistmagazine.com/rss/videos/list/1.xml"}), // example sometimes with items in the future
-  new Feed({name: "monster pulse", url: "http://www.monster-pulse.com/", id: "cc-comic", overideLink: "http://www.monster-pulse.com/"}), // html example, no root
-  new Feed({name: "nuzlocke", url: "http://nuzlocke.com/pokemonhardmode.php", id: "cg_img", root: "http://nuzlocke.com/", overideLink: "http://nuzlocke.com/pokemonhardmode.php"}) // html example with root
+  new Feed({name: "mspa", url: "http://www.mspaintadventures.com/rss/rss.xml", type: "rss"}), // example with lots of items
+  new Feed({name: "oots", url: "http://www.giantitp.com/comics/oots.rss", type: "rss"}), // example with no dates
+  new Feed({name: "megatokyo", url: "http://www.megatokyo.com/rss/", type: "rss"}), // example that currently has bad xml
+  new Feed({name: "zero punctuation", url: "http://www.escapistmagazine.com/rss/videos/list/1.xml", type: "rss"}), // example sometimes with items in the future
+  new Feed({name: "monster pulse", url: "http://www.monster-pulse.com/", id: "cc-comic", overrideLink: "http://www.monster-pulse.com/", type: "html"}), // html example, no root
+  new Feed({name: "nuzlocke", url: "http://nuzlocke.com/pokemonhardmode.php", id: "cg_img", root: "http://nuzlocke.com/", overrideLink: "http://nuzlocke.com/pokemonhardmode.php", type: "html"}) // html example with root
 ]
 
 function demo(){
   demoFeeds.forEach(feed => storage.push(feed));
-  moreDemoFeeds.forEach(url => storage.push(new Feed({name: url, url: url})));
+  moreDemoFeeds.forEach(url => storage.push(new Feed({name: url, url: url, type: "rss"})));
   saveOptions();
 }
 

@@ -178,12 +178,12 @@ function createNewFeed(){
     var root = rootText.val();
     var overrideLink = overrideText.val();
     if(root){
-      feed = new Feed({name: name, url: url, id: id, root: root, overrideLink: overrideLink});
+      feed = new Feed({name: name, url: url, id: id, root: root, overrideLink: overrideLink, type: "html"});
     } else {
-      feed = new Feed({name: name, url: url, id: id, overideLink: overrideLink});
+      feed = new Feed({name: name, url: url, id: id, overideLink: overrideLink, type: "html"});
     }
   } else {
-    feed = new Feed({name: name, url: url});
+    feed = new Feed({name: name, url: url, type: "rss"});
   }
   bg.createNewFeed(feed);
   nameText.val("");
@@ -194,8 +194,75 @@ function createNewFeed(){
 }
 
 function editMode(feed, event){
-  console.log(event);
+  var button = $(event.target);
+  createNewButton.unbind("click");
+  createNewButton.click(_ => editFeed(feed));
+  createNewButton.addClass("attention");
+  createNewButton.val("Save edits");
+  var oldDisabledButtons = feedListDiv.find(":disabled");
+  oldDisabledButtons.each(function(i){
+    var butt = $(oldDisabledButtons[i]);
+    butt.prop("disabled", false)
+    butt.val("Edit");
+  }); 
+  button.prop("disabled", true);
+  button.val("^ ^ ^ ^");
+  nameText.val(feed.name);
+  urlText.val(feed.url);
+  if(feed.type === "html"){
+    domTypeRadio.click();
+    overrideText.val(feed.overrideLink);
+    idText.val(feed.id);
+    if(feed.root){
+      rootText.val(feed.root);
+    } else {
+      rootText.val("");
+    }
+  } else {
+    xmlTypeRadio.click();
+  }
+  refreshCreateForm();
 };
+
+// TODO if a reload happens, edit progress will be lost
+// they only happen when a user causes one, or on the infrequent automatic read, so this is acceptable for now
+function editFeed(feed){
+  var name = nameText.val();
+  var url = urlText.val();
+  var id = idText.val();
+  var root = rootText.val();
+  var overrideLink = overrideText.val();
+  var htmlMode = domTypeRadio.is(":checked");
+  feed.name = name;
+  feed.url = url;
+  if(htmlMode){
+    feed.id = id;
+    feed.overrideLink = overrideLink;
+    if(root){
+      feed.root = root;
+    } else {
+      feed.root = null;
+    }
+    feed.type = "html";
+  } else {
+    feed.id = null;
+    feed.overrideLink = null;
+    feed.root = null;
+    feed.type = "rss";
+  }
+  if(!bg.storage.any(f => f == feed)){
+    notifyError("Edit error", "Failed to save edits");
+  }
+  bg.save();
+  nameText.val("");
+  urlText.val("");
+  idText.val("");
+  rootText.val("");
+  overrideText.val("")
+  createNewButton.removeClass("attention");
+  createNewButton.val("Create");
+  refreshCreateForm();
+}
 
 function confirmDelete(feed, event){
   var button = $(event.target)
@@ -211,7 +278,7 @@ function styleDiv(div, feed){
   if(feed.enabled){
     var rand = randomHue(hashString(feed.name));
     var hue = Math.trunc(360 * rand);
-    bgColour = `hsl(${hue}, 36%, 72%)`;
+    bgColour = `hsl(${hue}, 49%, 56%)`;
     textColour = `hsl(${hue}, 92%, 20%)`;
   } else {
     bgColour = "#909090";
