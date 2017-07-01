@@ -68,22 +68,53 @@ function createFeedPanel(feed){
   subPanel.append(row1);
   var name = $("<div>", {text: feed.name, class: "col-6 col-m-4 truncate padall"});
   var unreadNo = $("<div>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-4 truncate padall"});
+  var openDiv = $("<div>", { class: "col-2 col-m-4"});
   var openButton = $("<input>", {type: "button", value: "Open!"});
   openButton.click(_ => bg.openThis(feed));
+  openDiv.append(openButton);
   row1.append(name);
   row1.append(unreadNo);
-  row1.append(openButton);
+  row1.append(openDiv);
   var row2 = $("<div>", {class: "row"});
   subPanel.append(row2);
   var lastReadString = feed.lastRecord > new Date(0) ? asTimeString(new Date() - feed.lastRecord, 1) + " ago" : "never";
   var lastRead = $("<div>", {text: "read: " + lastReadString, class: "col-5 col-m-4 truncate padall"});
   var lastUpdateString = feed.recent.any() ? asTimeString(new Date() - feed.recent.last().date, 1) + " ago" : "unknown";
   var lastUpdate = $("<div>", {text: "updated: " + lastUpdateString, class: "col-5 col-m-4 truncate padall"});
+  var readDiv = $("<div>", { class: "col-2 col-m-4"});
   var readButton = $("<input>", {type: "button", value: "Read!"});
   readButton.click(_ => bg.readThis(feed));
+  readDiv.append(readButton);
   row2.append(lastRead);
   row2.append(lastUpdate);
-  row2.append(readButton);
+  row2.append(readDiv);
+  if(feed.active){
+    var row3 = $("<div>", {class: "row"});
+    subPanel.append(row3);
+    // TODO TIME INFO
+  }
+  var row4 = $("<div>", {class: "row"});
+  subPanel.append(row4);
+  var editDiv = $("<div>", { class: "col-5 col-m-4"});
+  var editButton = $("<input>", {type: "button", value: "Edit"});
+  editButton.click(_ => editMode(feed));
+  editDiv.append(editButton);
+  var activateDiv = $("<div>", { class: "col-5 col-m-4"});
+  var activateButton;
+  if(feed.active){
+    activateButton = $("<input>", {type: "button", value: "Deactivate"});
+  } else {
+    activateButton = $("<input>", {type: "button", value: "Activate"});
+  }
+  activateButton.click(_ => bg.toggleActiveness(feed));
+  activateDiv.append(activateButton);
+  var deleteDiv = $("<div>", { class: "col-2 col-m-4"});
+  var deleteButton = $("<input>", {type: "button", value: "Delete"});
+  deleteButton.click(_ => confirmDelete(feed));
+  deleteDiv.append(deleteButton);
+  row4.append(editDiv);
+  row4.append(activateDiv);
+  row4.append(deleteDiv);
   return panel;
 }
 
@@ -155,3 +186,11 @@ function createNewFeed(){
   rootText.val("");
   overrideText.val("");
 }
+
+function editMode(feed){
+  
+};
+
+function confirmDelete(feed){
+  
+};
