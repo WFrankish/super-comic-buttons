@@ -15,7 +15,7 @@ function dateEquals(a, b){
 		return true;
 	}
 	if(a instanceof Date && b instanceof Date){
-		return a.valueOf() === b.valueOf();
+		return a.valueOf() === b.valueOf() || (isNaN(a.valueOf()) && isNaN(b.valueOf()));
 	}
 	return false;
 }
