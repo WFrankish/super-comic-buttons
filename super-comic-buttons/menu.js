@@ -66,7 +66,10 @@ function createFeedPanel(feed){
   panel.append(subPanel);
   var row1 = $("<div>", {class: "row"});
   subPanel.append(row1);
-  var name = $("<div>", {text: feed.name, class: "col-6 col-m-4 truncate padall"});
+  var nameDiv = $("<div>", {class: "col-6 col-m-4 padall truncate"});
+  var name = $("<b>", {text: feed.name});
+  nameDiv.append(name);
+  styleDiv(name, feed);
   var unreadNo = $("<div>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-4 truncate padall"});
   var openDiv = $("<div>", { class: "col-2 col-m-4"});
   var openButton = $("<input>", {type: "button", value: "Open!"});
@@ -75,7 +78,7 @@ function createFeedPanel(feed){
   if(feed.unread > 0){
     openButton.addClass("attention");
   }
-  row1.append(name);
+  row1.append(nameDiv);
   row1.append(unreadNo);
   row1.append(openDiv);
   var row2 = $("<div>", {class: "row"});
@@ -201,3 +204,18 @@ function confirmDelete(feed, event){
   button.unbind("click");
   button.click(_ => bg.deleteThis(feed));
 };
+
+function styleDiv(div, feed){
+  var bgColour;
+  var textColour;
+  if(feed.enabled){
+    var rand = randomHue(hashString(feed.name));
+    var hue = Math.trunc(360 * rand);
+    bgColour = `hsl(${hue}, 36%, 72%)`;
+    textColour = `hsl(${hue}, 92%, 20%)`;
+  } else {
+    bgColour = "#909090";
+    textColour = "#484848";
+  }
+  div.css({"background-color": bgColour, "color" : textColour, "border-radius": "0.2em", "padding": "0.2em"});
+}

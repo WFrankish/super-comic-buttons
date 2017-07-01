@@ -116,7 +116,6 @@ function openOne(){
   if(possibles.length > 0){
     openThis(possibles[0]);
   }
-  
 }
 
 function openAll(){
@@ -135,6 +134,7 @@ function createNewFeed(feed){
 }
 
 function readAll(force = false){
+  notify("", "automatically checking for updates")
   var out = [];
   for (let i in storage){
     var promise = readSingle(storage[i]);

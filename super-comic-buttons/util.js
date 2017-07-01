@@ -97,3 +97,17 @@ function asTimeString(num, level){
 	}
 
 }
+
+function hashString(str){
+  var hash = 0;
+  for(var i = 0; i < str.length; i++){
+    var chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash;
+}
+
+function randomHue(seed){
+  return (Math.sin(seed * (0.5 / Math.PI)) + 1) / 2;
+}
