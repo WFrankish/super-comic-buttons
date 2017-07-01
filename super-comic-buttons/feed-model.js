@@ -53,13 +53,13 @@ class Feed{
 	get averagePerDay(){
 		const day = 1000 * 60 * 60 * 24;
 		var span = new Date() - this.firstRecord;
-		var daysSpan = Math.trunc(span / day);
+		var daysSpan = 1 + Math.trunc(span / day);
 		return this.count / daysSpan;
 	}
 	get averagePerWeek(){
 		const week = 1000 * 60 * 60 * 24 * 7;
 		var span = new Date() - this.firstRecord;
-		var weeksSpan = Math.trunc(span / week);
+		var weeksSpan = 1 + Math.trunc(span / week);
 		return this.count / weeksSpan;
 	}
 	get latestLink(){
