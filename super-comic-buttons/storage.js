@@ -43,6 +43,7 @@ function saveToLocal(now){
     notifyMe : bg.notifyMe,
     lastSaved : now,
     version : bg.version,
+    period: bg.period,
     storage : bg.storage
   });
 }
@@ -96,6 +97,7 @@ function loadFromLocal(){
     notifyMe : false,
     lastSaved : bg.epoch,
     version : bg.version,
+    period : 30,
     storage : null
   });
   var promise = loaded.then(item => {

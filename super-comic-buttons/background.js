@@ -8,6 +8,7 @@ var lastSaved;
 var useSync;
 var notifyMe;
 var storage;
+var period;
 const version = 1.0;
 
 // other variables
@@ -19,6 +20,9 @@ var unreadNo = 0;
 // events
 var unreadNoChange = new Event('unreadNoChange');
 var reloaded = new Event('reloaded');
+
+// alarms
+const readAlarm = "readAlarm";
 
 // some rss feeds
 
@@ -33,9 +37,10 @@ var demoFeeds = [
 ]
 
 function demo(){
+  storage = [];
   demoFeeds.forEach(feed => storage.push(feed));
   moreDemoFeeds.forEach(url => storage.push(new Feed({name: url, url: url, type: "rss"})));
-  saveOptions();
+  save();
 }
 
 var moreDemoFeeds = [
@@ -72,6 +77,11 @@ $(function(){
   ourUrl = browser.runtime.getURL("");
   addEventListener('reloaded', onReload);
   load();
+  browser.alarms.onAlarm.addListener(function(alarmInfo){
+    if(alarmInfo.name === readAlarm){
+      readAll(false);
+    }
+  });
 });
 
 function load(){
@@ -94,19 +104,28 @@ function onReload(){
     }
     storage = new MyArray(...temp);
   }
+  if(!period || !period > 0){
+    period = 30;
+  }
   unreadNo = storage.count(f => f.unread > 0);
   refreshBadge();
   dispatchEvent(unreadNoChange);
 }
 
-function activate(){
-  // TODO
+function activate(silent = false){
+  browser.alarms.create(readAlarm, {
+    periodInMinutes: period,
+    delayInMinutes: period
+  });
   active = true;
   refreshBadge();
+  if(!silent){
+    readAll(false);
+  }
 }
 
 function deactivate(){
-  // TODO
+  browser.alarms.clear(readAlarm);
   active = false;
   refreshBadge();
 }
@@ -137,15 +156,17 @@ function readAll(force = false){
   notify("", "automatically checking for updates")
   var out = [];
   for (let i in storage){
-    var promise = readSingle(storage[i]);
+    var promise = readSingle(storage[i], force);
     out.push(promise);
   }
   Promise.all(out).then(_ => save());
 }
 
 function readSingle(feed, force = false){
-  var promise = read(feed);
-  return promise;
+  if(force || feed.shouldRead){
+    var promise = read(feed);
+    return promise;
+  }
 }
 
 function readThis(feed){

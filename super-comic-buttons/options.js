@@ -1,6 +1,8 @@
 "use strict";
 
 // DOM
+var periodNumber;
+var periodButton;
 var syncStoreRadio;
 var localStoreRadio;
 var noErrorRadio;
@@ -14,6 +16,8 @@ $(document).ready(init);
 
 function init(){
   bg.outOfSync = false;
+  periodNumber = $("#periodNumber");
+  periodButton = $("#periodButton");
   syncStoreRadio = $("#syncStoreRadio");
   localStoreRadio = $("#localStoreRadio");
   noErrorRadio = $("#noErrorRadio");
@@ -27,6 +31,8 @@ function init(){
 // load options and restore the page
 function restoreOptions(){
   syncPending = false;
+  periodNumber.unbind("change");
+  periodButton.unbind("click");
   syncStoreRadio.unbind("change");
   localStoreRadio.unbind("change");
   noErrorRadio.unbind("change");
@@ -37,6 +43,9 @@ function restoreOptions(){
   forceInfoText.removeClass("warning");
   var data = loadOptions(false);
   data.then(_ => {
+    periodNumber.change(changePeriod);
+    periodNumber.val(bg.period);
+    periodButton.click(updatePeriod);
     if(bg.useSync){
       syncStoreRadio.click();
       localStoreRadio.change(switchSyncOption);
@@ -93,6 +102,27 @@ function switchErrorOption(){
   promise.then(_ => {
     restoreOptions();
   });
+}
+
+function changePeriod(){
+  if(periodNumber.val() > 0){
+    periodButton.prop("disabled", false);
+  } else {
+    periodButton.prop("disabled", true);
+  }
+}
+
+function updatePeriod(){
+  if(periodNumber.val() > 0){
+    bg.period = periodNumber.val() * 1
+    var promise = saveOptions(false);
+    promise.then(_ => {
+      if(bg.active){
+        bg.deactivate();
+        bg.activate(true);
+      }
+    });
+  }
 }
 
 function forceLoad(){

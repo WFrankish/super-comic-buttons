@@ -67,8 +67,10 @@ class Feed{
 			return this.overrideLink; 
 		}
 		return this.unreadLink;
-
 	}
+  get shouldRead(){
+    return this.enabled; // TODO
+  }
 
 	// adding and processing a new list of feed items
 	consume(feedItems){

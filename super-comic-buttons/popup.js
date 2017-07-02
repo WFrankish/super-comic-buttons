@@ -51,7 +51,7 @@ function toggleActivate(){
   if(bg.active){
     bg.deactivate();
   } else {
-    bg.activate();
+    bg.activate(false);
   }
   refresh();
 }

@@ -33,11 +33,12 @@
   },
   
   "permissions": [
+    "alarms",
     "notifications",
     "storage",
     "tabs",
     "http://*/",
-	"https://*/"
+    "https://*/"
   ],
 
   "sidebar_action": {
