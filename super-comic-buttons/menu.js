@@ -69,7 +69,7 @@ function createFeedPanel(feed){
   nameDiv.append(name);
   styleDiv(name, feed);
   var unreadNo = $("<div>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-5 truncate padall"});
-  var openDiv = $("<div>", { class: "col-3 col-m-4 padall"});
+  var openDiv = $("<div>", { class: "col-3 col-m-6 padall"});
   var openButton = $("<input>", {type: "button", value: "Open!"});
   openButton.click(_ => bg.openThis(feed));
   openDiv.append(openButton);
@@ -80,10 +80,10 @@ function createFeedPanel(feed){
   subPanel.append(unreadNo);
   subPanel.append(openDiv);
   var lastReadString = feed.lastRecord > new Date(0) ? asTimeString(new Date() - feed.lastRecord, 1) + " ago" : "never";
-  var lastRead = $("<div>", {text: "read: " + lastReadString, class: "col-4 col-m-8 truncate padall"});
+  var lastRead = $("<div>", {text: "read: " + lastReadString, class: "col-4 col-m-6 truncate padall"});
   var lastUpdateString = feed.recent.any() ? asTimeString(new Date() - feed.recent.last().date, 1) + " ago" : "unknown";
-  var lastUpdate = $("<div>", {text: "updated: " + lastUpdateString, class: "col-5 col-m-6 truncate padall"});
-  var readDiv = $("<div>", { class: "col-3 col-m-4 padall"});
+  var lastUpdate = $("<div>", {text: "updated: " + lastUpdateString, class: "col-5 col-m-7 truncate padall"});
+  var readDiv = $("<div>", { class: "col-3 col-m-5 padall"});
   var readButton = $("<input>", {type: "button", value: "Read!"});
   readButton.click(_ => bg.readThis(feed));
   readDiv.append(readButton);
@@ -119,9 +119,11 @@ function createFeedPanel(feed){
       t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[5][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Friday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[5][i]*feed.averagePerWeek*100)/100, "update")}`}));
       t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[6][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Saturday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[6][i]*feed.averagePerWeek*100)/100, "update")}`}));
     }
-    subPanel.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerWeek*100)/100}  updates per week`}));
-    subPanel.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerDay*100)/100}  updates per day`}));
-    subPanel.append($("<div>", {class: "col-m-6 col-6 padall wrap", text: `~${asTimeString(feed.averageGap,2)} between updates`}));
+    var inforow = $("<div>", {class: "row"});
+    subPanel.append(inforow);
+    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerWeek*100)/100}  updates per week`}));
+    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerDay*100)/100}  updates per day`}));
+    inforow.append($("<div>", {class: "col-m-6 col-6 padall wrap", text: `~${asTimeString(feed.averageGap,2)} between updates`}));
   }
   var editDiv = $("<div>", { class: "col-4 col-m-6 padall"});
   var editButton = $("<input>", {type: "button", value: "Edit"});
