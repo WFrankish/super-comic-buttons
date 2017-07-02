@@ -74,6 +74,7 @@ class Feed{
 
 	// adding and processing a new list of feed items
 	consume(feedItems){
+    var firstTime = !this.recent.any()
 		// update last record to now;
 		this.lastRecord = new Date();
 		// get index of first read item;
@@ -115,6 +116,14 @@ class Feed{
 				this.recent.shift();
 			}
 		}
+    if(firstTime){
+      if(!this.recent.any(f => dateEquals(f.date, f.feedDate))){
+        this.dayMap = [0, 0, 0, 0, 0, 0, 0];
+        this.hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        this.firstRecord = new Date();
+        this.count = 0;
+      }
+    }
 	}
 
 	// removes statistical data, except firstRecord

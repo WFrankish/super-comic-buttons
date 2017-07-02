@@ -121,8 +121,8 @@ function createFeedPanel(feed){
     }
     var inforow = $("<div>", {class: "row"});
     subPanel.append(inforow);
-    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerWeek*100)/100}  updates per week`}));
-    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${Math.round(feed.averagePerDay*100)/100}  updates per day`}));
+    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${pluralise(Math.round(feed.averagePerWeek*100)/100, "update")} per week`}));
+    inforow.append($("<div>", {class: "col-m-6 col-3 padall wrap", text: `${pluralise(Math.round(feed.averagePerDay*100)/100, "update")} per day`}));
     inforow.append($("<div>", {class: "col-m-6 col-6 padall wrap", text: `~${asTimeString(feed.averageGap,2)} between updates`}));
   }
   var editDiv = $("<div>", { class: "col-4 col-m-6 padall"});
