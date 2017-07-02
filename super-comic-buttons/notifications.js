@@ -8,7 +8,7 @@ function notifyError(title = "", string){
 		"type": "basic",
 		"title": "Super Comic Buttons: " + title,
 		"message": string,
-		"iconUrl": browser.extension.getURL("icons/error.png")
+		"iconUrl": browser.extension.getURL("icons/error-96.png")
 	});
 }
 
