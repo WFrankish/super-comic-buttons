@@ -163,7 +163,9 @@ class FeedItem{
 			feedDate, // Date - date from feed if present
 			date, // Date - assumed date of update
 			link // string - link to page
-		} = {}){
+		} = {}
+    , parent // the feed
+    ){
 		this.title = title;
 		this.feedDate = new Date(feedDate);
 		this.link = link;
@@ -173,7 +175,7 @@ class FeedItem{
 		if(!isNaN(nDate.getDate())){
 			this.date = nDate;
 		}
-		 else if(!isNaN(this.feedDate.getDate()) && this.feedDate < now){
+		 else if(!isNaN(this.feedDate.getDate()) && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
 			this.date = this.feedDate;
 		} else {
 			this.date = now;

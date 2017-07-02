@@ -30,25 +30,25 @@ function sendGetRequest(url){
 
 function handleResponse(data, feed){
     if($.isXMLDoc(data)){
-        return parseXml(data);
+        return parseXml(data, feed);
     }else{
-        return parseHTML(data, feed.id, feed.root);
+        return parseHTML(data, feed);
     }
 };
 
-function parseXml(xml){
+function parseXml(xml, feed){
     var atom = xml.getElementsByTagName("feed");
     if(atom.length > 0){
-        return parseAtom(atom[0]);
+        return parseAtom(atom[0], feed);
     } 
     var rss = xml.getElementsByTagName("rss");
     if(rss.length > 0){
-        return parseRss(rss[0]);
+        return parseRss(rss[0], feed);
     }
     throw "unknown format";
 }
 
-function parseRss(rss){
+function parseRss(rss, feed){
     var out = [];
     var items = rss.getElementsByTagName("item");
     for(var i = 0; i < items.length; i++){
@@ -59,12 +59,12 @@ function parseRss(rss){
         var feedDate = dateElem ? new Date(dateElem.textContent) : null;
         var linkElem = or(item.getElementsByTagName("link")[0]);
         var link = or(linkElem.textContent, "No link");
-        out.push(new FeedItem({title, feedDate, link}));
+        out.push(new FeedItem({title, feedDate, link}, feed));
     }
     return out;
 }
 
-function parseAtom(atom){
+function parseAtom(atom, feed){
     var out = [];
     var entries = atom.getElementsByTagName("entry");
     for(var i = 0; i < entries.length; i++){
@@ -75,18 +75,18 @@ function parseAtom(atom){
         var feedDate = dateElem ? new Date(dateElem.textContent) : null;
         var linkElem = or(entry.getElementsByTagName("link")[0]);
         var link = or(linkElem.attributes["href"].nodeValue,"No link");
-        out.push(new FeedItem({title, feedDate, link}));
+        out.push(new FeedItem({title, feedDate, link}, feed));
     }
     return out;
 }
 
-function parseHTML(html, id, root){
-    var selector = "#" + id;
+function parseHTML(html, feed){
+    var selector = "#" + feed.id;
     var start = or($(selector, html).get(0) || $(html).filter(selector).get(0));
     var img = findFirstImage(start);
     var url = or(img.src, "");
     // lousy parsing sticks the web extension's url on this if it's relative, so remove it
-	var link = url.replace(ourUrl, root);
+    var link = url.replace(ourUrl, feed.root);
     return [new FeedItem({link})];
 }
 
