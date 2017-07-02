@@ -70,6 +70,15 @@ input[type=text]{
   overflow: hidden;
   text-overflow: ellipsis;
 }
+table{
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+td{
+  width: 14.2857;
+  height: 0.4em;
+}
+
 /* Mobile Screens */
 [class*="col-"] {
   width: 100%;

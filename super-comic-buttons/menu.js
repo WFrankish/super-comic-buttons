@@ -107,23 +107,23 @@ function createFeedPanel(feed){
     row3.append(table);
     var days = $("<tr>");
     table.append(days);
-    days.append($("<th>", {text: "S", class:"day"}));
-    days.append($("<th>", {text: "M", class:"day"}));
-    days.append($("<th>", {text: "T", class:"day"}));
-    days.append($("<th>", {text: "W", class:"day"}));
-    days.append($("<th>", {text: "T", class:"day"}));
-    days.append($("<th>", {text: "F", class:"day"}));
-    days.append($("<th>", {text: "S", class:"day"}));
+    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[0] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "M", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[1] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[2] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "W", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[3] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[4] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "F", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[5] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[6] * feed.averagePerWeek)}, 86%, 56%)`}));
     for(var i = 0; i < 24; i++){
-      var t = $("<tr>", {title: ("0" + i).slice(-2), class: "hour"}); // show as 0#
+      var t = $("<tr>", {title: ("0" + i).slice(-2)+ ":00", class: "hour"}); // show as 0#
       table.append(t);
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[0][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[1][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[2][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[3][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[4][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[5][i])}`}));
-      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[6][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[0][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[1][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[2][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[3][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[4][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[5][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[6][i] * feed.averagePerWeek)}, 49%, 56%)`}));
     }
   }
   var row4 = $("<div>", {class: "row"});
@@ -302,8 +302,8 @@ function confirmDelete(feed, event){
 function colourFromNumber(num){
   var lessThanOne = Math.min(num, 1);
   var oneToFive = Math.max(Math.min(num - 1, 5 - 1), 0);
-  var hue = (120 * lessThanOne) + (60 * oneToFive);
-  return `hsl(${hue}, 49%, 56%)`
+  var hue = (120 * lessThanOne) + (15 * oneToFive);
+  return hue;
 }
 
 function styleDiv(div, feed){
