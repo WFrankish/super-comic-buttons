@@ -87,7 +87,7 @@ function asTimeString(num, level){
 	}
 	if(level > 0){
     if(num > 0){
-      res.push(pluralise(num, "millisecond"));
+      res.push(pluralise(Math.round(num), "millisecond"));
     }
 	}
 	if(res.length > 0){

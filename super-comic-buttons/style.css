@@ -30,7 +30,7 @@ p{
 input[type=button]{
   border: 1px solid #2060a8;
   background-color: #5888c8;
-  width: 6em;
+  width: 100%;
   height: 2em;
   margin: 0.2em;
   border-radius: 0.2em;
@@ -78,7 +78,9 @@ td{
   width: 14.2857;
   height: 0.4em;
 }
-
+.wrap {
+  word-wrap: normal;
+}
 /* Mobile Screens */
 [class*="col-"] {
   width: 100%;
