@@ -107,23 +107,23 @@ function createFeedPanel(feed){
     row3.append(table);
     var days = $("<tr>");
     table.append(days);
-    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[0] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "M", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[1] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[2] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "W", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[3] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[4] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "F", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[5] * feed.averagePerWeek)}, 86%, 56%)`}));
-    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[6] * feed.averagePerWeek)}, 86%, 56%)`}));
+    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[0] * feed.averagePerWeek)}, 86%, 56%)`, title: `Sunday - average of ${pluralise(Math.round(feed.dayMap[0]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "M", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[1] * feed.averagePerWeek)}, 86%, 56%)`, title: `Monday - average of ${pluralise(Math.round(feed.dayMap[1]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[2] * feed.averagePerWeek)}, 86%, 56%)`, title: `Tuesday - average of ${pluralise(Math.round(feed.dayMap[2]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "W", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[3] * feed.averagePerWeek)}, 86%, 56%)`, title: `Wednesday - average of ${pluralise(Math.round(feed.dayMap[3]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "T", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[4] * feed.averagePerWeek)}, 86%, 56%)`, title: `Thursday - average of ${pluralise(Math.round(feed.dayMap[4]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "F", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[5] * feed.averagePerWeek)}, 86%, 56%)`, title: `Friday - average of ${pluralise(Math.round(feed.dayMap[5]*feed.averagePerWeek*100)/100, "update")}`}));
+    days.append($("<th>", {text: "S", class:"day", style: `color: hsl(${colourFromNumber(feed.dayMap[6] * feed.averagePerWeek)}, 86%, 56%)`, title: `Saturday - average of ${pluralise(Math.round(feed.dayMap[6]*feed.averagePerWeek*100)/100, "update")}`}));
     for(var i = 0; i < 24; i++){
-      var t = $("<tr>", {title: ("0" + i).slice(-2)+ ":00", class: "hour"}); // show as 0#
+      var t = $("<tr>"); // show as 0#
       table.append(t);
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[0][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[1][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[2][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[3][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[4][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[5][i] * feed.averagePerWeek)}, 49%, 56%)`}));
-      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[6][i] * feed.averagePerWeek)}, 49%, 56%)`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[0][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Sunday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[0][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[1][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Monday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[1][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[2][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Tuesday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[2][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[3][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Wednesday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[3][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[4][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Thursday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[4][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[5][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Friday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[5][i]*feed.averagePerWeek*100)/100, "update")}`}));
+      t.append($("<td>", {class: "num", style: `background-color: hsl(${colourFromNumber(map[6][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Saturday ${("0" + i).slice(-2)}:00 - average of ${pluralise(Math.round(map[6][i]*feed.averagePerWeek*100)/100, "update")}`}));
     }
   }
   var row4 = $("<div>", {class: "row"});
@@ -150,7 +150,6 @@ function createFeedPanel(feed){
   row4.append(deleteDiv);
   return panel;
 }
-
 function refreshCreateForm(){
   var validated = true;
   if(nameText.val()){
