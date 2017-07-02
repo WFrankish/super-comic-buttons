@@ -94,10 +94,37 @@ function createFeedPanel(feed){
   row2.append(lastRead);
   row2.append(lastUpdate);
   row2.append(readDiv);
-  if(feed.active){
+  if(feed.enabled){
     var row3 = $("<div>", {class: "row"});
     subPanel.append(row3);
-    // TODO TIME INFO
+    var map = [];
+    feed.dayMap.forEach(function(day){
+      var hours = []
+      feed.hourMap.forEach(hour => hours.push(day*hour));
+      map.push(hours);
+    });
+    var table = $("<table>", {class: "col-m-12, col-12"});
+    row3.append(table);
+    var days = $("<tr>");
+    table.append(days);
+    days.append($("<th>", {text: "S", class:"day"}));
+    days.append($("<th>", {text: "M", class:"day"}));
+    days.append($("<th>", {text: "T", class:"day"}));
+    days.append($("<th>", {text: "W", class:"day"}));
+    days.append($("<th>", {text: "T", class:"day"}));
+    days.append($("<th>", {text: "F", class:"day"}));
+    days.append($("<th>", {text: "S", class:"day"}));
+    for(var i = 0; i < 24; i++){
+      var t = $("<tr>", {title: ("0" + i).slice(-2), class: "hour"}); // show as 0#
+      table.append(t);
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[0][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[1][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[2][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[3][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[4][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[5][i])}`}));
+      t.append($("<td>", {class: "num", style: `background-color: ${colourFromNumber(map[6][i])}`}));
+    }
   }
   var row4 = $("<div>", {class: "row"});
   subPanel.append(row4);
@@ -271,6 +298,13 @@ function confirmDelete(feed, event){
   button.unbind("click");
   button.click(_ => bg.deleteThis(feed));
 };
+
+function colourFromNumber(num){
+  var lessThanOne = Math.min(num, 1);
+  var oneToFive = Math.max(Math.min(num - 1, 5 - 1), 0);
+  var hue = (120 * lessThanOne) + (60 * oneToFive);
+  return `hsl(${hue}, 49%, 56%)`
+}
 
 function styleDiv(div, feed){
   var bgColour;
