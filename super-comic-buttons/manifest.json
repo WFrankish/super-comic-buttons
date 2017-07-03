@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Super Comic Buttons",
-  "version": "0.1",
+  "version": "1.0",
   "description": "Tracks the updates of your favourite webcomics (or anything with an rss feed)",
   "homepage_url": "https://github.com/WFrankish/super-comic-buttons.git",
   
