@@ -37,7 +37,7 @@ var demoFeeds = [
 ]
 
 function demo(){
-  storage = [];
+  storage = new MyArray();
   demoFeeds.forEach(feed => storage.push(feed));
   moreDemoFeeds.forEach(url => storage.push(new Feed({name: url, url: url, type: "rss"})));
   save();

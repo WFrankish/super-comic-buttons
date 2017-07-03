@@ -88,7 +88,7 @@ function switchSyncOption(){
   } else {
     syncPending = true;
     forceSaveButton.prop("disabled", false);
-    forceLoadButton.click(forceLoad);
+    forceLoadButton.click(saveLocalThenForceLoad);
     forceLoadButton.prop("disabled", false);
     forceSaveButton.click(forceSave);
     forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
@@ -123,6 +123,14 @@ function updatePeriod(){
       }
     });
   }
+}
+
+function saveLocalThenForceLoad(){
+  browser.storage.local.set({
+    useSync : true,
+  }).then(_ => {
+    forceLoad();
+  });
 }
 
 function forceLoad(){

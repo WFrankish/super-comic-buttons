@@ -79,11 +79,10 @@ function saveToSync(force, now, lastSavedLocal){
 function loadOptions(force = false){
   var local = loadFromLocal();
   var promise = local.then(_ => {
-    var inner = Promise.resolve();
     if(bg.useSync){
-      inner = loadFromSync(force);
+      return loadFromSync(force);
     }
-    return inner;
+    return Promise.resolve();
   });
   var promise2 = promise.then(_ => {
     bg.dispatchEvent(bg.reloaded);
@@ -116,7 +115,7 @@ function loadFromSync(force){
   }
   // get local version and date
   var metadata = loadLocalMetadata();
-  metadata.then(item => {
+  return metadata.then(item => {
     if(item.version > bg.version){
       notifyError("Sync load error", "The stored data is for a later version of this program, please update this addon");
       return Promise.resolve();
@@ -132,7 +131,7 @@ function loadFromSync(force){
       storage : null
     });
     var promise = loaded.then(item => {
-      bg.lastSaved = item.lastSaved,
+      bg.lastSaved = item.lastSaved;
       bg.storage = item.storage;
     });
     return promise;
