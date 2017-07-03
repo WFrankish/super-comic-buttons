@@ -19,7 +19,6 @@ class Feed{
 
 			// statistics
 			count = 0, // int - the number of updates in data
-			averageGap = 0, // int - the average time between updates, in milliseconds
 			// Array<double>(7) - the probability an update is on a given day, index matches Date().getDay
 			dayMap = [0, 0, 0, 0, 0, 0, 0], 
 			// Aray<double>(24) - the probability an updates is at a given hour
@@ -42,7 +41,6 @@ class Feed{
 		this.unreadLink = unreadLink;
 		this.unread = unread;
 		this.count = count;
-		this.averageGap = averageGap;
 		this.dayMap = dayMap;
 		this.hourMap = hourMap;
 		this.firstRecord = new Date(firstRecord);
@@ -68,6 +66,10 @@ class Feed{
 		}
 		return this.unreadLink;
 	}
+  get averageGap(){
+    var span = new Date() - this.firstRecord;
+    return span / this.count;
+  }
   get shouldRead(){
     return this.enabled; // TODO
   }
@@ -92,13 +94,7 @@ class Feed{
 		}
 		for(var i = unreadItems.length-1; i >= 0; i--){
 			var feedItem = unreadItems[i];
-			if(this.count > 0){
-				// update average time between
-				var gap = feedItem.date - this.recent.last().date;
-				this.averageGap *= this.count;
-				this.averageGap += gap;
-				this.averageGap /= (this.count + 1);
-			} else {
+			if(this.count <= 0){
 				this.firstRecord = feedItem.date;
 			}
 			// update hour map
@@ -130,7 +126,6 @@ class Feed{
 	// useful the first time a feed is run if the rss has no time data
 	flush(){
 		this.count = 0;
-		this.averageGap = 0;
 		this.dayMap = [0, 0, 0, 0, 0, 0, 0];
 		this.hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	}
