@@ -64,7 +64,6 @@ var moreDemoFeeds = [
 "http://www.beyondthecanopy.com/feed/",
 "http://nedroid.com/feed/",
 "http://feeds.feedburner.com/rsspect/fJur?format=xml",
-"http://www.megatokyo.com/rss/",
 "http://www.harkavagrant.com/rssfeed.php",
 "http://sssscomic.com/ssss-feed.xml",
 "http://www.kiwiblitz.com/rss.php",
@@ -133,17 +132,17 @@ function deactivate(){
 function openOne(){
   var possibles = storage.where(f => f.unread > 0).shuffled();
   if(possibles.length > 0){
-    openThis(possibles[0]);
+    openThis(possibles[0], false);
   }
 }
 
 function openAll(){
-  storage.forEach(feed => feed.open());
+  storage.forEach(feed => feed.open(false));
   save();
 }
 
-function openThis(feed){
-  feed.open();
+function openThis(feed, force = false){
+  feed.open(force);
   save();
 }
 

@@ -67,11 +67,22 @@ class Feed{
 		return this.unreadLink;
 	}
   get averageGap(){
-    var span = new Date() - this.firstRecord;
+    var span = this.lastRecord - this.firstRecord;
     return span / this.count;
   }
   get shouldRead(){
-    return this.enabled; // TODO
+    if(!this.enabled){
+      return false; // disabled, don't read automatically
+    }
+    const week = 1000*60*60*24*7;
+    if(Date.now() - this.lastRecord > week){
+      return true; // check at least once a week;
+    }
+    if(Date.now() - this.firstRecord < 4 * week){
+      return true; // check more frequently if a feed is new in order to learn data
+    }
+    var chance = this.getCumulativeUpdateChance(this.lastRecord, new Date());
+    return chance > (1/3); // chance of an update since our last check is better than 1 in 3
   }
 
 	// adding and processing a new list of feed items
@@ -140,8 +151,8 @@ class Feed{
 		}
 	}
   
-  open(){
-    if(this.unread > 0){
+  open(force = false){
+    if(force || this.unread > 0){
       var link = this.latestLink;
       var numNew = this.unread;
       this.updateUnread();
@@ -154,6 +165,20 @@ class Feed{
         );
       });
     }
+  }
+  
+  getCumulativeUpdateChance(time1, time2){
+    var startDay = time1.getDay()
+    var startHour = time1.getHours();
+    var hourSpan = (time2 - time1) / (1000 * 60 * 60);
+    var n = this.averagePerWeek;
+    var sum = 0;
+    for(var i = 0; i < hourSpan; i++){
+      var hour = (startHour + i) % 24;
+      var day = (startDay + Math.trunc(i / 24)) % 7
+      sum += n * this.dayMap[day] * this.hourMap[hour];
+    }
+    return sum;
   }
 
 	toSource(){
@@ -173,7 +198,12 @@ class FeedItem{
     , parent // the feed
     ){
 		this.title = title;
-		this.feedDate = new Date(feedDate);
+    var nFeedDate = new Date(this.feedDate);
+    if(!isNaN(nFeedDate.getDate())){
+      this.feedDate = nFeedDate;
+    } else {
+      this.feedDate = null;
+    }
 		this.link = link;
 		// if the feed has no date or its date is set to the future, override it
 		var now = new Date();
@@ -181,7 +211,7 @@ class FeedItem{
 		if(!isNaN(nDate.getDate())){
 			this.date = nDate;
 		}
-		 else if(!isNaN(this.feedDate.getDate()) && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
+		 else if(feedDate != null && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
 			this.date = this.feedDate;
 		} else {
 			this.date = now;

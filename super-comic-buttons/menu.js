@@ -71,7 +71,7 @@ function createFeedPanel(feed){
   var unreadNo = $("<div>", {text: pluralise(feed.unread, "update"), class: "col-4 col-m-5 truncate padall"});
   var openDiv = $("<div>", { class: "col-3 col-m-6 padall"});
   var openButton = $("<input>", {type: "button", value: "Open!"});
-  openButton.click(_ => bg.openThis(feed));
+  openButton.click(_ => bg.openThis(feed, true));
   openDiv.append(openButton);
   if(feed.unread > 0){
     openButton.addClass("attention");
