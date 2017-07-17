@@ -100,6 +100,7 @@ function loadFromLocal(){
     storage : null
   });
   var promise = loaded.then(item => {
+    bg.period = item.period;
     bg.lastSaved = item.lastSaved;
     bg.useSync = item.useSync;
     bg.notifyMe = item.notifyMe;

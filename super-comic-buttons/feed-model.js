@@ -125,10 +125,8 @@ class Feed{
 		}
     if(firstTime){
       if(!this.recent.any(f => dateEquals(f.date, f.feedDate))){
-        this.dayMap = [0, 0, 0, 0, 0, 0, 0];
-        this.hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        this.flush();
         this.firstRecord = new Date();
-        this.count = 0;
       }
     }
 	}
@@ -198,7 +196,7 @@ class FeedItem{
     , parent // the feed
     ){
 		this.title = title;
-    var nFeedDate = new Date(this.feedDate);
+    var nFeedDate = new Date(feedDate);
     if(!isNaN(nFeedDate.getDate())){
       this.feedDate = nFeedDate;
     } else {
@@ -211,7 +209,7 @@ class FeedItem{
 		if(!isNaN(nDate.getDate())){
 			this.date = nDate;
 		}
-		 else if(feedDate != null && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
+		 else if(this.feedDate != null && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
 			this.date = this.feedDate;
 		} else {
 			this.date = now;
