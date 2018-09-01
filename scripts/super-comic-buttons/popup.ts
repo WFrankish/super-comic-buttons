@@ -1,73 +1,101 @@
-"use strict";
+$(initPopup);
 
-var bg;
+function initPopup() : void {
+    var backgroundPage : any = browser.extension.getBackgroundPage();
+    var background : IBackground = backgroundPage.background;
+    var menuButton = $("#menu-button");
+    var optionsButton = $("#options-button");
+    var toggleButton = $("#toggle-button");
+    var readOneButton = $("#read-one-button");
+    var readAllButton = $("#read-all-button");
 
-$(function(){
-  bg = browser.extension.getBackgroundPage();
-  $("#menuButton").click(openMenu);
-  $("#optionsButton").click(openOptions);
-  $("#toggleButton").click(toggleActivate);
-  $("#readOneButton").click(bg.openOne);
-  $("#readAllButton").click(bg.openAll);
-  bg.addEventListener('unreadNoChange', refresh);
-  refresh();
-});
+    var popup : IPopup = new Popup(
+      background,
+      toggleButton,
+      readOneButton,
+      readAllButton
+    );
 
-function refresh(){
-  if(bg.active){
-    $("#toggleButton").val("Deactivate");
-    browser.browserAction.setIcon({ 
-      path : {
-        "16": "button/enabled-16.png",
-        "32": "button/enabled-32.png",
-        "64": "button/enabled-64.png",
-        "256": "button/enabled-256.png"
-      }
-    });
-  } else {
-    $("#toggleButton").val("Activate!");
-    browser.browserAction.setIcon({ 
-      path : {
-        "16": "button/icon-16.png",
-        "32": "button/icon-32.png",
-        "64": "button/icon-64.png",
-        "256": "button/icon-256.png"
-      }
-    });
-  }
-  if(bg.unreadNo > 0){
-    $("#readOneButton").prop("disabled", false);   
-  } else {
-    $("#readOneButton").prop("disabled", true);  
-  }
-  if(bg.unreadNo > 1){
-    $("#readAllButton").prop("disabled", false);  
-  } else {
-    $("#readAllButton").prop("disabled", true);  
-  }
+    menuButton.click(() => popup.openMenu);
+    optionsButton.click(() => popup.openOptions);
+    toggleButton.click(() => popup.toggleActivate);
+    readOneButton.click(() => background.openOne);
+    readAllButton.click(() => background.openAll);
+
+    backgroundPage.addEventListener('unreadNoChange', popup.refresh);
+
+    popup.refresh();
 }
 
-function toggleActivate(){
-  if(bg.active){
-    bg.deactivate();
-  } else {
-    bg.activate(false);
-  }
-  refresh();
-}
+class Popup implements IPopup {
+    private readonly background : IBackground;
+    private readonly toggleButton: JQuery<HTMLElement>;
+    private readonly readOneButton: JQuery<HTMLElement>;
+    private readonly readAllButton: JQuery<HTMLElement>;
 
-function openMenu(){
-  if(browser.sidebarAction && false){
-    // If sidebars are supported (firefox, but not chrome)
-    browser.sidebarAction.getPanel({}).then(url => {
-      // can't (yet?) open sidebar programatically, so open it in a new tab
-      browser.tabs.create({url : url});
-    });
-  } else {
-    browser.tabs.create({url : "menu.html"});
-  }
-}
+    constructor(
+      background : IBackground,
+      toggleButton: JQuery<HTMLElement>,
+      readOneButton: JQuery<HTMLElement>,
+      readAllButton: JQuery<HTMLElement>
+    ){
+        this.background = background;
+        this.toggleButton = toggleButton;
+        this.readOneButton = readOneButton;
+        this.readAllButton = readAllButton;
+    }
 
-function openOptions(){
-  browser.runtime.openOptionsPage();
+    refresh() : void {
+        if(this.background.active){
+            this.toggleButton.val("Deactivate");
+            browser.browserAction.setIcon({ 
+                path : {
+                    "16": "button/enabled-16.png",
+                    "32": "button/enabled-32.png",
+                    "64": "button/enabled-64.png",
+                    "256": "button/enabled-256.png"
+                }
+            });
+        } else {
+            this.toggleButton.val("Activate!");
+            browser.browserAction.setIcon({ 
+                path : {
+                    "16": "button/icon-16.png",
+                    "32": "button/icon-32.png",
+                    "64": "button/icon-64.png",
+                    "256": "button/icon-256.png"
+                }
+            });
+        }
+        if(this.background.unreadNo > 0){
+            this.readOneButton.prop("disabled", false);   
+        } else {
+            this.readOneButton.prop("disabled", true);  
+        }
+        if(this.background.unreadNo > 1){
+            this.readAllButton.prop("disabled", false);  
+        } else {
+            this.readAllButton.prop("disabled", true);  
+        }
+    }
+
+    toggleActivate() : void {
+        if(this.background.active){
+            this.background.deactivate();
+        } else {
+            this.background.activate(false);
+        }
+        this.refresh();
+    }
+
+    openMenu() : void {
+        browser.sidebarAction.getPanel({}).then(url => {
+            // can't (yet?) open sidebar programatically, so open it in a new tab
+            browser.tabs.create({url : url});
+        });
+    }
+
+    openOptions() : void {
+        browser.runtime.openOptionsPage();
+    }
 }
