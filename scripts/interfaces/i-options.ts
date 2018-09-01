@@ -1,3 +1,3 @@
 interface IOptions {
-    
+    restoreOptions() : void;
 }

@@ -1,144 +1,157 @@
 "use strict";
-// DOM
-var periodNumber;
-var periodButton;
-var syncStoreRadio;
-var localStoreRadio;
-var noErrorRadio;
-var yesErrorRadio;
-var forceLoadButton;
-var forceSyncButton;
-var forceInfoText;
-// initialisation
-$(document).ready(init);
-function init() {
-    bg.outOfSync = false;
-    periodNumber = $("#periodNumber");
-    periodButton = $("#periodButton");
-    syncStoreRadio = $("#syncStoreRadio");
-    localStoreRadio = $("#localStoreRadio");
-    noErrorRadio = $("#noErrorRadio");
-    yesErrorRadio = $("#yesErrorRadio");
-    forceLoadButton = $("#forceLoadButton");
-    forceSaveButton = $("#forceSaveButton");
-    forceInfoText = $("#forceInfoText");
-    restoreOptions();
+$(initOptions);
+function initOptions() {
+    var backgroundPage = browser.extension.getBackgroundPage();
+    var background = backgroundPage.background;
+    var storage = new WebStorage();
+    var periodNumber = $("#period-number");
+    var periodButton = $("#period-button");
+    var syncStoreRadio = $("#sync-store-radio");
+    var localStoreRadio = $("#local-store-radio");
+    var noErrorRadio = $("#no-error-radio");
+    var yesErrorRadio = $("#yes-error-radio");
+    var forceLoadButton = $("#force-load-button");
+    var forceSaveButton = $("#force-save-button");
+    var forceInfoText = $("#force-info-text");
+    var options = new Options(background, storage, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText);
+    options.restoreOptions();
 }
-// load options and restore the page
-function restoreOptions() {
-    syncPending = false;
-    periodNumber.unbind("change");
-    periodButton.unbind("click");
-    syncStoreRadio.unbind("change");
-    localStoreRadio.unbind("change");
-    noErrorRadio.unbind("change");
-    yesErrorRadio.unbind("change");
-    forceSaveButton.unbind("click");
-    forceLoadButton.unbind("click");
-    forceInfoText.text("Manually Save/Load");
-    forceInfoText.removeClass("warning");
-    var data = loadOptions(false);
-    data.then(_ => {
-        periodNumber.change(changePeriod);
-        periodNumber.val(bg.period);
-        periodButton.click(updatePeriod);
-        if (bg.useSync) {
-            syncStoreRadio.click();
-            localStoreRadio.change(switchSyncOption);
-            syncStoreRadio.change(switchSyncOption);
-            forceSaveButton.prop("disabled", false);
-            forceSaveButton.click(forceLoad);
-            forceLoadButton.prop("disabled", false);
-            forceLoadButton.click(forceSave);
-        }
-        else {
-            localStoreRadio.click();
-            localStoreRadio.change(switchSyncOption);
-            syncStoreRadio.change(switchSyncOption);
-            forceSaveButton.prop("disabled", true);
-            forceLoadButton.prop("disabled", true);
-        }
-        if (bg.notifyMe) {
-            yesErrorRadio.click();
-            yesErrorRadio.change(switchErrorOption);
-            noErrorRadio.change(switchErrorOption);
-        }
-        else {
-            noErrorRadio.click();
-            noErrorRadio.change(switchErrorOption);
-            yesErrorRadio.change(switchErrorOption);
-        }
-        if (bg.outOfSync) {
-            forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
-            forceInfoText.addClass("warning");
-        }
-    });
-}
-function switchSyncOption() {
-    if (bg.useSync || syncPending) {
-        bg.useSync = false;
-        bg.outOfSync = false;
-        var promise = saveOptions(false);
-        promise.then(_ => {
-            restoreOptions();
-        });
+class Options {
+    constructor(background, storage, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText) {
+        this.background = background;
+        this.storage = storage;
+        this.periodNumber = periodNumber;
+        this.periodButton = periodButton;
+        this.syncStoreRadio = syncStoreRadio;
+        this.localStoreRadio = localStoreRadio;
+        this.noErrorRadio = noErrorRadio;
+        this.yesErrorRadio = yesErrorRadio;
+        this.forceLoadButton = forceLoadButton;
+        this.forceSaveButton = forceSaveButton;
+        this.forceInfoText = forceInfoText;
+        this.background.outOfSync = false;
     }
-    else {
-        syncPending = true;
-        forceSaveButton.prop("disabled", false);
-        forceLoadButton.click(saveLocalThenForceLoad);
-        forceLoadButton.prop("disabled", false);
-        forceSaveButton.click(forceSave);
-        forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
-        forceInfoText.addClass("warning");
+    get period() {
+        return this.periodNumber.val() * 1;
     }
-}
-function switchErrorOption() {
-    bg.notifyMe = !bg.notifyMe;
-    var promise = saveOptions(false);
-    promise.then(_ => {
-        restoreOptions();
-    });
-}
-function changePeriod() {
-    if (periodNumber.val() > 0) {
-        periodButton.prop("disabled", false);
+    set period(value) {
+        this.periodNumber.unbind("change");
+        this.periodNumber.val(value);
+        this.periodNumber.change(this.onPeriodChange);
     }
-    else {
-        periodButton.prop("disabled", true);
-    }
-}
-function updatePeriod() {
-    if (periodNumber.val() > 0) {
-        bg.period = periodNumber.val() * 1;
-        var promise = saveOptions(false);
-        promise.then(_ => {
-            if (bg.active) {
-                bg.deactivate();
-                bg.activate(true);
+    restoreOptions() {
+        this.syncPending = false;
+        this.periodButton.unbind("click");
+        this.syncStoreRadio.unbind("change");
+        this.localStoreRadio.unbind("change");
+        this.noErrorRadio.unbind("change");
+        this.yesErrorRadio.unbind("change");
+        this.forceSaveButton.unbind("click");
+        this.forceLoadButton.unbind("click");
+        this.forceInfoText.text("Manually Save/Load");
+        this.forceInfoText.removeClass("warning");
+        var data = loadOptions(false);
+        data.then(_ => {
+            this.period = this.background.period;
+            this.periodButton.click(this.updatePeriod);
+            if (this.background.useSync) {
+                this.syncStoreRadio.click();
+                this.localStoreRadio.change(this.switchSyncOption);
+                this.syncStoreRadio.change(this.switchSyncOption);
+                this.forceSaveButton.prop("disabled", false);
+                this.forceSaveButton.click(this.forceLoad);
+                this.forceLoadButton.prop("disabled", false);
+                this.forceLoadButton.click(this.forceSave);
+            }
+            else {
+                this.localStoreRadio.click();
+                this.localStoreRadio.change(this.switchSyncOption);
+                this.syncStoreRadio.change(this.switchSyncOption);
+                this.forceSaveButton.prop("disabled", true);
+                this.forceLoadButton.prop("disabled", true);
+            }
+            if (this.background.notifyMe) {
+                this.yesErrorRadio.click();
+                this.yesErrorRadio.change(this.switchErrorOption);
+                this.noErrorRadio.change(this.switchErrorOption);
+            }
+            else {
+                this.noErrorRadio.click();
+                this.noErrorRadio.change(this.switchErrorOption);
+                this.yesErrorRadio.change(this.switchErrorOption);
+            }
+            if (this.background.outOfSync) {
+                this.forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
+                this.forceInfoText.addClass("warning");
             }
         });
     }
-}
-function saveLocalThenForceLoad() {
-    browser.storage.local.set({
-        useSync: true,
-    }).then(_ => {
-        forceLoad();
-    });
-}
-function forceLoad() {
-    bg.useSync = true;
-    var promise = loadOptions(true);
-    promise.then(_ => {
-        restoreOptions();
-    });
-}
-function forceSave() {
-    bg.useSync = true;
-    var promise = saveOptions(true);
-    promise.then(_ => {
-        restoreOptions();
-    });
+    switchSyncOption() {
+        if (this.background.useSync || this.syncPending) {
+            this.background.useSync = false;
+            this.background.outOfSync = false;
+            var promise = this.storage.saveOptions(false);
+            promise.then(_ => {
+                this.restoreOptions();
+            });
+        }
+        else {
+            this.syncPending = true;
+            this.forceSaveButton.prop("disabled", false);
+            this.forceLoadButton.click(this.saveLocalThenForceLoad);
+            this.forceLoadButton.prop("disabled", false);
+            this.forceSaveButton.click(this.forceSave);
+            this.forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
+            this.forceInfoText.addClass("warning");
+        }
+    }
+    switchErrorOption() {
+        this.background.notifyMe = !this.background.notifyMe;
+        var promise = this.storage.saveOptions(false);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
+    onPeriodChange() {
+        if (this.period > 0) {
+            this.periodButton.prop("disabled", false);
+        }
+        else {
+            this.periodButton.prop("disabled", true);
+        }
+    }
+    updatePeriod() {
+        if (this.period > 0) {
+            this.background.period = this.period;
+            var promise = this.storage.saveOptions(false);
+            promise.then(_ => {
+                if (this.background.active) {
+                    this.background.deactivate();
+                    this.background.activate(true);
+                }
+            });
+        }
+    }
+    saveLocalThenForceLoad() {
+        browser.storage.local.set({
+            useSync: true,
+        }).then(_ => {
+            this.forceLoad();
+        });
+    }
+    forceLoad() {
+        this.background.useSync = true;
+        var promise = this.storage.loadOptions(true);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
+    forceSave() {
+        this.background.useSync = true;
+        var promise = this.storage.saveOptions(true);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
 }
 //# sourceMappingURL=options.js.map

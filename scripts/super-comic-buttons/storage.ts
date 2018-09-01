@@ -1,3 +1,12 @@
+  class WebStorage implements IStorage {
+    saveOptions(force : boolean = false) : Promise<void> {
+        throw new Error("Not Implemented.")
+    }
+    loadOptions(force : boolean = false) : Promise<void> {
+        throw new Error("Not Implemented.")
+    }
+}
+
 "use strict";
 var bg;
 var syncPending;

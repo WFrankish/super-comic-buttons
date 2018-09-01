@@ -1,150 +1,202 @@
-"use strict";
+$(initOptions);
 
-// DOM
-var periodNumber;
-var periodButton;
-var syncStoreRadio;
-var localStoreRadio;
-var noErrorRadio;
-var yesErrorRadio;
-var forceLoadButton;
-var forceSaveButton;
-var forceInfoText;
+function initOptions() : void {
+    var backgroundPage : any = browser.extension.getBackgroundPage();
+    var background : IBackground = backgroundPage.background;
+    var storage : IStorage = new WebStorage();
+    var periodNumber : JQuery<HTMLInputElement> = $("#period-number");
+    var periodButton : JQuery<HTMLButtonElement> = $("#period-button");
+    var syncStoreRadio : JQuery<HTMLInputElement> = $("#sync-store-radio");
+    var localStoreRadio : JQuery<HTMLInputElement> = $("#local-store-radio");
+    var noErrorRadio : JQuery<HTMLInputElement> = $("#no-error-radio");
+    var yesErrorRadio : JQuery<HTMLInputElement> = $("#yes-error-radio");
+    var forceLoadButton : JQuery<HTMLButtonElement> = $("#force-load-button");
+    var forceSaveButton : JQuery<HTMLButtonElement> = $("#force-save-button");
+    var forceInfoText : JQuery<HTMLParagraphElement> = $("#force-info-text");
 
-// initialisation
-$(document).ready(init);
-
-function init(){
-  bg.outOfSync = false;
-  periodNumber = $("#periodNumber");
-  periodButton = $("#periodButton");
-  syncStoreRadio = $("#syncStoreRadio");
-  localStoreRadio = $("#localStoreRadio");
-  noErrorRadio = $("#noErrorRadio");
-  yesErrorRadio = $("#yesErrorRadio");
-  forceLoadButton = $("#forceLoadButton");
-  forceSaveButton = $("#forceSaveButton");
-  forceInfoText = $("#forceInfoText");
-  restoreOptions();
+    var options : IOptions = new Options(
+        background,
+        storage,
+        periodNumber,
+        periodButton,
+        syncStoreRadio,
+        localStoreRadio,
+        noErrorRadio,
+        yesErrorRadio,
+        forceLoadButton,
+        forceSaveButton,
+        forceInfoText
+    );
+    options.restoreOptions();
 }
 
-// load options and restore the page
-function restoreOptions(){
-  syncPending = false;
-  periodNumber.unbind("change");
-  periodButton.unbind("click");
-  syncStoreRadio.unbind("change");
-  localStoreRadio.unbind("change");
-  noErrorRadio.unbind("change");
-  yesErrorRadio.unbind("change");
-  forceSaveButton.unbind("click");
-  forceLoadButton.unbind("click");
-  forceInfoText.text("Manually Save/Load");
-  forceInfoText.removeClass("warning");
-  var data = loadOptions(false);
-  data.then(_ => {
-    periodNumber.change(changePeriod);
-    periodNumber.val(bg.period);
-    periodButton.click(updatePeriod);
-    if(bg.useSync){
-      syncStoreRadio.click();
-      localStoreRadio.change(switchSyncOption);
-      syncStoreRadio.change(switchSyncOption);
-      forceSaveButton.prop("disabled", false);
-      forceSaveButton.click(forceLoad);
-      forceLoadButton.prop("disabled", false);
-      forceLoadButton.click(forceSave);
-    } else {
-      localStoreRadio.click();
-      localStoreRadio.change(switchSyncOption);
-      syncStoreRadio.change(switchSyncOption);
-      forceSaveButton.prop("disabled", true);
-      forceLoadButton.prop("disabled", true);
+class Options implements IOptions {
+    private readonly background : IBackground;
+    private readonly storage : IStorage;
+    private readonly periodNumber : JQuery<HTMLInputElement>;
+    private readonly periodButton : JQuery<HTMLButtonElement>;
+    private readonly syncStoreRadio : JQuery<HTMLInputElement>;
+    private readonly localStoreRadio : JQuery<HTMLInputElement>;
+    private readonly noErrorRadio : JQuery<HTMLInputElement>;
+    private readonly yesErrorRadio : JQuery<HTMLInputElement>;
+    private readonly forceLoadButton : JQuery<HTMLButtonElement>;
+    private readonly forceSaveButton : JQuery<HTMLButtonElement>;
+    private readonly forceInfoText : JQuery<HTMLParagraphElement>;
+
+    private syncPending : boolean;
+
+    constructor(
+        background : IBackground,
+        storage : IStorage,
+        periodNumber : JQuery<HTMLInputElement>,
+        periodButton : JQuery<HTMLButtonElement>,
+        syncStoreRadio : JQuery<HTMLInputElement>,
+        localStoreRadio : JQuery<HTMLInputElement>,
+        noErrorRadio : JQuery<HTMLInputElement>,
+        yesErrorRadio : JQuery<HTMLInputElement>,
+        forceLoadButton : JQuery<HTMLButtonElement>,
+        forceSaveButton : JQuery<HTMLButtonElement>,
+        forceInfoText : JQuery<HTMLParagraphElement>
+    ){
+        this.background = background;
+        this.storage = storage;
+        this.periodNumber = periodNumber;
+        this.periodButton = periodButton;
+        this.syncStoreRadio = syncStoreRadio;
+        this.localStoreRadio = localStoreRadio;
+        this.noErrorRadio = noErrorRadio;
+        this.yesErrorRadio = yesErrorRadio;
+        this.forceLoadButton = forceLoadButton;
+        this.forceSaveButton = forceSaveButton;
+        this.forceInfoText = forceInfoText;
+
+        this.background.outOfSync = false;
     }
-    if(bg.notifyMe){
-      yesErrorRadio.click();
-      yesErrorRadio.change(switchErrorOption);
-      noErrorRadio.change(switchErrorOption);
-    } else {
-      noErrorRadio.click();
-      noErrorRadio.change(switchErrorOption);
-      yesErrorRadio.change(switchErrorOption);
+
+    private get period() : number {
+        return this.periodNumber.val() as number  * 1
     }
-    if(bg.outOfSync){
-      forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
-      forceInfoText.addClass("warning");
+    private set period(value: number) {
+        this.periodNumber.unbind("change");
+        this.periodNumber.val(value)
+        this.periodNumber.change(this.onPeriodChange);
     }
-  });
-}
 
-function switchSyncOption(){
-  if(bg.useSync || syncPending){
-    bg.useSync = false;
-    bg.outOfSync = false;
-    var promise = saveOptions(false);
-    promise.then(_ => {
-      restoreOptions();
-    });
-  } else {
-    syncPending = true;
-    forceSaveButton.prop("disabled", false);
-    forceLoadButton.click(saveLocalThenForceLoad);
-    forceLoadButton.prop("disabled", false);
-    forceSaveButton.click(forceSave);
-    forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
-    forceInfoText.addClass("warning");
-  }
-}
+    restoreOptions(){
+        this.syncPending = false;
+        this.periodButton.unbind("click");
+        this.syncStoreRadio.unbind("change");
+        this.localStoreRadio.unbind("change");
+        this.noErrorRadio.unbind("change");
+        this.yesErrorRadio.unbind("change");
+        this.forceSaveButton.unbind("click");
+        this.forceLoadButton.unbind("click");
+        this.forceInfoText.text("Manually Save/Load");
+        this.forceInfoText.removeClass("warning");
+        var data = loadOptions(false);
+        data.then(_ => {
+            this.period = this.background.period;
+            this.periodButton.click(this.updatePeriod);
+            if(this.background.useSync){
+                this.syncStoreRadio.click();
+                this.localStoreRadio.change(this.switchSyncOption);
+                this.syncStoreRadio.change(this.switchSyncOption);
+                this.forceSaveButton.prop("disabled", false);
+                this.forceSaveButton.click(this.forceLoad);
+                this.forceLoadButton.prop("disabled", false);
+                this.forceLoadButton.click(this.forceSave);
+            } else {
+                this.localStoreRadio.click();
+                this.localStoreRadio.change(this.switchSyncOption);
+                this.syncStoreRadio.change(this.switchSyncOption);
+                this.forceSaveButton.prop("disabled", true);
+                this.forceLoadButton.prop("disabled", true);
+            }
+            if(this.background.notifyMe){
+                this.yesErrorRadio.click();
+                this.yesErrorRadio.change(this.switchErrorOption);
+                this.noErrorRadio.change(this.switchErrorOption);
+            } else {
+                this.noErrorRadio.click();
+                this.noErrorRadio.change(this.switchErrorOption);
+                this.yesErrorRadio.change(this.switchErrorOption);
+            }
+            if(this.background.outOfSync){
+                this.forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
+                this.forceInfoText.addClass("warning");
+            }
+        });
+    }
 
-function switchErrorOption(){
-  bg.notifyMe = !bg.notifyMe;
-  var promise = saveOptions(false);
-  promise.then(_ => {
-    restoreOptions();
-  });
-}
+    private switchSyncOption(){
+        if(this.background.useSync || this.syncPending){
+            this.background.useSync = false;
+            this.background.outOfSync = false;
+            var promise = this.storage.saveOptions(false);
+            promise.then(_ => {
+                this.restoreOptions();
+            });
+        } else {
+            this.syncPending = true;
+            this.forceSaveButton.prop("disabled", false);
+            this.forceLoadButton.click(this.saveLocalThenForceLoad);
+            this.forceLoadButton.prop("disabled", false);
+            this.forceSaveButton.click(this.forceSave);
+            this.forceInfoText.text("To start using Firefox Sync, please choose whether to load any existing sync data, or save existing local data");
+            this.forceInfoText.addClass("warning");
+        }
+    }
 
-function changePeriod(){
-  if(periodNumber.val() > 0){
-    periodButton.prop("disabled", false);
-  } else {
-    periodButton.prop("disabled", true);
-  }
-}
+    private switchErrorOption(){
+        this.background.notifyMe = !this.background.notifyMe;
+        var promise = this.storage.saveOptions(false);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
 
-function updatePeriod(){
-  if(periodNumber.val() > 0){
-    bg.period = periodNumber.val() * 1
-    var promise = saveOptions(false);
-    promise.then(_ => {
-      if(bg.active){
-        bg.deactivate();
-        bg.activate(true);
-      }
-    });
-  }
-}
+    private onPeriodChange(){
+        if(this.period > 0){
+            this.periodButton.prop("disabled", false);
+        } else {
+            this.periodButton.prop("disabled", true);
+        }
+    }
 
-function saveLocalThenForceLoad(){
-  browser.storage.local.set({
-    useSync : true,
-  }).then(_ => {
-    forceLoad();
-  });
-}
+    private updatePeriod(){
+        if(this.period > 0){
+            this.background.period = this.period
+            var promise = this.storage.saveOptions(false);
+            promise.then(_ => {
+                if(this.background.active){
+                    this.background.deactivate();
+                    this.background.activate(true);
+                }
+            });
+        }
+    }
 
-function forceLoad(){
-  bg.useSync = true;
-  var promise = loadOptions(true);
-  promise.then(_ => {
-    restoreOptions();
-  });
-}
+    private saveLocalThenForceLoad(){
+        browser.storage.local.set({
+            useSync : true,
+        }).then(_ => {
+            this.forceLoad();
+        });
+    }
 
-function forceSave(){
-  bg.useSync = true;
-  var promise = saveOptions(true);
-  promise.then(_ => {
-    restoreOptions();
-  });
+    private forceLoad(){
+        this.background.useSync = true;
+        var promise = this.storage.loadOptions(true);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
+
+    private forceSave(){
+        this.background.useSync = true;
+        var promise = this.storage.saveOptions(true);
+        promise.then(_ => {
+            this.restoreOptions();
+        });
+    }
 }

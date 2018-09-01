@@ -1,4 +1,13 @@
 "use strict";
+class WebStorage {
+    saveOptions(force = false) {
+        throw new Error("Not Implemented.");
+    }
+    loadOptions(force = false) {
+        throw new Error("Not Implemented.");
+    }
+}
+"use strict";
 var bg;
 var syncPending;
 $(document).ready(function () {
