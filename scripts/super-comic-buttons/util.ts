@@ -1,7 +1,5 @@
-"use strict";
-
 // takes an input, and replaces it with a default if null or undefined
-function or(obj, def = {}){
+function or<T, T2>(obj : T | undefined | null, def : T2 | {} = {}) : T | T2 | {} {
     if(typeof obj === "undefined" || obj === null){
         return def;
     } else {
@@ -10,7 +8,7 @@ function or(obj, def = {}){
 }
 
 // returns if two objects are equal, or if both are equivalent dates
-function dateEquals(a, b){
+function dateEquals(a : Date, b : Date) : boolean {
 	if(a === b){
 		return true;
 	}
@@ -20,7 +18,7 @@ function dateEquals(a, b){
 	return false;
 }
 
-function pluralise(num, string, plural = string+"s"){
+function pluralise(num : number, string : string, plural = string+"s") : string {
 	if(num === 1){
 		return num + " " + string;
 	} else {
@@ -29,14 +27,14 @@ function pluralise(num, string, plural = string+"s"){
 }
 
 // returns a number in milliseconds as a time, to specified precision
-function asTimeString(num, level){
+function asTimeString(num : number, level : number) : string {
 	const sec = 1000;
 	const min = 60*sec;
 	const hour = 60*min;
 	const day = 24*hour;
 	const week = 7*day;
 	const year = 365*day;
-	var res = [];
+	var res : string[] = [];
 	if(num >= year){
 		var years = Math.trunc(num / year);
     if(years > 0){
@@ -98,7 +96,7 @@ function asTimeString(num, level){
 
 }
 
-function hashString(str){
+function hashString(str : string) : number {
   var hash = 0;
   for(var i = 0; i < str.length; i++){
     var chr = str.charCodeAt(i);
@@ -108,6 +106,6 @@ function hashString(str){
   return hash;
 }
 
-function randomHue(seed){
+function randomHue(seed : number) : number {
   return (Math.sin(seed * (0.5 / Math.PI)) + 1) / 2;
 }

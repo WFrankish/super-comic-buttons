@@ -1,72 +1,184 @@
 "use strict";
-// this is basically linq
 class MyArray extends Array {
-    constructor(...args) {
-        if (args.length == 1 && typeof args[0] === "number") {
+    constructor(...array) {
+        if (array.length == 1) {
+            // array constructor does something different when given a single number
+            // avoid that
             super();
-            this.push(args[0]);
+            this.push(array[0]);
         }
         else {
-            super(...args);
+            super(...array);
+        }
+    }
+    select(func) {
+        var result = this.map(func);
+        return new MyArray(...result);
+    }
+    selectMany(func) {
+        var results = this.select(func);
+        var concat = new MyArray();
+        results.forEach(arr => {
+            concat.push(...arr);
+        });
+        return concat;
+    }
+    where(func) {
+        // filter has weird behaviour, possibly because we're extending array
+        // if you filter out all members, it returns an array containing a 0
+        // so we'll just reimplement it
+        var result = [];
+        this.forEach(t => {
+            if (func(t)) {
+                result.push(t);
+            }
+        });
+        return new MyArray(...result);
+    }
+    count(func) {
+        if (func !== undefined) {
+            return this.where(func).count();
+        }
+        else {
+            return this.length;
         }
     }
     any(func) {
-        return this.count(func) > 0;
+        if (func !== undefined) {
+            return this.some(func);
+        }
+        else {
+            return this.length > 0;
+        }
     }
-    count(func) {
-        var filtered = this.where(func);
-        return filtered.length;
+    all(func) {
+        return this.every(func);
+    }
+    singleOrDefault(func) {
+        if (func !== undefined) {
+            return this.where(func).single();
+        }
+        else {
+            if (this.length == 1) {
+                return this[0];
+            }
+            else {
+                return null;
+            }
+        }
+    }
+    single(func) {
+        var result = this.singleOrDefault(func);
+        if (result == null) {
+            throw new Error('Invalid operation.');
+        }
+        else {
+            return result;
+        }
+    }
+    firstOrDefault(func) {
+        if (func !== undefined) {
+            let length = this.length;
+            for (let ii = 0; ii < length; ii++) {
+                if (func(this[ii])) {
+                    return this[ii];
+                }
+            }
+            return null;
+        }
+        else {
+            if (this.length > 0) {
+                return this[0];
+            }
+            else {
+                return null;
+            }
+        }
     }
     first(func) {
-        var filtered = this.where(func);
-        return filtered[0];
+        if (func !== undefined) {
+            let length = this.length;
+            for (let ii = 0; ii < length; ii++) {
+                if (func(this[ii])) {
+                    return this[ii];
+                }
+            }
+            throw new Error('Invalid operation.');
+        }
+        else {
+            if (this.length > 0) {
+                return this[0];
+            }
+            else {
+                throw new Error('Invalid operation.');
+            }
+        }
+    }
+    lastOrDefault(func) {
+        if (func !== undefined) {
+            return this.where(func).lastOrDefault();
+        }
+        else {
+            if (this.length > 0) {
+                return this[this.length - 1];
+            }
+            else {
+                return null;
+            }
+        }
     }
     last(func) {
-        var filtered = this.where(func);
-        return filtered[filtered.length - 1];
-    }
-    // select and where are already implemented as map and filter, but when I realised
-    // and replaced them it acted weird so whatever
-    select(func) {
-        if (typeof func !== "function") {
-            return this;
+        if (func !== undefined) {
+            return this.where(func).last();
         }
-        var res = new MyArray();
-        this.forEach(val => res.push(func(val)));
-        return res;
-    }
-    where(func) {
-        if (typeof func !== "function") {
-            return this;
+        else {
+            if (this.length > 0) {
+                return this[this.length - 1];
+            }
+            else {
+                throw new Error('Invalid operation.');
+            }
         }
-        var res = new MyArray();
-        this.forEach(val => {
-            if (func(val)) {
-                res.push(val);
+    }
+    shuffle() {
+        var results = new MyArray(...this);
+        for (let ii = results.length; ii > 0; ii--) {
+            var rand = Math.trunc(Math.random() * ii);
+            var temp = results[rand];
+            results[rand] = results[ii - 1];
+            results[ii - 1] = temp;
+        }
+        return results;
+    }
+    distinct(func) {
+        var results = [];
+        this.forEach(t => {
+            if (func !== undefined) {
+                if (results.findIndex(t2 => func(t, t2)) < 0) {
+                    results.push(t);
+                }
+            }
+            else {
+                if (results.indexOf(t) < 0) {
+                    results.push(t);
+                }
             }
         });
-        return res;
+        return new MyArray(...results);
     }
-    remove(item) {
-        for (var i = 0; i < this.length; i++) {
-            if (item == this[i]) {
-                this.splice(i, 1);
-                return;
-            }
-        }
+    except(...exceptions) {
+        return this.where(t => exceptions.indexOf(t) < 0);
     }
-    shuffled() {
-        var res = new MyArray(...this);
-        for (var i = res.length - 1; i > 0; i--) {
-            var j = Math.trunc(Math.random() * (i + 1));
-            var temp = res[i];
-            res[i] = res[j];
-            res[j] = temp;
-        }
-        return res;
+    drop(n) {
+        var results = this.slice(n);
+        return new MyArray(...results);
     }
-    toSource() {
-        return `(new Feed(${super.toSource()}))`;
+    contains(t) {
+        return this.any(t2 => t2 == t);
     }
+}
+function selectAsMyArray(array, func) {
+    var result = array.map(func);
+    return new MyArray(...result);
 }
 //# sourceMappingURL=my-array.js.map

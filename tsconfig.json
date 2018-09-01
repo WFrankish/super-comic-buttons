@@ -7,8 +7,15 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "sourceMap": true,
-        "sourceRoot": "./scripts",
+        "sourceRoot": "./",
         "strictNullChecks": true,
-        "target": "es2017"
-    }
+        "target": "es2017",
+        "typeRoots": [
+            "node_modules/@types",
+            "node_modules/web-ext-types"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }

@@ -8,7 +8,7 @@ var localStoreRadio;
 var noErrorRadio;
 var yesErrorRadio;
 var forceLoadButton;
-var forceSyncButton;
+var forceSaveButton;
 var forceInfoText;
 
 // initialisation
