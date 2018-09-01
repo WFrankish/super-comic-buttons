@@ -1,22 +1,53 @@
-"use strict";
+class Notifications implements INotifications {
+    readonly notificationId = "soundstone-x-notification";
+    readonly notificationAlarm = "notification";
 
-var errorNoteId = "comic-error";
-var noteId = "comic-note";
+    private anyErrors: boolean = false;
+    private messages: string[] = [];
 
-function notifyError(title = "", string){
-	var errorNote = browser.notifications.create(errorNoteId, {
-		"type": "basic",
-		"title": "Super Comic Buttons: " + title,
-		"message": string,
-		"iconUrl": browser.extension.getURL("icons/error-96.png")
-	});
-}
+    constructor() {
+        browser.alarms.onAlarm.addListener(x => this.releaseMessages(x));
+    }
 
-function notify(title = "", string){
-	var note = browser.notifications.create(noteId, {
-		"type": "basic",
-		"title": "Super Comic Buttons: " + title,
-		"message": string,
-		"iconUrl": browser.extension.getURL("icons/icon-96.png")
-	});
+    message(message: string): void {
+        console.log(message);
+        browser.alarms.create(this.notificationAlarm,
+            {
+                delayInMinutes: 0.05
+            }
+        );
+        this.messages.push(message);
+    }
+
+    error(error: string): void {
+        this.anyErrors = true;
+        this.message("Error: " + error);
+    }
+
+    private releaseMessages(info: browser.alarms.Alarm): void {
+        if (info.name !== this.notificationAlarm) {
+            return;
+        }
+
+        let title = this.anyErrors ? "Super Comic Buttons - Error" : "Super Comic Buttons";
+        let icon = "icons/" + (this.anyErrors ? "icons/error" : "icons/icon") + "-96.png";
+
+        this.anyErrors = false;
+
+        let summedMessages = "";
+        while (this.messages.length > 0) {
+            let message = this.messages.shift();
+            summedMessages += message + "\n";
+        }
+
+        browser.notifications.create(
+            this.notificationId,
+            {
+                title: title,
+                message: summedMessages,
+                type: "basic",
+                iconUrl: icon
+            }
+        );
+    }
 }

@@ -1,20 +1,41 @@
 "use strict";
-var errorNoteId = "comic-error";
-var noteId = "comic-note";
-function notifyError(title = "", string) {
-    var errorNote = browser.notifications.create(errorNoteId, {
-        "type": "basic",
-        "title": "Super Comic Buttons: " + title,
-        "message": string,
-        "iconUrl": browser.extension.getURL("icons/error-96.png")
-    });
-}
-function notify(title = "", string) {
-    var note = browser.notifications.create(noteId, {
-        "type": "basic",
-        "title": "Super Comic Buttons: " + title,
-        "message": string,
-        "iconUrl": browser.extension.getURL("icons/icon-96.png")
-    });
+class Notifications {
+    constructor() {
+        this.notificationId = "soundstone-x-notification";
+        this.notificationAlarm = "notification";
+        this.anyErrors = false;
+        this.messages = [];
+        browser.alarms.onAlarm.addListener(x => this.releaseMessages(x));
+    }
+    message(message) {
+        console.log(message);
+        browser.alarms.create(this.notificationAlarm, {
+            delayInMinutes: 0.05
+        });
+        this.messages.push(message);
+    }
+    error(error) {
+        this.anyErrors = true;
+        this.message("Error: " + error);
+    }
+    releaseMessages(info) {
+        if (info.name !== this.notificationAlarm) {
+            return;
+        }
+        let title = this.anyErrors ? "Super Comic Buttons - Error" : "Super Comic Buttons";
+        let icon = "icons/" + (this.anyErrors ? "icons/error" : "icons/icon") + "-96.png";
+        this.anyErrors = false;
+        let summedMessages = "";
+        while (this.messages.length > 0) {
+            let message = this.messages.shift();
+            summedMessages += message + "\n";
+        }
+        browser.notifications.create(this.notificationId, {
+            title: title,
+            message: summedMessages,
+            type: "basic",
+            iconUrl: icon
+        });
+    }
 }
 //# sourceMappingURL=notifications.js.map
