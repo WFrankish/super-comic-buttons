@@ -6,9 +6,11 @@
 	],
 	"settings": {
 		"files.exclude": {
+			"*.png": true,
 			"**/.git": true,
 			"**/*.js": true,
-			"**/*.js.map": true
+			"**/*.map": true,
+			"**/*.zip" : true
 		}
 	}
 }

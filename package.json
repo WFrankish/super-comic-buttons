@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/jquery": "^3.3.6",
+    "@types/qunit": "^2.5.2",
+    "@types/sinon": "^5.0.2",
+    "web-ext-types": "^2.1.0"
+  }
+}

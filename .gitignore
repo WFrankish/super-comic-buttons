@@ -1,2 +1,3 @@
 /super-comic-buttons/interfaces/
-*.js.map
+*.map
+node_modules/
