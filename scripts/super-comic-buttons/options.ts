@@ -3,7 +3,7 @@ $(initOptions);
 function initOptions() : void {
     var backgroundPage : any = browser.extension.getBackgroundPage();
     var background : IBackground = backgroundPage.background;
-    var storage : IStorage = new WebStorage();
+    var storage : IStorage = new WebStorage(backgroundPage, background);
     var periodNumber : JQuery<HTMLInputElement> = $("#period-number");
     var periodButton : JQuery<HTMLButtonElement> = $("#period-button");
     var syncStoreRadio : JQuery<HTMLInputElement> = $("#sync-store-radio");
@@ -93,7 +93,7 @@ class Options implements IOptions {
         this.forceLoadButton.unbind("click");
         this.forceInfoText.text("Manually Save/Load");
         this.forceInfoText.removeClass("warning");
-        var data = loadOptions(false);
+        var data = this.storage.loadOptions(false);
         data.then(_ => {
             this.period = this.background.period;
             this.periodButton.click(this.updatePeriod);

@@ -1,6 +1,14 @@
 interface IBackground {
+    readonly epoch : Date;
+
+    readonly reloaded : Event;
+
     readonly active : boolean;
     readonly unreadNo : number;
+
+    lastSaved : Date;
+    version : number;
+    storage: any; // TODO
 
     outOfSync : boolean;
     period: number;

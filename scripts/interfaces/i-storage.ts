@@ -4,3 +4,20 @@ interface IStorage {
     loadOptions() : Promise<void>;
     loadOptions(force : boolean) : Promise<void>;
 }
+
+type Metadata = {
+    version : number,
+    lastSaved : string
+}
+
+
+type SyncStorage  = Metadata & {
+    notifyMe : boolean,
+    version : number,
+    period: number,
+    storage : any
+}
+
+type LocalStorage = SyncStorage & {
+    useSync : boolean
+}
