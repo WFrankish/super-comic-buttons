@@ -1,0 +1,14 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "outDir": "./super-comic-buttons",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "sourceMap": true,
+        "sourceRoot": "./scripts",
+        "strictNullChecks": true,
+        "target": "es2017"
+    }
+}
