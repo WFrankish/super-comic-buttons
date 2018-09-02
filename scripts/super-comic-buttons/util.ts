@@ -8,7 +8,7 @@ function or<T, T2>(obj : T | undefined | null, def : T2 | {} = {}) : T | T2 | {}
 }
 
 // returns if two objects are equal, or if both are equivalent dates
-function dateEquals(a : Date, b : Date) : boolean {
+function dateEquals(a : any, b : any) : boolean {
 	if(a === b){
 		return true;
 	}

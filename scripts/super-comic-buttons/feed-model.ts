@@ -1,9 +1,25 @@
-"use strict";
+class Feed implements IFeed {
+	name : string;
+    url: string;
+    enabled : boolean;
+    type: string;
+    overrideLink : string;
+    id : string;
+    root : string;
 
-class Feed{
+    recent : FeedItemDto[];
+    unreadLink : string;
+    unread : number;
+
+    count : number;
+    dayMap : number[];
+    hourMap : number[];
+    firstRecord : Date;
+    lastRecord : Date;
+
 	// eval(this.toSource()) should return this
-    constructor({
-			// config
+    constructor(
+		{
 			name, // string - the name of the feed
 			url, // string - the url to read from
 			enabled = true, // bool - whether this feed is active
@@ -25,7 +41,8 @@ class Feed{
 			hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			firstRecord = new Date(), // Date - the date of the earliest information about this feed
 			lastRecord // Date - the last time the feed was read
-		} = {}){ // I don't really know why the ={} is necessary, but it is
+		} : FeedDto
+	){
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -34,10 +51,10 @@ class Feed{
 		if(overrideLink) this.overrideLink = overrideLink;
 		if(id) this.id = id;
 		if(root) this.root = root;
-    this.recent = new MyArray();
-    recent.forEach(item => {
-      this.recent.push(new FeedItem(item));
-    });
+		this.recent = new MyArray();
+		recent.forEach(item => {
+			this.recent.push(new FeedItem(item));
+		});
 		this.unreadLink = unreadLink;
 		this.unread = unread;
 		this.count = count;
@@ -47,175 +64,181 @@ class Feed{
 		this.lastRecord = new Date(lastRecord);
     }
 
-	// getters
-	get averagePerDay(){
-		const day = 1000 * 60 * 60 * 24;
-		var span = new Date() - this.firstRecord;
-		var daysSpan = 1 + Math.trunc(span / day);
-		return this.count / daysSpan;
-	}
-	get averagePerWeek(){
-		const week = 1000 * 60 * 60 * 24 * 7;
-		var span = new Date() - this.firstRecord;
-		var weeksSpan = 1 + Math.trunc(span / week);
-		return this.count / weeksSpan;
-	}
-	get latestLink(){
-		if(this.overrideLink){ 
-			return this.overrideLink; 
+		// getters
+		get averagePerDay(){
+				const day = 1000 * 60 * 60 * 24;
+				var span = new Date() - this.firstRecord;
+				var daysSpan = 1 + Math.trunc(span / day);
+				return this.count / daysSpan;
 		}
-		return this.unreadLink;
-	}
-  get averageGap(){
-    var span = this.lastRecord - this.firstRecord;
-    return span / this.count;
-  }
-  get shouldRead(){
-    if(!this.enabled){
-      return false; // disabled, don't read automatically
-    }
-    const week = 1000*60*60*24*7;
-    if(Date.now() - this.lastRecord > week){
-      return true; // check at least once a week;
-    }
-    if(Date.now() - this.firstRecord < 4 * week){
-      return true; // check more frequently if a feed is new in order to learn data
-    }
-    var chance = this.getCumulativeUpdateChance(this.lastRecord, new Date());
-    return chance > (1/3); // chance of an update since our last check is better than 1 in 3
-  }
+		get averagePerWeek(){
+				const week = 1000 * 60 * 60 * 24 * 7;
+				var span = new Date() - this.firstRecord;
+				var weeksSpan = 1 + Math.trunc(span / week);
+				return this.count / weeksSpan;
+		}
+		get latestLink(){
+			if(this.overrideLink){ 
+					return this.overrideLink; 
+			}
+			return this.unreadLink;
+		}
+		get averageGap(){
+				var span = this.lastRecord - this.firstRecord;
+				return span / this.count;
+		}
+		get shouldRead(){
+			if(!this.enabled){
+				return false; // disabled, don't read automatically
+			}
+			const week = 1000*60*60*24*7;
+			if(Date.now() - this.lastRecord > week){
+				return true; // check at least once a week;
+			}
+			if(Date.now() - this.firstRecord < 4 * week){
+				return true; // check more frequently if a feed is new in order to learn data
+			}
+			var chance = this.getCumulativeUpdateChance(this.lastRecord, new Date());
+			return chance > (1/3); // chance of an update since our last check is better than 1 in 3
+		}
 
-	// adding and processing a new list of feed items
-	consume(feedItems){
-    var firstTime = !this.recent.any()
-		// update last record to now;
-		this.lastRecord = new Date();
-		// get index of first read item;
-		var i;
-		for(i = 0; i < feedItems.length; i++){
-			if(this.recent.any(f => f.equals(feedItems[i]))){
-				break;
+		// adding and processing a new list of feed items
+		consume(feedItems){
+			var firstTime = !this.recent.any()
+			// update last record to now;
+			this.lastRecord = new Date();
+			// get index of first read item;
+			var i;
+			for(i = 0; i < feedItems.length; i++){
+				if(this.recent.any(f => f.equals(feedItems[i]))){
+					break;
+				}
+			}
+			// seperate out new items;
+			var unreadItems = new MyArray(...feedItems.slice(0, i));
+			if(unreadItems.any()){
+				this.unreadLink = unreadItems.last().link;
+				this.unread += unreadItems.length;
+			}
+			for(var i = unreadItems.length-1; i >= 0; i--){
+				var feedItem = unreadItems[i];
+				if(this.count <= 0){
+					this.firstRecord = feedItem.date;
+				}
+				// update hour map
+				this.hourMap = this.hourMap.map(v => v * this.count);
+				this.hourMap[feedItem.date.getHours()] += 1;
+				this.hourMap = this.hourMap.map(v => v / (this.count+1));
+				// update day map
+				this.dayMap = this.dayMap.map(v => v * this.count);
+				this.dayMap[feedItem.date.getDay()] += 1;
+				this.dayMap = this.dayMap.map(v => v / (this.count+1));
+				this.count++;
+				// push to recent
+				this.recent.push(feedItem);
+				if(this.recent.length > 10){
+					this.recent.shift();
+				}
+			}
+			if(firstTime){
+				if(!this.recent.any(f => dateEquals(f.date, f.feedDate))){
+					this.flush();
+					this.firstRecord = new Date();
+				}
 			}
 		}
-		// seperate out new items;
-		var unreadItems = new MyArray(...feedItems.slice(0, i));
-		if(unreadItems.any()){
-			this.unreadLink = unreadItems.last().link;
-			this.unread += unreadItems.length;
+
+		// removes statistical data, except firstRecord
+		// useful the first time a feed is run if the rss has no time data
+		flush(){
+			this.count = 0;
+			this.dayMap = [0, 0, 0, 0, 0, 0, 0];
+			this.hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		}
-		for(var i = unreadItems.length-1; i >= 0; i--){
-			var feedItem = unreadItems[i];
-			if(this.count <= 0){
-				this.firstRecord = feedItem.date;
-			}
-			// update hour map
-			this.hourMap = this.hourMap.map(v => v * this.count);
-			this.hourMap[feedItem.date.getHours()] += 1;
-			this.hourMap = this.hourMap.map(v => v / (this.count+1));
-			// update day map
-			this.dayMap = this.dayMap.map(v => v * this.count);
-			this.dayMap[feedItem.date.getDay()] += 1;
-			this.dayMap = this.dayMap.map(v => v / (this.count+1));
-			this.count++;
-			// push to recent
-			this.recent.push(feedItem);
-			if(this.recent.length > 10){
-				this.recent.shift();
+
+		// return the unread link and set the link to the newest item
+		updateUnread(){
+			if(this.recent.any()){
+				var old = this.unreadLink;
+				this.unreadLink = this.recent.last().link;
+				this.unread = 0;
+				return old;
 			}
 		}
-    if(firstTime){
-      if(!this.recent.any(f => dateEquals(f.date, f.feedDate))){
-        this.flush();
-        this.firstRecord = new Date();
-      }
-    }
-	}
-
-	// removes statistical data, except firstRecord
-	// useful the first time a feed is run if the rss has no time data
-	flush(){
-		this.count = 0;
-		this.dayMap = [0, 0, 0, 0, 0, 0, 0];
-		this.hourMap = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	}
-
-	// return the unread link and set the link to the newest item
-	updateUnread(){
-		if(this.recent.any()){
-			var old = this.unreadLink;
-			this.unreadLink = this.recent.last().link;
-			this.unread = 0;
-			return old;
+		
+		open(force = false){
+			if(force || this.unread > 0){
+				var link = this.latestLink;
+				var numNew = this.unread;
+				this.updateUnread();
+				this.unread = 0;
+				var promise = browser.tabs.create({ url: link });
+				promise.then(tab => {
+					// TODO: some sites will override this
+					browser.tabs.executeScript(tab.id, 
+						{code : `document.title = "${numNew} new update${numNew > 1 ? "s" : ""} - ${this.name}";`}
+					);
+				});
+			}
 		}
-	}
-  
-  open(force = false){
-    if(force || this.unread > 0){
-      var link = this.latestLink;
-      var numNew = this.unread;
-      this.updateUnread();
-      this.unread = 0;
-      var promise = browser.tabs.create({ url: link });
-      promise.then(tab => {
-        // TODO: some sites will override this
-        browser.tabs.executeScript(tab.id, 
-          {code : `document.title = "${numNew} new update${numNew > 1 ? "s" : ""} - ${this.name}";`}
-        );
-      });
-    }
-  }
-  
-  getCumulativeUpdateChance(time1, time2){
-    var startDay = time1.getDay()
-    var startHour = time1.getHours();
-    var hourSpan = (time2 - time1) / (1000 * 60 * 60);
-    var n = this.averagePerWeek;
-    var sum = 0;
-    for(var i = 0; i < hourSpan; i++){
-      var hour = (startHour + i) % 24;
-      var day = (startDay + Math.trunc(i / 24)) % 7
-      sum += n * this.dayMap[day] * this.hourMap[hour];
-    }
-    return sum;
-  }
+		
+		getCumulativeUpdateChance(time1 : Date, time2 : Date) : number {
+			var startDay = time1.getDay()
+			var startHour = time1.getHours();
+			var hourSpan = (time2 - time1) / (1000 * 60 * 60);
+			var n = this.averagePerWeek;
+			var sum = 0;
+			for(var i = 0; i < hourSpan; i++){
+				var hour = (startHour + i) % 24;
+				var day = (startDay + Math.trunc(i / 24)) % 7
+				sum += n * this.dayMap[day] * this.hourMap[hour];
+			}
+			return sum;
+		}
 
-	toSource(){
-		return `(new Feed(${super.toSource()}))`;
-	}
+		toSource(){
+			return `(new Feed(${super.toSource()}))`;
+		}
 
 }
 
-class FeedItem{
+class FeedItem implements IFeedItem {
+	title : string;
+    feedDate : Date | null; // date from feed if present
+    date : Date; // assumed date of update
+    link : string;
+
     constructor
-		({
-			title = "No title found", // string - title of item
-			feedDate, // Date - date from feed if present
-			date, // Date - assumed date of update
-			link // string - link to page
-		} = {}
-    , parent // the feed
+	(
+		{
+			title = "No title found",
+			feedDate,
+			date,
+			link
+		} : FeedItemDto,
+		parent : IFeed
     ){
 		this.title = title;
-    var nFeedDate = new Date(feedDate);
-    if(!isNaN(nFeedDate.getDate())){
-      this.feedDate = nFeedDate;
-    } else {
-      this.feedDate = null;
-    }
+		var nFeedDate = new Date(feedDate);
+		if(!isNaN(nFeedDate.getDate())){
+			this.feedDate = nFeedDate;
+		} else {
+			this.feedDate = null;
+		}
 		this.link = link;
 		// if the feed has no date or its date is set to the future, override it
 		var now = new Date();
-    var nDate = new Date(date);
+		var nDate = new Date(date);
 		if(!isNaN(nDate.getDate())){
 			this.date = nDate;
 		}
-		 else if(this.feedDate != null && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
+		else if(this.feedDate != null && this.feedDate < now && (parent == null || !parent.lastRecord instanceof Date || isNaN(parent.lastRecord.getDate()) || this.feedDate > parent.lastRecord)){
 			this.date = this.feedDate;
 		} else {
 			this.date = now;
 		}
-  }
-	equals(that){
+  	}	
+	equals(that : any) : boolean {
 		if (typeof that != "object"){
 			return false;
 		}
@@ -225,7 +248,7 @@ class FeedItem{
 		// do not match on date, only feedDate
 		return titleMatch && linkMatch && dateMatch;
 	}
-	toSource(){
+	toSource() : string {
 		return `(new FeedItem(${super.toSource()}))`;
 	}
 }

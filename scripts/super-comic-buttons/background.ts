@@ -1,146 +1,165 @@
-"use strict";
+$(initBackground);
 
-// the url of this extension
-var ourUrl;
+function initBackground(){
+    var ourUrl = browser.runtime.getURL("");
+    var notifications = new Notifications();
+    var background : IBackground = new Background(ourUrl, notifications);
 
-// stored variables
-var lastSaved;
-var useSync;
-var notifyMe;
-var storage;
-var period;
-const version = 1.0;
+    addEventListener('reloaded', background.onReload);
+    background.load();
+    browser.alarms.onAlarm.addListener(function(alarmInfo){
+        if(alarmInfo.name === background.readAlarm){
+            background.readAll(false);
+        }
+    });
+}
 
-// other variables
-var outOfSync;
-const epoch = new Date(0);
-var active = false;
-var unreadNo = 0;
+class Background implements IBackground {
+    private readonly ourUrl : string;
+    private readonly notifications : INotifications;
+    private readonly storage : IStorage;
+    private readonly reader : IReader;
 
-// events
-var unreadNoChange = new Event('unreadNoChange');
-var reloaded = new Event('reloaded');
+    // stored variables
+    lastSaved : Date;
+    useSync : boolean;
+    notifyMe : boolean;
+    storedData : MyArray<IFeed>;
+    period : number;
+    readonly version = 2.0;
 
-// alarms
-const readAlarm = "readAlarm";
+    // other variables
+    outOfSync : boolean;
+    readonly epoch = new Date(0);
+    active = false;
+    unreadNo = 0;
 
-// onload
-$(function(){
-  ourUrl = browser.runtime.getURL("");
-  addEventListener('reloaded', onReload);
-  load();
-  browser.alarms.onAlarm.addListener(function(alarmInfo){
-    if(alarmInfo.name === readAlarm){
-      readAll(false);
+    // events
+    unreadNoChange = new Event('unreadNoChange');
+    reloaded = new Event('reloaded');
+
+    // alarms
+    readonly readAlarm = "readAlarm";
+
+    constructor(
+        ourUrl : string,
+        notifications : INotifications
+    ){
+        this.ourUrl = ourUrl;
+        this.notifications = notifications;
+        this.storage = new WebStorage(window, this);
+        this.reader = new Reader(this, this.notifications);
     }
-  });
-});
 
-function load(){
-  return loadOptions();
-}
-
-function save(){
-  var promise = saveOptions();
-  promise.then(_ => onReload());
-}
-
-function onReload(){
-  if(!storage){
-    storage = new MyArray();
-  } else {
-    var temp = [];
-    for (let i in storage){
-      var feed = new Feed(storage[i]);
-      temp.push(feed);
+    load() : Promise<void>{
+        return this.storage.loadOptions();
     }
-    storage = new MyArray(...temp);
-  }
-  if(!period || !period > 0){
-    period = 30;
-  }
-  unreadNo = storage.count(f => f.unread > 0);
-  refreshBadge();
-  dispatchEvent(unreadNoChange);
-}
 
-function activate(silent = false){
-  browser.alarms.create(readAlarm, {
-    periodInMinutes: period,
-    delayInMinutes: period
-  });
-  active = true;
-  refreshBadge();
-  if(!silent){
-    readAll(false);
-  }
-}
+    save() : void {
+        var promise = this.storage.saveOptions();
+        promise.then(_ => this.onReload());
+    }
 
-function deactivate(){
-  browser.alarms.clear(readAlarm);
-  active = false;
-  refreshBadge();
-}
+    onReload() : void {
+        if(!this.storedData){
+            this.storedData = new MyArray();
+        } else {
+            var temp = [];
+            for (let i in this.storedData){
+                var feed = new Feed(this.storedData[i]);
+                temp.push(feed);
+            }
+            this.storedData = new MyArray(...temp);
+        }
+        if(!this.period || !(this.period > 0)){
+            this.period = 30;
+        }
+        this.unreadNo = this.storedData.count(f => f.unread > 0);
+        this.refreshBadge();
+        dispatchEvent(this.unreadNoChange);
+    }
 
-function openOne(){
-  var possibles = storage.where(f => f.unread > 0).shuffled();
-  if(possibles.length > 0){
-    openThis(possibles[0], false);
-  }
-}
+    activate(silent : boolean = false) : void {
+        browser.alarms.create(this.readAlarm, {
+            periodInMinutes: this.period,
+            delayInMinutes: this.period
+        });
+        this.active = true;
+        this.refreshBadge();
+        if(!silent){
+            this.readAll(false);
+        }
+    }
 
-function openAll(){
-  storage.forEach(feed => feed.open(false));
-  save();
-}
+    deactivate() : void {
+        browser.alarms.clear(this.readAlarm);
+        this.active = false;
+        this.refreshBadge();
+    }
 
-function openThis(feed, force = false){
-  feed.open(force);
-  save();
-}
+    openOne() : void {
+        var possibles = this.storedData.where(f => f.unread > 0).shuffle();
+        if(possibles.length > 0){
+            this.openThis(possibles[0], false);
+        }
+    }
 
-function createNewFeed(feed){
-  storage.push(feed);
-  save();
-}
+    openAll() : void {
+        this.storedData.forEach(feed => feed.open(false));
+        this.save();
+    }
 
-function readAll(force = false){
-  notify("", "automatically checking for updates")
-  var out = [];
-  for (let i in storage){
-    var promise = readSingle(storage[i], force);
-    out.push(promise);
-  }
-  Promise.all(out).then(_ => save());
-}
+    openThis(feed : IFeed, force = false) : void {
+        feed.open(force);
+        this.save();
+    }
 
-function readSingle(feed, force = false){
-  if(force || feed.shouldRead){
-    var promise = read(feed);
-    return promise;
-  }
-}
+    createNewFeed(feed : IFeed){
+        this.storedData.push(feed);
+        this.save();
+    }
 
-function readThis(feed){
-  var promise = readSingle(feed, true);
-  promise.then(_ => save());
-}
+    readAll(force : boolean = false){
+        this.notifications.message("automatically checking for updates")
+        var out : Promise<any>[] = [];
+        for (let i in this.storedData){
+            var promise = this.readSingle(this.storedData[i], force);
+            out.push(promise);
+        }
+        Promise.all(out).then(_ => this.save());
+    }
 
-function toggleActiveness(feed){
-  feed.enabled = !feed.enabled;
-  save();
-}
+    readSingle(feed : IFeed, force = false) : Promise<any>{
+        if(force || feed.shouldRead){
+            var promise = read(feed);
+            return promise;
+        } else {
+            return Promise.resolve();
+        }
+    }
 
-function deleteThis(feed){
-  storage.remove(feed);
-  save();
-}
+    readThis(feed : IFeed) : void {
+        var promise = this.readSingle(feed, true);
+        promise.then(_ => this.save());
+    }
 
-function refreshBadge(){
-  if(active){
-    browser.browserAction.setBadgeText({text: unreadNo.toString()});
-    browser.browserAction.setBadgeBackgroundColor({color: "#ff000022"})
-  } else {
-    browser.browserAction.setBadgeText({text: ""});
-  }
+    toggleActiveness(feed : IFeed){
+        feed.enabled = !feed.enabled;
+        this.save();
+    }
+
+    deleteThis(feed : Feed){
+        this.storedData.remove(feed);
+        this.save();
+    }
+
+    refreshBadge(){
+        if(this.active){
+            browser.browserAction.setBadgeText({text: this.unreadNo.toString()});
+            browser.browserAction.setBadgeBackgroundColor({color: "#ff000022"})
+        } else {
+            browser.browserAction.setBadgeText({text: ""});
+        }
+    }
+
 }

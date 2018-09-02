@@ -1,5 +1,6 @@
 interface IBackground {
     readonly epoch : Date;
+    readonly readAlarm: string;
 
     readonly reloaded : Event;
 
@@ -7,8 +8,8 @@ interface IBackground {
     readonly unreadNo : number;
 
     lastSaved : Date;
-    version : number;
-    storage: any; // TODO
+    readonly version : number;
+    storedData: MyArray<IFeed>;
 
     outOfSync : boolean;
     period: number;
@@ -17,7 +18,10 @@ interface IBackground {
 
     openOne() : void;
     openAll() : void;
-    activate() : void;
-    activate(silent : boolean) : void;
+    activate(silent? : boolean) : void;
     deactivate() : void;
+
+    load() : void;
+    onReload() : void;
+    readAll(force? : boolean) : void;
 }

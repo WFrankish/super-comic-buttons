@@ -15,7 +15,7 @@ type SyncStorage  = Metadata & {
     notifyMe : boolean,
     version : number,
     period: number,
-    storage : any
+    storage : FeedDto[]
 }
 
 type LocalStorage = SyncStorage & {

@@ -63,7 +63,7 @@ class WebStorage implements IStorage {
             lastSaved : now.toDateString(),
             version : this.background.version,
             period: this.background.period,
-            storage : this.background.storage
+            storage : this.background.storedData as FeedDto[]
         });
     }
 
@@ -88,7 +88,7 @@ class WebStorage implements IStorage {
             browser.storage.sync.set({
                 version : this.background.version,
                 lastSaved : now.toDateString(),
-                storage : this.background.storage
+                storage : this.background.storedData
             });
         }, error => {
             notifyError("Sync save error", error.message);
@@ -110,7 +110,7 @@ class WebStorage implements IStorage {
             this.background.lastSaved = lastSaved;
             this.background.useSync = item.useSync;
             this.background.notifyMe = item.notifyMe;
-            this.background.storage = item.storage;
+            this.background.storedData = item.storage;
         });
         return promise;
     }
@@ -140,7 +140,7 @@ class WebStorage implements IStorage {
             });
             var promise = loaded.then(item => {
                 this.background.lastSaved = lastSaved;
-                this.background.storage = item.storage;
+                this.background.storedData = item.storage;
             });
             return promise;
         }, error => {
