@@ -5,19 +5,15 @@ class Reader {
         this.notifications = notifications;
     }
     read(feed) {
-        var resp = this.sendGetRequest(feed.url);
-        var xml = resp.then(data => this.handleResponse(data, feed));
-        var success = xml.then(data => {
-            feed.consume(data);
-            return true;
-        }, function (xhr, text, err) {
-            var e = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${text}`;
+        var result = this.sendGetRequest(feed.url)
+            .then((data) => this.handleResponse(data, feed), (xhr, status, err) => {
+            var ex = `${feed.url} threw ${err} : ${xhr.statusText} because ${status}`;
             if (this.background.notifyMe) {
-                this.notifications.error(feed.title, e);
+                this.notifications.error(ex);
             }
-            return false;
+            return [];
         });
-        return success;
+        return Promise.resolve(result);
     }
     sendGetRequest(url) {
         return $.ajax({
@@ -50,14 +46,26 @@ class Reader {
         var out = [];
         var items = rss.getElementsByTagName("item");
         for (var i = 0; i < items.length; i++) {
+            var title = feed.name;
+            var date = null;
+            var link = "No link";
             var item = items[i];
-            var titleElem = or(item.getElementsByTagName("title")[0]);
-            var title = or(titleElem.textContent, "No title");
-            var dateElem = or(item.getElementsByTagName("pubDate")[0]);
-            var feedDate = dateElem ? new Date(dateElem.textContent) : null;
-            var linkElem = or(item.getElementsByTagName("link")[0]);
-            var link = or(linkElem.textContent, "No link");
-            out.push(new FeedItem({ title, feedDate, link }, feed));
+            var titleElem = item.getElementsByTagName("title")[0];
+            if (titleElem !== undefined && titleElem !== null &&
+                titleElem.textContent !== null) {
+                title = titleElem.textContent;
+            }
+            var dateElem = item.getElementsByTagName("pubDate")[0];
+            if (dateElem !== undefined && dateElem !== null &&
+                dateElem.textContent !== null) {
+                date = new Date(dateElem.textContent);
+            }
+            var linkElem = item.getElementsByTagName("link")[0];
+            if (linkElem !== undefined && linkElem !== null &&
+                linkElem.href !== null) {
+                title = linkElem.href;
+            }
+            out.push({ title, date, link });
         }
         return out;
     }
@@ -65,32 +73,49 @@ class Reader {
         var out = [];
         var entries = atom.getElementsByTagName("entry");
         for (var i = 0; i < entries.length; i++) {
+            var title = feed.name;
+            var date = null;
+            var link = "No link";
             var entry = entries[i];
-            var titleElem = or(entry.getElementsByTagName("title")[0]);
-            var title = or(titleElem.textContent, "No title");
-            var dateElem = or(entry.getElementsByTagName("updated")[0]);
-            var feedDate = dateElem ? new Date(dateElem.textContent) : null;
-            var linkElem = or(entry.getElementsByTagName("link")[0]);
-            var link = or(linkElem.attributes["href"].nodeValue, "No link");
-            out.push(new FeedItem({ title, feedDate, link }, feed));
+            var titleElem = entry.getElementsByTagName("title")[0];
+            if (titleElem !== undefined && titleElem !== null &&
+                titleElem.textContent !== null) {
+                title = titleElem.textContent;
+            }
+            var dateElem = entry.getElementsByTagName("updated")[0];
+            if (dateElem !== undefined && dateElem !== null &&
+                dateElem.textContent !== null) {
+                date = new Date(dateElem.textContent);
+            }
+            var linkElem = entry.getElementsByTagName("link")[0];
+            if (linkElem !== undefined && linkElem !== null &&
+                linkElem.href !== null) {
+                title = linkElem.href;
+            }
+            out.push({ title, date, link });
         }
         return out;
     }
     parseHTML(html, feed) {
         var selector = "#" + feed.id;
-        var start = or($(selector, html).get(0) || $(html).filter(selector).get(0));
-        var img = this.findFirstImage(start);
-        var url = or(img.src, "");
+        var start = $(html).filter(selector).get(0);
+        var url = "";
+        if (start !== undefined && start !== null) {
+            var img = this.findFirstImage(start);
+            if (img !== null) {
+                url = img.src;
+            }
+        }
         // lousy parsing sticks the web extension's url on this if it's relative, so remove it
-        var link = url.replace(ourUrl, feed.root);
-        return [new FeedItem({ link })];
+        var link = url.replace(this.background.ourUrl, feed.root);
+        return [{ title: feed.name, date: new Date(), link }];
     }
     findFirstImage(start) {
         var stack = [];
         stack.push(start);
-        while (!stack.isEmpty) {
+        while (stack.length > 0) {
             var node = stack.pop();
-            if (node.tagName === "IMG") {
+            if (node instanceof HTMLImageElement) {
                 return node;
             }
             if (node.children) {
@@ -99,7 +124,7 @@ class Reader {
                 }
             }
         }
-        return {};
+        return null;
     }
 }
 //# sourceMappingURL=reader.js.map

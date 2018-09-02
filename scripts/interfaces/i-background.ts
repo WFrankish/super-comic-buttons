@@ -4,6 +4,7 @@ interface IBackground {
 
     readonly reloaded : Event;
 
+    readonly ourUrl: string;
     readonly active : boolean;
     readonly unreadNo : number;
 
