@@ -1,9 +1,9 @@
 class Reader implements IReader {
-    private readonly background : IBackground;
+    private readonly background : IBackgroundForReader;
     private readonly notifications : INotifications;
 
     constructor(
-        background : IBackground,
+        background : IBackgroundForReader,
         notifications : INotifications
     ){
         this.background = background;
@@ -15,7 +15,7 @@ class Reader implements IReader {
             .then(
                 (data) => this.handleResponse(data, feed),
                 (xhr, status, err) => {
-                    var ex = `${feed.url} threw ${err} : ${xhr.statusText} because ${status}`;
+                    var ex = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${status}`;
                     if(this.background.notifyMe){
                         this.notifications.error(ex);
                     }
@@ -68,7 +68,7 @@ class Reader implements IReader {
                 titleElem !== undefined && titleElem !== null &&
                 titleElem.textContent !== null            
             ){
-                title = titleElem.textContent;
+                title = titleElem.textContent.trim();
             }
             var dateElem = item.getElementsByTagName("pubDate")[0];
             if(
@@ -80,9 +80,9 @@ class Reader implements IReader {
             var linkElem = item.getElementsByTagName("link")[0];
             if(
                 linkElem !== undefined && linkElem !== null &&
-                linkElem.href !== null            
+                linkElem.textContent !== null            
             ){
-                title = linkElem.href;
+                link = linkElem.textContent.trim();
             }
             out.push({title, date, link});
         }
@@ -103,7 +103,7 @@ class Reader implements IReader {
                 titleElem !== undefined && titleElem !== null &&
                 titleElem.textContent !== null            
             ){
-                title = titleElem.textContent;
+                title = titleElem.textContent.trim();
             }
             var dateElem = entry.getElementsByTagName("updated")[0];
             if(
@@ -112,12 +112,12 @@ class Reader implements IReader {
             ){
                 date = new Date(dateElem.textContent);
             }
-            var linkElem = entry.getElementsByTagName("link")[0];
+            var linkElem = entry.getElementsByTagName("id")[0];
             if(
                 linkElem !== undefined && linkElem !== null &&
-                linkElem.href !== null            
+                linkElem.textContent !== null            
             ){
-                title = linkElem.href;
+                link = linkElem.textContent.trim();
             }
             out.push({title, date, link});
         }
@@ -128,7 +128,7 @@ class Reader implements IReader {
         var selector = "#" + feed.id;
         var start = $(html).filter(selector).get(0);
         var url = "";
-        
+
         if(start !== undefined && start !== null){
             var img = this.findFirstImage(start);
             if(img !== null){
@@ -138,7 +138,7 @@ class Reader implements IReader {
 
         // lousy parsing sticks the web extension's url on this if it's relative, so remove it
         var link = url.replace(this.background.ourUrl, feed.root);
-        return [{title: feed.name, date: new Date(), link}];
+        return [{title: feed.name, date: null, link}];
     }
     
     private findFirstImage(start : Element) : HTMLImageElement | null {

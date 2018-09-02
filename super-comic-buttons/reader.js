@@ -7,7 +7,7 @@ class Reader {
     read(feed) {
         var result = this.sendGetRequest(feed.url)
             .then((data) => this.handleResponse(data, feed), (xhr, status, err) => {
-            var ex = `${feed.url} threw ${err} : ${xhr.statusText} because ${status}`;
+            var ex = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${status}`;
             if (this.background.notifyMe) {
                 this.notifications.error(ex);
             }
@@ -53,7 +53,7 @@ class Reader {
             var titleElem = item.getElementsByTagName("title")[0];
             if (titleElem !== undefined && titleElem !== null &&
                 titleElem.textContent !== null) {
-                title = titleElem.textContent;
+                title = titleElem.textContent.trim();
             }
             var dateElem = item.getElementsByTagName("pubDate")[0];
             if (dateElem !== undefined && dateElem !== null &&
@@ -62,8 +62,8 @@ class Reader {
             }
             var linkElem = item.getElementsByTagName("link")[0];
             if (linkElem !== undefined && linkElem !== null &&
-                linkElem.href !== null) {
-                title = linkElem.href;
+                linkElem.textContent !== null) {
+                link = linkElem.textContent.trim();
             }
             out.push({ title, date, link });
         }
@@ -80,17 +80,17 @@ class Reader {
             var titleElem = entry.getElementsByTagName("title")[0];
             if (titleElem !== undefined && titleElem !== null &&
                 titleElem.textContent !== null) {
-                title = titleElem.textContent;
+                title = titleElem.textContent.trim();
             }
             var dateElem = entry.getElementsByTagName("updated")[0];
             if (dateElem !== undefined && dateElem !== null &&
                 dateElem.textContent !== null) {
                 date = new Date(dateElem.textContent);
             }
-            var linkElem = entry.getElementsByTagName("link")[0];
+            var linkElem = entry.getElementsByTagName("id")[0];
             if (linkElem !== undefined && linkElem !== null &&
-                linkElem.href !== null) {
-                title = linkElem.href;
+                linkElem.textContent !== null) {
+                link = linkElem.textContent.trim();
             }
             out.push({ title, date, link });
         }
@@ -108,7 +108,7 @@ class Reader {
         }
         // lousy parsing sticks the web extension's url on this if it's relative, so remove it
         var link = url.replace(this.background.ourUrl, feed.root);
-        return [{ title: feed.name, date: new Date(), link }];
+        return [{ title: feed.name, date: null, link }];
     }
     findFirstImage(start) {
         var stack = [];

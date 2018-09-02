@@ -1,10 +1,9 @@
-interface IBackground {
+interface IBackground extends IBackgroundForReader {
     readonly epoch : Date;
     readonly readAlarm: string;
 
     readonly reloaded : Event;
 
-    readonly ourUrl: string;
     readonly active : boolean;
     readonly unreadNo : number;
 
@@ -15,7 +14,6 @@ interface IBackground {
     outOfSync : boolean;
     period: number;
     useSync: boolean;
-    notifyMe : boolean;
 
     openOne() : void;
     openAll() : void;
@@ -25,4 +23,9 @@ interface IBackground {
     load() : void;
     onReload() : void;
     readAll(force? : boolean) : void;
+}
+
+interface IBackgroundForReader {
+    readonly ourUrl: string;
+    notifyMe : boolean;
 }
