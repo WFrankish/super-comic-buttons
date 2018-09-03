@@ -126,7 +126,7 @@ class Reader implements IReader {
     
     private parseHTML(html : Element, feed : FeedDto) : ReadResult[] {
         var selector = "#" + feed.id;
-        var start = $(html).filter(selector).get(0);
+        var start = $(selector, html).get(0);
         var url = "";
 
         if(start !== undefined && start !== null){

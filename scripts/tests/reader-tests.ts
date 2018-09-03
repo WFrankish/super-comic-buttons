@@ -15,7 +15,7 @@ QUnit.module("reader", {
 
 function getMockBackground() : IBackgroundForReader {
     var background : IBackgroundForReader = {
-        ourUrl: "",
+        ourUrl: "file://",
         notifyMe: true
     }
 
@@ -120,6 +120,33 @@ QUnit.test("html-no-root", async function ( assert: Assert) {
     requests[0].respond(200, {
         "Content-Type": "text/html" },
         monster_html_no_root
+    )
+
+    await result.then(arr => {
+        arr.forEach(i => {
+            console.log(i);
+            assert.equal(i.title, "test");
+            assert.equal(i.date, null);
+            assert.notEqual(i.link, "");
+        })
+    });
+});
+
+QUnit.test("html-root", async function ( assert: Assert) {
+    var background = getMockBackground();
+    var notifications = new ConsoleNotifications();
+
+    var reader = new Reader(background, notifications);
+
+    var feed = getMockFeed();
+    feed.id = "body";
+    feed.root = "http://www.whatever.com";
+
+    var result = reader.read(feed);
+
+    requests[0].respond(200, {
+        "Content-Type": "text/html" },
+        nuzlocke_html_root
     )
 
     await result.then(arr => {

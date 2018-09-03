@@ -98,7 +98,7 @@ class Reader {
     }
     parseHTML(html, feed) {
         var selector = "#" + feed.id;
-        var start = $(html).filter(selector).get(0);
+        var start = $(selector, html).get(0);
         var url = "";
         if (start !== undefined && start !== null) {
             var img = this.findFirstImage(start);

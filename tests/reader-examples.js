@@ -1,4 +1,6 @@
 "use strict";
+// lousy cross domain rules :(
+// add a bunch of real examples to test with
 var sleepless_rss_standard = `<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
 <channel>
 <title>Sleepless Domain</title>
@@ -510,6 +512,300 @@ var monster_html_no_root = `<!DOCTYPE html>
     </div>	
 <div style="clear:both"></div>
 </div>
+
+</body>
+</html>
+`;
+// had to modify this one, since they no longer have rootless urls
+var nuzlocke_html_root = `<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+	<!-- stylesheet -->
+	<link rel="stylesheet" href="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/css/app.css">
+	<!-- Google fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	<!-- icons -->
+	<link rel="icon" href="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/img/favicon.ico">
+	<link rel="apple-touch-icon" href="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/img/appicon.png" />
+	<style>
+	.wpsisac-slick-slider-wrp.wpsisac-clearfix {
+		border-radius: 4px;
+		overflow: hidden;
+		margin: 0 15px 30px;
+	}
+	@media only screen and (max-width: 40.0625em) {
+		.wpsisac-slick-slider.design-1 .slick-image-slide img, .slick-image-slide, .slide-wrap  {
+			height: auto !important;
+		}
+	}
+	</style>
+
+	<title>Pokemon: Hard-Mode - Nuzlocke Comics</title>
+
+<!-- This site is optimized with the Yoast SEO plugin v7.8 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="http://www.nuzlocke.com/comics/pokemon-hard-mode/" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Pokemon: Hard-Mode - Nuzlocke Comics" />
+<meta property="og:url" content="http://www.nuzlocke.com/comics/pokemon-hard-mode/" />
+<meta property="og:site_name" content="Nuzlocke Comics" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Pokemon: Hard-Mode - Nuzlocke Comics" />
+<script type='application/ld+json'>{"@context":"https:\/\/schema.org","@type":"Person","url":"http:\/\/www.nuzlocke.com\/","sameAs":[],"@id":"#person","name":"Nick Franco"}</script>
+<!-- / Yoast SEO plugin. -->
+
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="Nuzlocke Comics &raquo; Feed" href="http://www.nuzlocke.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Nuzlocke Comics &raquo; Comments Feed" href="http://www.nuzlocke.com/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.nuzlocke.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.8"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55358,56760,9792,65039],[55358,56760,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='wpos-slick-style-css'  href='http://www.nuzlocke.com/wp-content/plugins/wp-slick-slider-and-image-carousel/assets/css/slick.css?ver=1.5.1' type='text/css' media='all' />
+<link rel='stylesheet' id='wpsisac-public-style-css'  href='http://www.nuzlocke.com/wp-content/plugins/wp-slick-slider-and-image-carousel/assets/css/slick-slider-style.css?ver=1.5.1' type='text/css' media='all' />
+<link rel='stylesheet' id='nuzlocke-style-css'  href='http://www.nuzlocke.com/wp-content/themes/Nuzlocke/style.css?ver=4.9.8' type='text/css' media='all' />
+<link rel='https://api.w.org/' href='http://www.nuzlocke.com/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.nuzlocke.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.nuzlocke.com/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.9.8" />
+<link rel='shortlink' href='http://www.nuzlocke.com/?p=13' />
+<link rel="alternate" type="application/json+oembed" href="http://www.nuzlocke.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.nuzlocke.com%2Fcomics%2Fpokemon-hard-mode%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://www.nuzlocke.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.nuzlocke.com%2Fcomics%2Fpokemon-hard-mode%2F&#038;format=xml" />
+</head>
+
+<body class="page-template page-template-comics page-template-comics-php page page-id-13 page-child parent-pageid-52">
+<div id="wrapper">
+
+	<div id="background"></div>
+
+	<header id="header" class="row align-middle">
+
+		<!-- Logo -->
+		<div class="columns small-12 medium-5">
+			<div id="logo">
+				<a href="/"><img src="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/img/logo.png" alt="Nuzlocke comics"/></a>
+				<p>comics and creations by Nick Franco</p>
+			</div>
+		</div>
+
+		<!-- Navigation -->
+		<div class="columns small-12 medium-7">
+
+			<i class="material-icons hamburger">menu</i>
+
+			<div id="navigation">
+				<ul class="dropdown menu" data-dropdown-menu>
+
+					<i class="material-icons close">close</i>
+
+					<li id="menu-item-66" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-66"><a href="#">Comics</a>
+<ul class="sub-menu">
+	<li id="menu-item-25" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-13 current_page_item menu-item-25"><a href="http://www.nuzlocke.com/comics/pokemon-hard-mode/">Pokemon: Hard-Mode</a></li>
+	<li id="menu-item-23" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23"><a href="http://www.nuzlocke.com/comics/space-cat/">Space Cat</a></li>
+	<li id="menu-item-24" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://www.nuzlocke.com/comics/speedrun/">Speedrun</a></li>
+	<li id="menu-item-548" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-548"><a href="http://www.nuzlocke.com/comics/muh-phoenix/">Muh Phoenix</a></li>
+</ul>
+</li>
+<li id="menu-item-21" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-21"><a href="http://www.nuzlocke.com/archive/">Archive</a></li>
+<li id="menu-item-20" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="http://www.nuzlocke.com/about/">About</a></li>
+<li id="menu-item-27" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-27"><a target="_blank" href="http://s7.zetaboards.com/Nuzlocke_Forum/site/">Forum</a></li>
+<li id="menu-item-28" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-28"><a target="_blank" href="http://nuzlocke.spreadshirt.com/">Shop</a></li>
+<li id="menu-item-32" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-32"><a target="_blank" href="https://twitter.com/Nuzlocke"><i class="fab fa-twitter"></i></a></li>
+<li id="menu-item-556" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-556"><a target="_blank" href="https://www.twitch.tv/nuzdawg"><i class="fab fa-twitch"></i></a></li>
+<li id="menu-item-557" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-557"><a href="mailto:nuzlocke.comics@gmail.com"><i class="fas fa-envelope"></i></a></li>
+
+				</ul>
+			</div>
+
+		</div>
+
+	</header>
+
+	<div id="body">
+
+	<div class="row">
+		<!-- Left advert -->
+		<div class="columns hide-for-small-only medium-2 ad-vertical">
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- mainsky -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-2144584771555552"
+     data-ad-slot="6732330419"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+		</div>
+		<!-- Comic -->
+		<div class="columns small-12 medium-8 comic">
+
+			
+		 <div class="comic-controls light">
+			 <!-- Last button -->
+<a href="/comics/pokemon-hard-mode/"><i class="material-icons last">arrow_forward_ios</i></a>
+
+<span aria-current='page' class='page-numbers current'>1</span>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/2/'>2</a>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/3/'>3</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/68/'>68</a>
+<a class="next page-numbers" href="http://www.nuzlocke.com/comics/pokemon-hard-mode/page/2/"><i class="material-icons">arrow_back_ios</i></a>
+<!-- First button -->
+<a href="/comics/pokemon-hard-mode/page/68/"><i class="material-icons first">arrow_back_ios</i></a>
+		 </div>
+
+		 
+									<img src="/wp-content/uploads/2018/06/068white.png" />
+				
+			
+			<div class="comic-controls dark">
+				<!-- Last button -->
+<a href="/comics/pokemon-hard-mode/"><i class="material-icons last">arrow_forward_ios</i></a>
+
+<span aria-current='page' class='page-numbers current'>1</span>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/2/'>2</a>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/3/'>3</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://www.nuzlocke.com/comics/pokemon-hard-mode/page/68/'>68</a>
+<a class="next page-numbers" href="http://www.nuzlocke.com/comics/pokemon-hard-mode/page/2/"><i class="material-icons">arrow_back_ios</i></a>
+<!-- First button -->
+<a href="/comics/pokemon-hard-mode/page/68/"><i class="material-icons first">arrow_back_ios</i></a>
+			</div>
+
+			
+		</div>
+		<!-- Right advert -->
+		<div class="columns small-12 medium-2 ad-vertical">
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- mainsky -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-2144584771555552"
+     data-ad-slot="6732330419"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+		</div>
+	</div>
+
+
+</div><!-- #body -->
+
+	<!-- Footer -->
+	<footer id="footer">
+		<div class="footer-top">
+
+			<div class="row">
+
+				<div class="columns small-12 medium-3">
+					<ul>
+						<li class="title"><h6>Nuzlocke comics</h6></li>
+						<li id="menu-item-59" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-13 current_page_item menu-item-59"><a href="http://www.nuzlocke.com/comics/pokemon-hard-mode/">Pokemon: Hard-Mode</a></li>
+<li id="menu-item-57" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-57"><a href="http://www.nuzlocke.com/comics/speedrun/">Speedrun</a></li>
+<li id="menu-item-58" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-58"><a href="http://www.nuzlocke.com/comics/space-cat/">Space Cat</a></li>
+<li id="menu-item-549" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-549"><a href="http://www.nuzlocke.com/comics/muh-phoenix/">Muh Phoenix</a></li>
+					</ul>
+				</div>
+
+				<div class="columns small-12 medium-2">
+					<ul>
+						<li class="title"><h6>Navigation</h6></li>
+						<li id="menu-item-492" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-492"><a href="/">Home</a></li>
+<li id="menu-item-63" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-63"><a href="http://www.nuzlocke.com/archive/">Archive</a></li>
+<li id="menu-item-62" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-62"><a href="http://www.nuzlocke.com/about/">About</a></li>
+					</ul>
+				</div>
+
+				<div class="columns small-12 medium-4">
+					<ul>
+						<li class="title hide-for-small-only"></li>
+						<li id="menu-item-494" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-494"><a href="http://s7.zetaboards.com/Nuzlocke_Forum/site/">Forum</a></li>
+<li id="menu-item-495" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-495"><a href="http://nuzlocke.spreadshirt.com/">Shop</a></li>
+<li id="menu-item-493" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-493"><a href="http://www.nuzlocke.com/privacy-policy/">Privacy Policy</a></li>
+					</ul>
+				</div>
+
+				<div class="columns small-12 medium-3 ad-horizontal">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- newfoot -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-2144584771555552"
+     data-ad-slot="1314857461"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+				</div>
+
+			</div>
+
+		</div>
+		<div class="footer-bottom">
+
+			<div class="row">
+				<div class="column">
+					<p>
+						Copyright Nuzlocke comics 2010 - 2018<br />
+						Website created by <a href="https://www.jackscorey.co.uk" target="_blank">Jack Scorey</a>
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</footer>
+
+</div><!-- #wrapper -->
+
+<script src="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/node_modules/jquery/dist/jquery.js"></script>
+<script src="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/node_modules/what-input/dist/what-input.js"></script>
+<script src="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/node_modules/foundation-sites/dist/js/foundation.js"></script>
+<script src="http://www.nuzlocke.com/wp-content/themes/Nuzlocke/js/app.js"></script>
+
+<script>
+$("i.hamburger").click(function(){
+  $("#navigation").addClass("open");
+});
+
+$("i.close").click(function(){
+	$("#navigation").removeClass("open");
+});
+</script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-27762156-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-27762156-1');
+</script>
+
+
+
+<script type='text/javascript' src='http://www.nuzlocke.com/wp-content/themes/Nuzlocke/js/navigation.js?ver=20151215'></script>
+<script type='text/javascript' src='http://www.nuzlocke.com/wp-content/themes/Nuzlocke/js/skip-link-focus-fix.js?ver=20151215'></script>
+<script type='text/javascript' src='http://www.nuzlocke.com/wp-includes/js/wp-embed.min.js?ver=4.9.8'></script>
 
 </body>
 </html>
