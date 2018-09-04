@@ -4,12 +4,13 @@
         "alwaysStrict": true,
         "outDir": "./",
         "noFallthroughCasesInSwitch": true,
+        "strictPropertyInitialization": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "sourceMap": true,
         "sourceRoot": "./scripts",
         "strictNullChecks": true,
-        "target": "es2017",
+        "target": "esnext",
         "typeRoots": [
             "node_modules/@types",
             "node_modules/web-ext-types"
