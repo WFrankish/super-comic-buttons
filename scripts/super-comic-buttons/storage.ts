@@ -65,7 +65,7 @@ class WebStorage implements IStorage {
             notifyMe : this.background.notifyMe,
             lastSaved : now.toDateString(),
             version : this.background.version,
-            period: this.background.period,
+            period: this.background.periodMinutes,
             storage : this.background.storedData as FeedDto[]
         });
     }
@@ -108,7 +108,7 @@ class WebStorage implements IStorage {
             storage : []
         });
         var promise = loaded.then(item => {
-            this.background.period = item.period;
+            this.background.periodMinutes = item.period;
             var lastSaved = new Date(item.lastSaved);
             this.background.lastSaved = lastSaved;
             this.background.useSync = item.useSync;

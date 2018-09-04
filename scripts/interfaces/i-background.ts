@@ -1,7 +1,6 @@
 interface IBackground extends IBackgroundForPopup, IBackgroundForMenu, IBackgroundForReader, IBackgroundForStorage, IBackgroundForOptions {
     readonly readAlarm: string;
     
-
     openOne() : void;
     openAll() : void;
 
@@ -21,7 +20,14 @@ interface IBackgroundForPopup {
 }
 
 interface IBackgroundForMenu {
-    
+    storedData: FeedDto[];
+
+    openThis(feed : FeedDto, force? : boolean) : void;
+    readThis(feed : FeedDto) : void;
+    deleteThis(feed: FeedDto) : void;
+    createNewFeed(feed: FeedDto) : void;
+    toggleActiveness(feed: FeedDto) : void;
+    save() : void;
 }
 
 interface IBackgroundForReader {
@@ -37,7 +43,7 @@ interface IBackgroundForStorage {
     lastSaved : Date;
     notifyMe : boolean;
     outOfSync : boolean;
-    period: number;
+    periodMinutes: number;
     useSync: boolean;
     storedData: FeedDto[];
 }

@@ -15,31 +15,27 @@ function initBackground(){
 }
 
 class Background implements IBackground {
-    private readonly ourUrl : string;
-    private readonly notifications : INotifications;
     private readonly storage : IStorage;
     private readonly reader : IReader;
+    private readonly feedHandler : IFeedHandler;
 
-    // stored variables
-    lastSaved : Date;
-    useSync : boolean;
-    notifyMe : boolean;
-    storedData : MyArray<IFeed>;
-    period : number;
+    readonly notifications : INotifications;
     readonly version = 2.0;
+    readonly ourUrl : string;
+    
+    readonly unreadNoChange = new Event("unreadNoChange");
+    readonly reloaded = new Event("reloaded");
 
-    // other variables
-    outOfSync : boolean;
-    readonly epoch = new Date(0);
-    active = false;
-    unreadNo = 0;
-
-    // events
-    unreadNoChange = new Event('unreadNoChange');
-    reloaded = new Event('reloaded');
-
-    // alarms
-    readonly readAlarm = "readAlarm";
+    readAlarm = "readAlarm"
+    active: boolean;
+    unreadNo: number;
+    notifyMe: boolean;
+    
+    lastSaved: Date;
+    outOfSync: boolean;
+    periodMinutes: number;
+    useSync: boolean;
+    storedData: FeedDto[];
 
     constructor(
         ourUrl : string,
@@ -47,12 +43,13 @@ class Background implements IBackground {
     ){
         this.ourUrl = ourUrl;
         this.notifications = notifications;
-        this.storage = new WebStorage(window, this);
+        this.storage = new WebStorage(window, this, this.notifications);
         this.reader = new Reader(this, this.notifications);
+        this.feedHandler = new FeedHandler();
     }
 
-    load() : Promise<void>{
-        return this.storage.loadOptions();
+    load() : void {
+        this.storage.loadOptions();
     }
 
     save() : void {
@@ -61,28 +58,21 @@ class Background implements IBackground {
     }
 
     onReload() : void {
-        if(!this.storedData){
-            this.storedData = new MyArray();
-        } else {
-            var temp = [];
-            for (let i in this.storedData){
-                var feed = new Feed(this.storedData[i]);
-                temp.push(feed);
-            }
-            this.storedData = new MyArray(...temp);
+        if(this.storedData === undefined){
+            this.storedData = [];
         }
-        if(!this.period || !(this.period > 0)){
-            this.period = 30;
+        if(this.periodMinutes === undefined || this.periodMinutes <= 0){
+            this.periodMinutes = 30;
         }
-        this.unreadNo = this.storedData.count(f => f.unread > 0);
+        this.unreadNo = this.storedData.filter(f => f.unread > 0).length;
         this.refreshBadge();
         dispatchEvent(this.unreadNoChange);
     }
 
     activate(silent : boolean = false) : void {
         browser.alarms.create(this.readAlarm, {
-            periodInMinutes: this.period,
-            delayInMinutes: this.period
+            periodInMinutes: this.periodMinutes,
+            delayInMinutes: this.periodMinutes
         });
         this.active = true;
         this.refreshBadge();
@@ -98,23 +88,24 @@ class Background implements IBackground {
     }
 
     openOne() : void {
-        var possibles = this.storedData.where(f => f.unread > 0).shuffle();
+        var storedData = new MyArray(...this.storedData);
+        var possibles = storedData.where(f => f.unread > 0).shuffle();
         if(possibles.length > 0){
             this.openThis(possibles[0], false);
         }
     }
 
     openAll() : void {
-        this.storedData.forEach(feed => feed.open(false));
+        this.storedData.forEach(feed => this.feedHandler.open(feed));
         this.save();
     }
 
-    openThis(feed : IFeed, force = false) : void {
-        feed.open(force);
+    openThis(feed : FeedDto, force = false) : void {
+        this.feedHandler.open(feed, force);
         this.save();
     }
 
-    createNewFeed(feed : IFeed){
+    createNewFeed(feed : FeedDto){
         this.storedData.push(feed);
         this.save();
     }
@@ -129,31 +120,32 @@ class Background implements IBackground {
         Promise.all(out).then(_ => this.save());
     }
 
-    readSingle(feed : IFeed, force = false) : Promise<any>{
-        if(force || feed.shouldRead){
-            var promise = read(feed);
-            return promise;
+    private readSingle(feed : FeedDto, force = false) : Promise<any>{
+        if(force || this.feedHandler.shouldRead(feed)){
+            return this.reader.read(feed)
+                .then(fs => this.feedHandler.consume(feed, fs));
         } else {
             return Promise.resolve();
         }
     }
 
-    readThis(feed : IFeed) : void {
+    readThis(feed : FeedDto) : void {
         var promise = this.readSingle(feed, true);
         promise.then(_ => this.save());
     }
 
-    toggleActiveness(feed : IFeed){
+    toggleActiveness(feed : FeedDto){
         feed.enabled = !feed.enabled;
         this.save();
     }
 
-    deleteThis(feed : Feed){
-        this.storedData.remove(feed);
+    deleteThis(feed : FeedDto){
+        var i = this.storedData.indexOf(feed);
+        this.storedData.splice(i,1);
         this.save();
     }
 
-    refreshBadge(){
+    private refreshBadge(){
         if(this.active){
             browser.browserAction.setBadgeText({text: this.unreadNo.toString()});
             browser.browserAction.setBadgeBackgroundColor({color: "#ff000022"})

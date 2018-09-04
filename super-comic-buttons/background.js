@@ -15,48 +15,37 @@ function initBackground() {
 class Background {
     constructor(ourUrl, notifications) {
         this.version = 2.0;
-        this.epoch = new Date(0);
-        this.active = false;
-        this.unreadNo = 0;
-        // events
-        this.unreadNoChange = new Event('unreadNoChange');
-        this.reloaded = new Event('reloaded');
-        // alarms
+        this.unreadNoChange = new Event("unreadNoChange");
+        this.reloaded = new Event("reloaded");
         this.readAlarm = "readAlarm";
         this.ourUrl = ourUrl;
         this.notifications = notifications;
-        this.storage = new WebStorage(window, this);
+        this.storage = new WebStorage(window, this, this.notifications);
+        this.reader = new Reader(this, this.notifications);
+        this.feedHandler = new FeedHandler();
     }
     load() {
-        return this.storage.loadOptions();
+        this.storage.loadOptions();
     }
     save() {
         var promise = this.storage.saveOptions();
         promise.then(_ => this.onReload());
     }
     onReload() {
-        if (!this.storedData) {
-            this.storedData = new MyArray();
+        if (this.storedData === undefined) {
+            this.storedData = [];
         }
-        else {
-            var temp = [];
-            for (let i in this.storedData) {
-                var feed = new Feed(this.storedData[i]);
-                temp.push(feed);
-            }
-            this.storedData = new MyArray(...temp);
+        if (this.periodMinutes === undefined || this.periodMinutes <= 0) {
+            this.periodMinutes = 30;
         }
-        if (!this.period || !(this.period > 0)) {
-            this.period = 30;
-        }
-        this.unreadNo = this.storedData.count(f => f.unread > 0);
+        this.unreadNo = this.storedData.filter(f => f.unread > 0).length;
         this.refreshBadge();
         dispatchEvent(this.unreadNoChange);
     }
     activate(silent = false) {
         browser.alarms.create(this.readAlarm, {
-            periodInMinutes: this.period,
-            delayInMinutes: this.period
+            periodInMinutes: this.periodMinutes,
+            delayInMinutes: this.periodMinutes
         });
         this.active = true;
         this.refreshBadge();
@@ -70,17 +59,18 @@ class Background {
         this.refreshBadge();
     }
     openOne() {
-        var possibles = this.storedData.where(f => f.unread > 0).shuffled();
+        var storedData = new MyArray(...this.storedData);
+        var possibles = storedData.where(f => f.unread > 0).shuffle();
         if (possibles.length > 0) {
             this.openThis(possibles[0], false);
         }
     }
     openAll() {
-        this.storedData.forEach(feed => feed.open(false));
+        this.storedData.forEach(feed => this.feedHandler.open(feed));
         this.save();
     }
     openThis(feed, force = false) {
-        feed.open(force);
+        this.feedHandler.open(feed, force);
         this.save();
     }
     createNewFeed(feed) {
@@ -97,9 +87,9 @@ class Background {
         Promise.all(out).then(_ => this.save());
     }
     readSingle(feed, force = false) {
-        if (force || feed.shouldRead) {
-            var promise = read(feed);
-            return promise;
+        if (force || this.feedHandler.shouldRead(feed)) {
+            return this.reader.read(feed)
+                .then(fs => this.feedHandler.consume(feed, fs));
         }
         else {
             return Promise.resolve();
@@ -114,7 +104,8 @@ class Background {
         this.save();
     }
     deleteThis(feed) {
-        this.storedData.remove(feed);
+        var i = this.storedData.indexOf(feed);
+        this.storedData.splice(i, 1);
         this.save();
     }
     refreshBadge() {

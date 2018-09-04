@@ -95,7 +95,7 @@ class Options implements IOptions {
         this.forceInfoText.removeClass("warning");
         var data = this.storage.loadOptions(false);
         data.then(_ => {
-            this.period = this.background.period;
+            this.period = this.background.periodMinutes;
             this.periodButton.click(this.updatePeriod);
             if(this.background.useSync){
                 this.syncStoreRadio.click();
@@ -165,7 +165,7 @@ class Options implements IOptions {
 
     private updatePeriod(){
         if(this.period > 0){
-            this.background.period = this.period
+            this.background.periodMinutes = this.period
             var promise = this.storage.saveOptions(false);
             promise.then(_ => {
                 if(this.background.active){
