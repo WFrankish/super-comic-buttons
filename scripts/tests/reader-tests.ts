@@ -23,16 +23,18 @@ function getMockBackground() : IBackgroundForReader {
 }
 
 function getMockFeed() : FeedDto {
-    var feed = {
+    var feed : FeedDto = {
         name: "test",
         url: "",
-        type: "",
-        overrideLink: "",
-        id: "",
-        root: "",
-        unreadLink: "",
-        lastRecord: new Date()
-    };
+        enabled: true,
+        type: "html",
+    
+        recent: [],
+        unread: 0,
+    
+        count: 0,
+        map: []
+    }
 
     return feed;
 }

@@ -1,31 +1,47 @@
-interface IBackground extends IBackgroundForReader {
-    readonly epoch : Date;
+interface IBackground extends IBackgroundForPopup, IBackgroundForMenu, IBackgroundForReader, IBackgroundForStorage, IBackgroundForOptions {
     readonly readAlarm: string;
-
-    readonly reloaded : Event;
-
-    readonly active : boolean;
-    readonly unreadNo : number;
-
-    lastSaved : Date;
-    readonly version : number;
-    storedData: MyArray<IFeed>;
-
-    outOfSync : boolean;
-    period: number;
-    useSync: boolean;
+    
 
     openOne() : void;
     openAll() : void;
-    activate(silent? : boolean) : void;
-    deactivate() : void;
 
     load() : void;
     onReload() : void;
     readAll(force? : boolean) : void;
 }
 
+// split up background to make mocks for testing more bearable
+
+interface IBackgroundForPopup {
+    readonly active : boolean;
+    readonly unreadNo : number;
+    
+    activate(silent? : boolean) : void;
+    deactivate() : void;
+}
+
+interface IBackgroundForMenu {
+    
+}
+
 interface IBackgroundForReader {
     readonly ourUrl: string;
     notifyMe : boolean;
+}
+
+interface IBackgroundForStorage {
+    readonly notifications : INotifications
+    readonly version : number;
+    readonly reloaded : Event;
+
+    lastSaved : Date;
+    notifyMe : boolean;
+    outOfSync : boolean;
+    period: number;
+    useSync: boolean;
+    storedData: FeedDto[];
+}
+
+interface IBackgroundForOptions extends IBackgroundForStorage, IBackgroundForPopup {
+
 }

@@ -3,7 +3,7 @@ $(initOptions);
 function initOptions() : void {
     var backgroundPage : any = browser.extension.getBackgroundPage();
     var background : IBackground = backgroundPage.background;
-    var storage : IStorage = new WebStorage(backgroundPage, background);
+    var storage : IStorage = new WebStorage(backgroundPage, background, background.notifications);
     var periodNumber : JQuery<HTMLInputElement> = $("#period-number");
     var periodButton : JQuery<HTMLButtonElement> = $("#period-button");
     var syncStoreRadio : JQuery<HTMLInputElement> = $("#sync-store-radio");
@@ -31,7 +31,7 @@ function initOptions() : void {
 }
 
 class Options implements IOptions {
-    private readonly background : IBackground;
+    private readonly background : IBackgroundForOptions;
     private readonly storage : IStorage;
     private readonly periodNumber : JQuery<HTMLInputElement>;
     private readonly periodButton : JQuery<HTMLButtonElement>;
@@ -46,7 +46,7 @@ class Options implements IOptions {
     private syncPending : boolean;
 
     constructor(
-        background : IBackground,
+        background : IBackgroundForOptions,
         storage : IStorage,
         periodNumber : JQuery<HTMLInputElement>,
         periodButton : JQuery<HTMLButtonElement>,

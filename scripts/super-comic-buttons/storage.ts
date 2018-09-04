@@ -1,16 +1,19 @@
 class WebStorage implements IStorage {
     private readonly backgroundWindow : Window;
-    private readonly background : IBackground;
+    private readonly background : IBackgroundForStorage;
+    private readonly notifications : INotifications;
 
     private syncPending : boolean;
 
     constructor(
         backgroundWindow : Window,
-        background : IBackground
+        background : IBackgroundForStorage,
+        notifications : INotifications
     ){
         this.backgroundWindow = backgroundWindow;
         this.background = background;
         this.syncPending = false;
+        this.notifications = notifications;
     }
 
     saveOptions(force : boolean = false) : Promise<void> {
@@ -45,14 +48,14 @@ class WebStorage implements IStorage {
     private loadLocalMetadata() : Promise<Metadata> {
         return browser.storage.local.get<Metadata>({
             version : this.background.version,
-            lastSaved : this.background.epoch.toDateString()
+            lastSaved : new Date(0).toDateString()
         });
     }
 
     private loadSyncMetadata() : Promise<Metadata> {
         return browser.storage.sync.get<Metadata>({
             version : this.background.version,
-            lastSaved : this.background.epoch.toDateString()
+            lastSaved : new Date(0).toDateString()
         });
     }
 
@@ -69,7 +72,7 @@ class WebStorage implements IStorage {
 
     private saveToSync(force : boolean, now : Date, lastSavedLocal : Date) : void {
         if(this.background.outOfSync && !force){
-            notifyError("Sync save error", "The local and sync data are out of sync, please visit the options page to resolve");
+            this.notifications.error("Sync save error - The local and sync data are out of sync, please visit the options page to resolve");
             return;
         }
         // get sync version and date
@@ -77,12 +80,12 @@ class WebStorage implements IStorage {
         gettingItems.then(item => {
             var lastSaved = new Date(item.lastSaved);
             if(item.version > this.background.version){
-                notifyError("Sync save error", "The stored data is for a later version of this program, please update this addon.");
+                this.notifications.error("Sync save error - The stored data is for a later version of this program, please update this addon.");
                 return;
             }
             if((lastSaved > lastSavedLocal) && !force){
                 this.background.outOfSync = true;
-                notifyError("Sync save error", "Sync data is newer then load data, please visit the options page to resolve");
+                this.notifications.error("Sync save error - Sync data is newer then load data, please visit the options page to resolve");
                 return;
             }
             browser.storage.sync.set({
@@ -91,7 +94,7 @@ class WebStorage implements IStorage {
                 storage : this.background.storedData
             });
         }, error => {
-            notifyError("Sync save error", error.message);
+            error("Sync save error", error.message);
         });
     }
 
@@ -99,10 +102,10 @@ class WebStorage implements IStorage {
         var loaded = browser.storage.local.get<LocalStorage>({
             useSync : false,
             notifyMe : false,
-            lastSaved : this.background.epoch.toDateString(),
+            lastSaved : new Date(0).toString(),
             version : this.background.version,
             period : 30,
-            storage : null
+            storage : []
         });
         var promise = loaded.then(item => {
             this.background.period = item.period;
@@ -117,7 +120,7 @@ class WebStorage implements IStorage {
 
     private loadFromSync(force : boolean) : Promise<void> {
         if(this.background.outOfSync && !force){
-            notifyError("Sync load error", "The local and sync data are out of sync, please visit the options page to resolve");
+            this.notifications.error("Sync load error - The local and sync data are out of sync, please visit the options page to resolve");
             return Promise.resolve();
         }
         // get local version and date
@@ -125,18 +128,18 @@ class WebStorage implements IStorage {
         return metadata.then(item => {
             var lastSaved = new Date(item.lastSaved);
             if(item.version > this.background.version){
-                notifyError("Sync load error", "The stored data is for a later version of this program, please update this addon");
+                this.notifications.error("Sync load error - The stored data is for a later version of this program, please update this addon");
                 return Promise.resolve();
             }
             if(this.background.lastSaved > lastSaved && !force){
-                notifyError("Sync load error", "Local data is newer then sync data, please visit options page to resolve");
+                this.notifications.error("Sync load error - Local data is newer then sync data, please visit options page to resolve");
                 this.background.outOfSync = true;
                 return Promise.resolve();
             }
             var loaded = browser.storage.sync.get({
                 version : this.background.version,
-                lastSaved : this.background.epoch.toDateString(),
-                storage : null
+                lastSaved : new Date(0).toDateString(),
+                storage : []
             });
             var promise = loaded.then(item => {
                 this.background.lastSaved = lastSaved;
@@ -144,7 +147,7 @@ class WebStorage implements IStorage {
             });
             return promise;
         }, error => {
-            notifyError("Sync load error", error.message);
+            this.notifications.error("Sync load error - " + error.message);
         });
     }
 }

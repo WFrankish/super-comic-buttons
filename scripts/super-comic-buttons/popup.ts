@@ -28,13 +28,13 @@ function initPopup() : void {
 }
 
 class Popup implements IPopup {
-    private readonly background : IBackground;
+    private readonly background : IBackgroundForPopup;
     private readonly toggleButton: JQuery<HTMLElement>;
     private readonly readOneButton: JQuery<HTMLElement>;
     private readonly readAllButton: JQuery<HTMLElement>;
 
     constructor(
-      background : IBackground,
+      background : IBackgroundForPopup,
       toggleButton: JQuery<HTMLElement>,
       readOneButton: JQuery<HTMLElement>,
       readAllButton: JQuery<HTMLElement>

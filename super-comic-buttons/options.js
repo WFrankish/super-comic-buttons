@@ -3,7 +3,7 @@ $(initOptions);
 function initOptions() {
     var backgroundPage = browser.extension.getBackgroundPage();
     var background = backgroundPage.background;
-    var storage = new WebStorage(backgroundPage, background);
+    var storage = new WebStorage(backgroundPage, background, background.notifications);
     var periodNumber = $("#period-number");
     var periodButton = $("#period-button");
     var syncStoreRadio = $("#sync-store-radio");
