@@ -106,8 +106,11 @@ class Reader {
                 url = img.src;
             }
         }
-        // lousy parsing sticks the web extension's url on this if it's relative, so remove it
-        var link = url.replace(this.background.ourUrl, feed.root);
+        var link = url;
+        if (feed.root !== undefined) {
+            // lousy parsing sticks the web extension's url on this if it's relative, so remove it
+            var link = url.replace(this.background.ourUrl, feed.root);
+        }
         return [{ title: feed.name, date: null, link }];
     }
     findFirstImage(start) {
