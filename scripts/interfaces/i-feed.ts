@@ -27,7 +27,7 @@ type FeedDto = {
     // a 7 by 24 map of (roughly) the probability of an update
     // use UTC times
     map : number[][];
-    firstRecord? : string;
+    firstRecord : string;
     lastRecord? : string;
 }
 

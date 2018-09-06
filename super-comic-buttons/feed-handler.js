@@ -11,6 +11,7 @@ class FeedHandler {
             unread: 0,
             count: 0,
             map: [],
+            firstRecord: new Date().toDateString()
         };
         this.flush(result);
         return result;
@@ -28,6 +29,7 @@ class FeedHandler {
             unread: 0,
             count: 0,
             map: [],
+            firstRecord: new Date().toDateString()
         };
         this.flush(result);
         return result;
@@ -68,16 +70,17 @@ class FeedHandler {
     consume(feed, items) {
         var now = new Date();
         var firstTime = feed.recent.length == 0;
-        // update last record to now;
+        // update last record to now
         feed.lastRecord = new Date().toString();
-        // get index of first read item;
+        // get index of first read item
+        // assume: items are in newest first order
         var i;
         for (i = 0; i < items.length; i++) {
             if (feed.recent.some(f => this.equals(f, items[i], now))) {
                 break;
             }
         }
-        // seperate out new items;
+        // seperate out new items
         var unreadItems = new MyArray(...items.slice(0, i));
         if (unreadItems.any()) {
             feed.unreadLink = unreadItems.last().link;
@@ -85,7 +88,7 @@ class FeedHandler {
         }
         for (var i = unreadItems.length - 1; i >= 0; i--) {
             var feedItem = this.newFeedItem(unreadItems[i], now);
-            if (feed.count <= 0) {
+            if (feed.recent.length == 0) {
                 feed.firstRecord = feedItem.date.toString();
             }
             // update map
@@ -112,22 +115,24 @@ class FeedHandler {
         }
     }
     averagePerDay(feed) {
-        if (feed.firstRecord === undefined) {
+        if (feed.lastRecord === undefined) {
             return 0;
         }
         const day = 1000 * 60 * 60 * 24;
         var firstRecord = new Date(feed.firstRecord);
-        var span = Date.now() - firstRecord.valueOf();
+        var lastRecord = new Date(feed.lastRecord);
+        var span = lastRecord.valueOf() - firstRecord.valueOf();
         var daysSpan = 1 + Math.trunc(span / day);
         return feed.count / daysSpan;
     }
     averagePerWeek(feed) {
-        if (feed.firstRecord === undefined) {
+        if (feed.lastRecord === undefined) {
             return 0;
         }
         const week = 1000 * 60 * 60 * 24 * 7;
         var firstRecord = new Date(feed.firstRecord);
-        var span = Date.now() - firstRecord.valueOf();
+        var lastRecord = new Date(feed.lastRecord);
+        var span = lastRecord.valueOf() - firstRecord.valueOf();
         var weekSpan = 1 + Math.trunc(span / week);
         return feed.count / weekSpan;
     }
@@ -141,7 +146,7 @@ class FeedHandler {
         return null;
     }
     averageGap(feed) {
-        if (feed.firstRecord === undefined || feed.lastRecord === undefined) {
+        if (feed.lastRecord === undefined) {
             return NaN;
         }
         var lastRecord = new Date(feed.lastRecord);
@@ -157,8 +162,8 @@ class FeedHandler {
         }
     }
     getCumulativeUpdateChance(feed, time1, time2) {
-        var startDay = time1.getDay();
-        var startHour = time1.getHours();
+        var startDay = time1.getUTCDay();
+        var startHour = time1.getUTCHours();
         var hourSpan = (time2.valueOf() - time1.valueOf()) / (1000 * 60 * 60);
         var n = this.averagePerWeek(feed);
         var sum = 0;
@@ -172,8 +177,8 @@ class FeedHandler {
     equals(existing, newer, now) {
         var dateOK = newer.date == null
             || newer.date.valueOf() > now.valueOf()
-            || new Date(existing.date) == newer.date;
-        return dateOK && existing.link === newer.link && existing.title === newer.link;
+            || new Date(existing.date).valueOf() === newer.date.valueOf();
+        return dateOK && existing.link === newer.link && existing.title === newer.title;
     }
     newFeedItem(readResult, now) {
         var date;

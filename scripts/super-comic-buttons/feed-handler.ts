@@ -10,7 +10,8 @@ class FeedHandler implements IFeedHandler {
             recent: [],
             unread: 0,
             count: 0,
-            map: [], //flush will deal with this
+            map: [], //flush will deal with this,
+            firstRecord: new Date().toDateString()
         }
         this.flush(result);
         return result;
@@ -29,6 +30,7 @@ class FeedHandler implements IFeedHandler {
             unread: 0,
             count: 0,
             map: [], //flush will deal with this
+            firstRecord: new Date().toDateString()
         }
         this.flush(result);
         return result;
@@ -80,10 +82,11 @@ class FeedHandler implements IFeedHandler {
         var now = new Date();
         var firstTime = feed.recent.length == 0;
 
-        // update last record to now;
+        // update last record to now
         feed.lastRecord = new Date().toString();
 
-        // get index of first read item;
+        // get index of first read item
+        // assume: items are in newest first order
         var i : number;
         for(i = 0; i < items.length; i++){
             if(feed.recent.some(f => this.equals(f, items[i], now))){
@@ -91,7 +94,7 @@ class FeedHandler implements IFeedHandler {
             }
         }
 
-        // seperate out new items;
+        // seperate out new items
         var unreadItems = new MyArray(...items.slice(0, i));
         if(unreadItems.any()){
             feed.unreadLink = unreadItems.last().link;
@@ -100,7 +103,8 @@ class FeedHandler implements IFeedHandler {
 
         for(var i = unreadItems.length-1; i >= 0; i--){
             var feedItem = this.newFeedItem(unreadItems[i], now);
-            if(feed.count <= 0){
+
+            if(feed.recent.length == 0){
                 feed.firstRecord = feedItem.date.toString();
             }
 
@@ -132,23 +136,25 @@ class FeedHandler implements IFeedHandler {
     }
         
     averagePerDay(feed: FeedDto): number {
-        if(feed.firstRecord === undefined){
+        if(feed.lastRecord === undefined){
             return 0;
         }
         const day = 1000 * 60 * 60 * 24;
         var firstRecord = new Date(feed.firstRecord);
-        var span = Date.now() - firstRecord.valueOf();
+        var lastRecord = new Date(feed.lastRecord);
+        var span = lastRecord.valueOf() - firstRecord.valueOf();
         var daysSpan = 1 + Math.trunc(span / day);
         return feed.count / daysSpan;
     }
     
     averagePerWeek(feed: FeedDto): number {
-        if(feed.firstRecord === undefined){
+        if(feed.lastRecord === undefined){
             return 0;
         }
         const week = 1000 * 60 * 60 * 24 * 7;
         var firstRecord = new Date(feed.firstRecord);
-        var span = Date.now() - firstRecord.valueOf();
+        var lastRecord = new Date(feed.lastRecord);
+        var span = lastRecord.valueOf() - firstRecord.valueOf();
         var weekSpan = 1 + Math.trunc(span / week);
         return feed.count / weekSpan;
     }
@@ -164,7 +170,7 @@ class FeedHandler implements IFeedHandler {
     }
     
     averageGap(feed: FeedDto): number {
-        if(feed.firstRecord === undefined || feed.lastRecord === undefined){
+        if(feed.lastRecord === undefined){
             return NaN;
         }
         var lastRecord = new Date(feed.lastRecord);
@@ -182,8 +188,8 @@ class FeedHandler implements IFeedHandler {
     }
 
     private getCumulativeUpdateChance(feed : FeedDto, time1 : Date, time2 : Date) : number {
-        var startDay = time1.getDay()
-        var startHour = time1.getHours();
+        var startDay = time1.getUTCDay()
+        var startHour = time1.getUTCHours();
         var hourSpan = (time2.valueOf() - time1.valueOf()) / (1000 * 60 * 60);
         var n = this.averagePerWeek(feed);
         var sum = 0;
@@ -198,8 +204,8 @@ class FeedHandler implements IFeedHandler {
     private equals(existing: FeedItemDto, newer : ReadResult, now : Date) : boolean {
         var dateOK = newer.date == null
             || newer.date.valueOf() > now.valueOf()        
-            || new Date(existing.date) == newer.date;
-        return dateOK && existing.link === newer.link && existing.title === newer.link;
+            || new Date(existing.date).valueOf() === newer.date.valueOf();
+        return dateOK && existing.link === newer.link && existing.title === newer.title;
     }
 
     private newFeedItem(readResult : ReadResult, now : Date) : FeedItemDto {

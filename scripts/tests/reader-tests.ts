@@ -33,7 +33,8 @@ function getMockFeed() : FeedDto {
         unread: 0,
     
         count: 0,
-        map: []
+        map: [],
+        firstRecord: ""
     }
 
     return feed;
@@ -59,7 +60,7 @@ QUnit.test("rss-standard", async function ( assert: Assert) {
             assert.notEqual(i.date, null);
             assert.notEqual((i.date as Date).toDateString(), "Invalid Date");
             assert.notEqual(i.link, "");
-        })
+        });
     });
 });
 
@@ -81,7 +82,7 @@ QUnit.test("rss-no-dates", async function ( assert: Assert) {
             assert.notEqual(i.title, "test");
             assert.equal(i.date, null);
             assert.notEqual(i.link, "");
-        })
+        });
     });
 });
 
@@ -104,7 +105,7 @@ QUnit.test("atom-standard", async function ( assert: Assert) {
             assert.notEqual(i.date, null);
             assert.notEqual((i.date as Date).toDateString(), "Invalid Date");
             assert.notEqual(i.link, "");
-        })
+        });
     });
 });
 
@@ -126,11 +127,10 @@ QUnit.test("html-no-root", async function ( assert: Assert) {
 
     await result.then(arr => {
         arr.forEach(i => {
-            console.log(i);
             assert.equal(i.title, "test");
             assert.equal(i.date, null);
             assert.notEqual(i.link, "");
-        })
+        });
     });
 });
 
@@ -153,11 +153,11 @@ QUnit.test("html-root", async function ( assert: Assert) {
 
     await result.then(arr => {
         arr.forEach(i => {
-            console.log(i);
             assert.equal(i.title, "test");
             assert.equal(i.date, null);
             assert.notEqual(i.link, "");
         })
+        console.log(arr);
     });
 });
 

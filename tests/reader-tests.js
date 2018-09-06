@@ -27,7 +27,8 @@ function getMockFeed() {
         recent: [],
         unread: 0,
         count: 0,
-        map: []
+        map: [],
+        firstRecord: ""
     };
     return feed;
 }
@@ -93,7 +94,6 @@ QUnit.test("html-no-root", async function (assert) {
     }, monster_html_no_root);
     await result.then(arr => {
         arr.forEach(i => {
-            console.log(i);
             assert.equal(i.title, "test");
             assert.equal(i.date, null);
             assert.notEqual(i.link, "");
@@ -113,11 +113,11 @@ QUnit.test("html-root", async function (assert) {
     }, nuzlocke_html_root);
     await result.then(arr => {
         arr.forEach(i => {
-            console.log(i);
             assert.equal(i.title, "test");
             assert.equal(i.date, null);
             assert.notEqual(i.link, "");
         });
+        console.log(arr);
     });
 });
 //# sourceMappingURL=reader-tests.js.map
