@@ -16,7 +16,7 @@ class Reader implements IReader {
                 (data) => this.handleResponse(data, feed),
                 (xhr, status, err) => {
                     var ex = `${feed.url} threw ${xhr.status} : ${xhr.statusText} because ${status}`;
-                    if(this.background.notifyMe){
+                    if(this.background.storage.notifyMe){
                         this.notifications.error(ex);
                     }
                     return [];

@@ -1,15 +1,18 @@
 interface IStorage {
-    saveOptions() : Promise<void>;
-    saveOptions(force : boolean) : Promise<void>;
-    loadOptions() : Promise<void>;
-    loadOptions(force : boolean) : Promise<void>;
+    notifyMe : boolean;
+    outOfSync : boolean;
+    periodMinutes: number;
+    useSync: boolean;
+    storedData: FeedDto[];
+
+    save(force? : boolean) : Promise<void>;
+    load(force? : boolean) : Promise<void>;
 }
 
 type Metadata = {
     version : number,
     lastSaved : string
 }
-
 
 type SyncStorage  = Metadata & {
     notifyMe : boolean,

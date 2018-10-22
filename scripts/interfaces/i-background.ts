@@ -1,10 +1,6 @@
 interface IBackground extends IBackgroundForPopup, IBackgroundForMenu, IBackgroundForReader, IBackgroundForStorage, IBackgroundForOptions {
     readonly readAlarm: string;
     
-    openOne() : void;
-    openAll() : void;
-
-    load() : void;
     onReload() : void;
     readAll(force? : boolean) : void;
 }
@@ -17,37 +13,34 @@ interface IBackgroundForPopup {
     
     activate(silent? : boolean) : void;
     deactivate() : void;
+    openOne() : void;
+    openAll() : void;
 }
 
 interface IBackgroundForMenu {
-    storedData: FeedDto[];
+    readonly storage : IStorage;
 
     openThis(feed : FeedDto, force? : boolean) : void;
     readThis(feed : FeedDto) : void;
     deleteThis(feed: FeedDto) : void;
     createNewFeed(feed: FeedDto) : void;
     toggleActiveness(feed: FeedDto) : void;
-    save() : void;
 }
 
 interface IBackgroundForReader {
+    readonly storage : IStorage;
     readonly ourUrl: string;
-    notifyMe : boolean;
 }
 
 interface IBackgroundForStorage {
     readonly notifications : INotifications
-    readonly version : number;
     readonly reloaded : Event;
-
-    lastSaved : Date;
-    notifyMe : boolean;
-    outOfSync : boolean;
-    periodMinutes: number;
-    useSync: boolean;
-    storedData: FeedDto[];
 }
 
-interface IBackgroundForOptions extends IBackgroundForStorage, IBackgroundForPopup {
+interface IBackgroundForOptions {
+    readonly storage : IStorage;
+    readonly active : boolean;
 
+    activate(silent? : boolean) : void;
+    deactivate() : void;
 }

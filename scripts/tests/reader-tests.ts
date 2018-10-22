@@ -14,9 +14,19 @@ QUnit.module("reader", {
 });
 
 function getMockBackground() : IBackgroundForReader {
+    var mockStorage : IStorage = {
+        notifyMe: false,
+        outOfSync: false,
+        periodMinutes: 0,
+        useSync: false,
+        storedData: [],
+        save: (force?: boolean) => { return Promise.resolve() },
+        load: (force?: boolean) => { return Promise.resolve() }
+    }
+
     var background : IBackgroundForReader = {
         ourUrl: "file://",
-        notifyMe: true
+        storage: mockStorage
     }
 
     return background;

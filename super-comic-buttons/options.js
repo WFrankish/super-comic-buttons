@@ -3,7 +3,6 @@ $(initOptions);
 function initOptions() {
     var backgroundPage = browser.extension.getBackgroundPage();
     var background = backgroundPage.background;
-    var storage = new WebStorage(backgroundPage, background, background.notifications);
     var periodNumber = $("#period-number");
     var periodButton = $("#period-button");
     var syncStoreRadio = $("#sync-store-radio");
@@ -13,13 +12,14 @@ function initOptions() {
     var forceLoadButton = $("#force-load-button");
     var forceSaveButton = $("#force-save-button");
     var forceInfoText = $("#force-info-text");
-    var options = new Options(background, storage, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText);
+    var options = new Options(background, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText);
     options.restoreOptions();
 }
 class Options {
-    constructor(background, storage, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText) {
+    constructor(background, periodNumber, periodButton, syncStoreRadio, localStoreRadio, noErrorRadio, yesErrorRadio, forceLoadButton, forceSaveButton, forceInfoText) {
+        this.syncPending = false;
         this.background = background;
-        this.storage = storage;
+        this.storage = background.storage;
         this.periodNumber = periodNumber;
         this.periodButton = periodButton;
         this.syncStoreRadio = syncStoreRadio;
@@ -29,7 +29,7 @@ class Options {
         this.forceLoadButton = forceLoadButton;
         this.forceSaveButton = forceSaveButton;
         this.forceInfoText = forceInfoText;
-        this.background.outOfSync = false;
+        this.storage.outOfSync = false;
     }
     get period() {
         return this.periodNumber.val() * 1;
@@ -50,11 +50,11 @@ class Options {
         this.forceLoadButton.unbind("click");
         this.forceInfoText.text("Manually Save/Load");
         this.forceInfoText.removeClass("warning");
-        var data = this.storage.loadOptions(false);
+        var data = this.storage.load(false);
         data.then(_ => {
-            this.period = this.background.periodMinutes;
+            this.period = this.storage.periodMinutes;
             this.periodButton.click(this.updatePeriod);
-            if (this.background.useSync) {
+            if (this.storage.useSync) {
                 this.syncStoreRadio.click();
                 this.localStoreRadio.change(this.switchSyncOption);
                 this.syncStoreRadio.change(this.switchSyncOption);
@@ -70,7 +70,7 @@ class Options {
                 this.forceSaveButton.prop("disabled", true);
                 this.forceLoadButton.prop("disabled", true);
             }
-            if (this.background.notifyMe) {
+            if (this.storage.notifyMe) {
                 this.yesErrorRadio.click();
                 this.yesErrorRadio.change(this.switchErrorOption);
                 this.noErrorRadio.change(this.switchErrorOption);
@@ -80,17 +80,17 @@ class Options {
                 this.noErrorRadio.change(this.switchErrorOption);
                 this.yesErrorRadio.change(this.switchErrorOption);
             }
-            if (this.background.outOfSync) {
+            if (this.storage.outOfSync) {
                 this.forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
                 this.forceInfoText.addClass("warning");
             }
         });
     }
     switchSyncOption() {
-        if (this.background.useSync || this.syncPending) {
-            this.background.useSync = false;
-            this.background.outOfSync = false;
-            var promise = this.storage.saveOptions(false);
+        if (this.storage.useSync || this.syncPending) {
+            this.storage.useSync = false;
+            this.storage.outOfSync = false;
+            var promise = this.storage.save(false);
             promise.then(_ => {
                 this.restoreOptions();
             });
@@ -106,8 +106,8 @@ class Options {
         }
     }
     switchErrorOption() {
-        this.background.notifyMe = !this.background.notifyMe;
-        var promise = this.storage.saveOptions(false);
+        this.storage.notifyMe = !this.storage.notifyMe;
+        var promise = this.storage.save(false);
         promise.then(_ => {
             this.restoreOptions();
         });
@@ -122,8 +122,8 @@ class Options {
     }
     updatePeriod() {
         if (this.period > 0) {
-            this.background.periodMinutes = this.period;
-            var promise = this.storage.saveOptions(false);
+            this.storage.periodMinutes = this.period;
+            var promise = this.storage.save(false);
             promise.then(_ => {
                 if (this.background.active) {
                     this.background.deactivate();
@@ -140,15 +140,15 @@ class Options {
         });
     }
     forceLoad() {
-        this.background.useSync = true;
-        var promise = this.storage.loadOptions(true);
+        this.storage.useSync = true;
+        var promise = this.storage.load(true);
         promise.then(_ => {
             this.restoreOptions();
         });
     }
     forceSave() {
-        this.background.useSync = true;
-        var promise = this.storage.saveOptions(true);
+        this.storage.useSync = true;
+        var promise = this.storage.save(true);
         promise.then(_ => {
             this.restoreOptions();
         });

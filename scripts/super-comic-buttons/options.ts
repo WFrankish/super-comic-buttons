@@ -3,7 +3,6 @@ $(initOptions);
 function initOptions() : void {
     var backgroundPage : any = browser.extension.getBackgroundPage();
     var background : IBackground = backgroundPage.background;
-    var storage : IStorage = new WebStorage(backgroundPage, background, background.notifications);
     var periodNumber : JQuery<HTMLInputElement> = $("#period-number");
     var periodButton : JQuery<HTMLButtonElement> = $("#period-button");
     var syncStoreRadio : JQuery<HTMLInputElement> = $("#sync-store-radio");
@@ -16,7 +15,6 @@ function initOptions() : void {
 
     var options : IOptions = new Options(
         background,
-        storage,
         periodNumber,
         periodButton,
         syncStoreRadio,
@@ -43,11 +41,10 @@ class Options implements IOptions {
     private readonly forceSaveButton : JQuery<HTMLButtonElement>;
     private readonly forceInfoText : JQuery<HTMLParagraphElement>;
 
-    private syncPending : boolean;
+    private syncPending = false;
 
     constructor(
         background : IBackgroundForOptions,
-        storage : IStorage,
         periodNumber : JQuery<HTMLInputElement>,
         periodButton : JQuery<HTMLButtonElement>,
         syncStoreRadio : JQuery<HTMLInputElement>,
@@ -59,7 +56,7 @@ class Options implements IOptions {
         forceInfoText : JQuery<HTMLParagraphElement>
     ){
         this.background = background;
-        this.storage = storage;
+        this.storage = background.storage;
         this.periodNumber = periodNumber;
         this.periodButton = periodButton;
         this.syncStoreRadio = syncStoreRadio;
@@ -70,7 +67,7 @@ class Options implements IOptions {
         this.forceSaveButton = forceSaveButton;
         this.forceInfoText = forceInfoText;
 
-        this.background.outOfSync = false;
+        this.storage.outOfSync = false;
     }
 
     private get period() : number {
@@ -93,11 +90,11 @@ class Options implements IOptions {
         this.forceLoadButton.unbind("click");
         this.forceInfoText.text("Manually Save/Load");
         this.forceInfoText.removeClass("warning");
-        var data = this.storage.loadOptions(false);
+        var data = this.storage.load(false);
         data.then(_ => {
-            this.period = this.background.periodMinutes;
+            this.period = this.storage.periodMinutes;
             this.periodButton.click(this.updatePeriod);
-            if(this.background.useSync){
+            if(this.storage.useSync){
                 this.syncStoreRadio.click();
                 this.localStoreRadio.change(this.switchSyncOption);
                 this.syncStoreRadio.change(this.switchSyncOption);
@@ -112,7 +109,7 @@ class Options implements IOptions {
                 this.forceSaveButton.prop("disabled", true);
                 this.forceLoadButton.prop("disabled", true);
             }
-            if(this.background.notifyMe){
+            if(this.storage.notifyMe){
                 this.yesErrorRadio.click();
                 this.yesErrorRadio.change(this.switchErrorOption);
                 this.noErrorRadio.change(this.switchErrorOption);
@@ -121,7 +118,7 @@ class Options implements IOptions {
                 this.noErrorRadio.change(this.switchErrorOption);
                 this.yesErrorRadio.change(this.switchErrorOption);
             }
-            if(this.background.outOfSync){
+            if(this.storage.outOfSync){
                 this.forceInfoText.text("Local data and sync data have become out of sync. Please choose to either load sync data or save local data to resolve this");
                 this.forceInfoText.addClass("warning");
             }
@@ -129,10 +126,10 @@ class Options implements IOptions {
     }
 
     private switchSyncOption(){
-        if(this.background.useSync || this.syncPending){
-            this.background.useSync = false;
-            this.background.outOfSync = false;
-            var promise = this.storage.saveOptions(false);
+        if(this.storage.useSync || this.syncPending){
+            this.storage.useSync = false;
+            this.storage.outOfSync = false;
+            var promise = this.storage.save(false);
             promise.then(_ => {
                 this.restoreOptions();
             });
@@ -148,8 +145,8 @@ class Options implements IOptions {
     }
 
     private switchErrorOption(){
-        this.background.notifyMe = !this.background.notifyMe;
-        var promise = this.storage.saveOptions(false);
+        this.storage.notifyMe = !this.storage.notifyMe;
+        var promise = this.storage.save(false);
         promise.then(_ => {
             this.restoreOptions();
         });
@@ -165,8 +162,8 @@ class Options implements IOptions {
 
     private updatePeriod(){
         if(this.period > 0){
-            this.background.periodMinutes = this.period
-            var promise = this.storage.saveOptions(false);
+            this.storage.periodMinutes = this.period
+            var promise = this.storage.save(false);
             promise.then(_ => {
                 if(this.background.active){
                     this.background.deactivate();
@@ -185,16 +182,16 @@ class Options implements IOptions {
     }
 
     private forceLoad(){
-        this.background.useSync = true;
-        var promise = this.storage.loadOptions(true);
+        this.storage.useSync = true;
+        var promise = this.storage.load(true);
         promise.then(_ => {
             this.restoreOptions();
         });
     }
 
     private forceSave(){
-        this.background.useSync = true;
-        var promise = this.storage.saveOptions(true);
+        this.storage.useSync = true;
+        var promise = this.storage.save(true);
         promise.then(_ => {
             this.restoreOptions();
         });

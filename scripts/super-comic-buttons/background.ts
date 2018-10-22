@@ -1,12 +1,13 @@
 $(initBackground);
 
+
+
 function initBackground(){
     var ourUrl = browser.runtime.getURL("");
     var notifications = new Notifications();
     var background : IBackground = new Background(ourUrl, notifications);
 
-    addEventListener('reloaded', background.onReload);
-    background.load();
+    addEventListener(background.reloaded.type, background.onReload);
     browser.alarms.onAlarm.addListener(function(alarmInfo){
         if(alarmInfo.name === background.readAlarm){
             background.readAll(false);
@@ -15,27 +16,19 @@ function initBackground(){
 }
 
 class Background implements IBackground {
-    private readonly storage : IStorage;
     private readonly reader : IReader;
     private readonly feedHandler : IFeedHandler;
 
+    readonly storage : IStorage;
     readonly notifications : INotifications;
-    readonly version = 2.0;
     readonly ourUrl : string;
     
     readonly unreadNoChange = new Event("unreadNoChange");
     readonly reloaded = new Event("reloaded");
 
     readAlarm = "readAlarm"
-    active: boolean;
-    unreadNo: number;
-    notifyMe: boolean;
-    
-    lastSaved: Date;
-    outOfSync: boolean;
-    periodMinutes: number;
-    useSync: boolean;
-    storedData: FeedDto[];
+    active = false;
+    unreadNo = 0;
 
     constructor(
         ourUrl : string,
@@ -44,35 +37,21 @@ class Background implements IBackground {
         this.ourUrl = ourUrl;
         this.notifications = notifications;
         this.storage = new WebStorage(window, this, this.notifications);
+        this.storage.load();
         this.reader = new Reader(this, this.notifications);
         this.feedHandler = new FeedHandler();
     }
 
-    load() : void {
-        this.storage.loadOptions();
-    }
-
-    save() : void {
-        var promise = this.storage.saveOptions();
-        promise.then(_ => this.onReload());
-    }
-
     onReload() : void {
-        if(this.storedData === undefined){
-            this.storedData = [];
-        }
-        if(this.periodMinutes === undefined || this.periodMinutes <= 0){
-            this.periodMinutes = 30;
-        }
-        this.unreadNo = this.storedData.filter(f => f.unread > 0).length;
+        this.unreadNo = this.storage.storedData.filter(f => f.unread > 0).length;
         this.refreshBadge();
         dispatchEvent(this.unreadNoChange);
     }
 
     activate(silent : boolean = false) : void {
         browser.alarms.create(this.readAlarm, {
-            periodInMinutes: this.periodMinutes,
-            delayInMinutes: this.periodMinutes
+            periodInMinutes: this.storage.periodMinutes,
+            delayInMinutes: this.storage.periodMinutes
         });
         this.active = true;
         this.refreshBadge();
@@ -88,7 +67,7 @@ class Background implements IBackground {
     }
 
     openOne() : void {
-        var storedData = new MyArray(...this.storedData);
+        var storedData = new MyArray(...this.storage.storedData);
         var possibles = storedData.where(f => f.unread > 0).shuffle();
         if(possibles.length > 0){
             this.openThis(possibles[0], false);
@@ -96,28 +75,28 @@ class Background implements IBackground {
     }
 
     openAll() : void {
-        this.storedData.forEach(feed => this.feedHandler.open(feed));
-        this.save();
+        this.storage.storedData.forEach(feed => this.feedHandler.open(feed));
+        this.storage.save();
     }
 
     openThis(feed : FeedDto, force = false) : void {
         this.feedHandler.open(feed, force);
-        this.save();
+        this.storage.save();
     }
 
     createNewFeed(feed : FeedDto){
-        this.storedData.push(feed);
-        this.save();
+        this.storage.storedData.push(feed);
+        this.storage.save();
     }
 
     readAll(force : boolean = false){
         this.notifications.message("automatically checking for updates")
         var out : Promise<any>[] = [];
-        for (let i in this.storedData){
-            var promise = this.readSingle(this.storedData[i], force);
+        for (let i in this.storage.storedData){
+            var promise = this.readSingle(this.storage.storedData[i], force);
             out.push(promise);
         }
-        Promise.all(out).then(_ => this.save());
+        Promise.all(out).then(_ => this.storage.save());
     }
 
     private readSingle(feed : FeedDto, force = false) : Promise<any>{
@@ -131,18 +110,18 @@ class Background implements IBackground {
 
     readThis(feed : FeedDto) : void {
         var promise = this.readSingle(feed, true);
-        promise.then(_ => this.save());
+        promise.then(_ => this.storage.save());
     }
 
     toggleActiveness(feed : FeedDto){
         feed.enabled = !feed.enabled;
-        this.save();
+        this.storage.save();
     }
 
     deleteThis(feed : FeedDto){
-        var i = this.storedData.indexOf(feed);
-        this.storedData.splice(i,1);
-        this.save();
+        var i = this.storage.storedData.indexOf(feed);
+        this.storage.storedData.splice(i,1);
+        this.storage.save();
     }
 
     private refreshBadge(){

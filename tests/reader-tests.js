@@ -12,9 +12,18 @@ QUnit.module("reader", {
     }
 });
 function getMockBackground() {
+    var mockStorage = {
+        notifyMe: false,
+        outOfSync: false,
+        periodMinutes: 0,
+        useSync: false,
+        storedData: [],
+        save: (force) => { return Promise.resolve(); },
+        load: (force) => { return Promise.resolve(); }
+    };
     var background = {
         ourUrl: "file://",
-        notifyMe: true
+        storage: mockStorage
     };
     return background;
 }
