@@ -1,12 +1,11 @@
 class FeedHandler implements IFeedHandler {
 
-    newRssFeed(name: string, url: string, overrideLink?: string): FeedDto {
+    newRssFeed(name: string, url: string): FeedDto {
         var result: FeedDto = {
             name,
             url,
             enabled: true,
             type: "rss",
-            overrideLink,
             recent: [],
             unread: 0,
             count: 0,

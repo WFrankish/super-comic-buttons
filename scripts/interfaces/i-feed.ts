@@ -1,5 +1,5 @@
 interface IFeedHandler {
-    newRssFeed(name: string, url: string, overrideLink?: string): FeedDto;
+    newRssFeed(name: string, url: string): FeedDto;
     newHtmlFeed(name: string, url: string, id: string, root?: string, overrideLink?: string): FeedDto;
     open(feed: FeedDto, force?: boolean): void;
     shouldRead(feed: FeedDto): boolean;

@@ -1,12 +1,11 @@
 "use strict";
 class FeedHandler {
-    newRssFeed(name, url, overrideLink) {
+    newRssFeed(name, url) {
         var result = {
             name,
             url,
             enabled: true,
             type: "rss",
-            overrideLink,
             recent: [],
             unread: 0,
             count: 0,

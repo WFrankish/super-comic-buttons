@@ -17,8 +17,8 @@ function initBackground() {
 
 class Background implements IBackground {
     private readonly reader: IReader;
-    private readonly feedHandler: IFeedHandler;
-
+    
+    readonly feedHandler: IFeedHandler;
     readonly storage: IStorage;
     readonly notifications: INotifications;
     readonly ourUrl: string;

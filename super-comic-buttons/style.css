@@ -81,6 +81,9 @@ td{
 .wrap {
   word-wrap: normal;
 }
+.ng-hide {
+    display: none!important;
+}
 /* Mobile Screens */
 [class*="col-"] {
   width: 100%;
@@ -118,6 +121,6 @@ td{
   .col-11 {width: 96.66666666%;}
   .col-12 {width: 100%;}
 }
-input[type=text].invalid {
+input[type=text].ng-invalid {
   border: 1px red solid;
 }

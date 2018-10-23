@@ -19,6 +19,7 @@ interface IBackgroundForPopup {
 
 interface IBackgroundForMenu {
     readonly storage: IStorage;
+    readonly feedHandler: IFeedHandler;
 
     openThis(feed: FeedDto, force?: boolean): void;
     readThis(feed: FeedDto): void;

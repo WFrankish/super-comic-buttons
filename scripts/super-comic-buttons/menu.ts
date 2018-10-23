@@ -1,34 +1,62 @@
-$(init);
+var menu = angular.module("menu", []);
+
+menu.controller("menuCtrl", $scope => {
+    var backgroundPage: any = browser.extension.getBackgroundPage();
+    var background: IBackground = backgroundPage.background;
+    var menu = new Menu(background);
+    $scope.type = "rss";
+    $scope.createClick = () => menu.create($scope);
+});
 
 function init() {
-    var bg = browser.extension.getBackgroundPage();
-    var feedListDiv = $("#feedListDiv");
 
-    var nameText = $("#nameText");
-    var urlText = $("#urlText");
-    var xmlTypeRadio = $("#xmlTypeRadio");
-    var domTypeRadio = $("#domTypeRadio");
-    var specialRow = $("#specialRow");
-    var idText = $("#idText");
-    var rootText = $("#rootText");
-    var overrideText = $("#overrideText");
-    var createNewButton = $("#createNewButton");
-
-    var menu = new Menu();
-
-    nameText.on("input", menu.refreshCreateForm);
-    urlText.on("input", menu.refreshCreateForm);
-    idText.on("input", menu.refreshCreateForm);
-    overrideText.on("input", menu.refreshCreateForm);
-    xmlTypeRadio.change(menu.refreshCreateForm);
-    domTypeRadio.change(menu.refreshCreateForm);
-    menu.refreshFeedList();
-    menu.refreshCreateForm();
-    createNewButton.click(menu.createNewFeed);
-    bg.addEventListener('unreadNoChange', menu.refreshFeedList);
+    // nameText.on("input", menu.refreshCreateForm);
+    // urlText.on("input", menu.refreshCreateForm);
+    // idText.on("input", menu.refreshCreateForm);
+    // overrideText.on("input", menu.refreshCreateForm);
+    // xmlTypeRadio.change(menu.refreshCreateForm);
+    // domTypeRadio.change(menu.refreshCreateForm);
+    // menu.refreshFeedList();
+    // menu.refreshCreateForm();
+    // createNewButton.click(menu.createNewFeed);
+    // bg.addEventListener('unreadNoChange', menu.refreshFeedList);
 };
 
 class Menu implements IMenu {
+    private readonly background: IBackgroundForMenu;
+
+    constructor(
+        background: IBackgroundForMenu
+    ) {
+        this.background = background;
+    }
+
+    create($scope: IMenuScope): void {
+        if ($scope.type === "html") {
+            var root = $scope.root === "" ? undefined : $scope.root;
+            var override = $scope.override === "" ? undefined : $scope.override;
+
+            var feed = this.background.feedHandler.newHtmlFeed(
+                $scope.name, $scope.url,
+                $scope.id, root, override
+            );
+            this.background.createNewFeed(feed);
+        } else {
+            var feed = this.background.feedHandler.newRssFeed(
+                $scope.name, $scope.url
+            );
+            this.background.createNewFeed(feed);
+        }
+        $scope.name = "";
+        $scope.url = "";
+        $scope.type = "rss";
+        $scope.id = "";
+        $scope.root = "";
+        $scope.override = "";
+    }
+}
+
+class OldMenu {
     feedListDiv: JQuery<HTMLDivElement>;
     bg: IBackgroundForMenu;
     nameText: JQuery<HTMLInputElement>;
