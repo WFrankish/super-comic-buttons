@@ -1,7 +1,7 @@
 class WebStorage implements IStorage {
-    private readonly backgroundWindow : Window;
-    private readonly background : IBackgroundForStorage;
-    private readonly notifications : INotifications;
+    private readonly backgroundWindow: Window;
+    private readonly background: IBackgroundForStorage;
+    private readonly notifications: INotifications;
     private readonly version = 2.0;
 
     private lastSaved = new Date(0);
@@ -13,20 +13,20 @@ class WebStorage implements IStorage {
     storedData: FeedDto[] = [];
 
     constructor(
-        backgroundWindow : Window,
-        background : IBackgroundForStorage,
-        notifications : INotifications
-    ){
+        backgroundWindow: Window,
+        background: IBackgroundForStorage,
+        notifications: INotifications
+    ) {
         this.backgroundWindow = backgroundWindow;
         this.background = background;
         this.notifications = notifications;
     }
 
-    save(force : boolean = false) : Promise<void> {
+    save(force: boolean = false): Promise<void> {
         var now = new Date();
         var metadata = this.loadLocalMetadata();
-        var promise = metadata.then(item => {   
-            if(this.useSync){
+        var promise = metadata.then(item => {
+            if (this.useSync) {
                 var lastSaved = new Date(item.lastSaved)
                 this.saveToSync(force, now, lastSaved);
             }
@@ -38,19 +38,19 @@ class WebStorage implements IStorage {
         })
         return promise;
     }
-    load(force : boolean = false) : Promise<void> {
+    load(force: boolean = false): Promise<void> {
         // TODO version conversion
         var local = this.loadFromLocal();
         var promise = local.then(_ => {
-            if(this.useSync){
+            if (this.useSync) {
                 return this.loadFromSync(force);
             }
             return Promise.resolve();
         }).then(_ => {
-            if(this.storedData === undefined){
+            if (this.storedData === undefined) {
                 this.storedData = [];
             }
-            if(this.periodMinutes === undefined || this.periodMinutes <= 0){
+            if (this.periodMinutes === undefined || this.periodMinutes <= 0) {
                 this.periodMinutes = 30;
             }
             this.backgroundWindow.dispatchEvent(this.background.reloaded);
@@ -59,33 +59,33 @@ class WebStorage implements IStorage {
     }
 
     // load these bits of data, with the following defaults if null
-    private loadLocalMetadata() : Promise<Metadata> {
+    private loadLocalMetadata(): Promise<Metadata> {
         return browser.storage.local.get<Metadata>({
-            version : this.version,
-            lastSaved : new Date(0).toDateString()
+            version: this.version,
+            lastSaved: new Date(0).toDateString()
         });
     }
 
-    private loadSyncMetadata() : Promise<Metadata> {
+    private loadSyncMetadata(): Promise<Metadata> {
         return browser.storage.sync.get<Metadata>({
-            version : this.version,
-            lastSaved : new Date(0).toDateString()
+            version: this.version,
+            lastSaved: new Date(0).toDateString()
         });
     }
 
-    private saveToLocal(now : Date) : void {
+    private saveToLocal(now: Date): void {
         browser.storage.local.set({
-            useSync : this.useSync,
-            notifyMe : this.notifyMe,
-            lastSaved : now.toDateString(),
-            version : this.version,
+            useSync: this.useSync,
+            notifyMe: this.notifyMe,
+            lastSaved: now.toDateString(),
+            version: this.version,
             period: this.periodMinutes,
-            storage : this.storedData as FeedDto[]
+            storage: this.storedData as FeedDto[]
         });
     }
 
-    private saveToSync(force : boolean, now : Date, lastSavedLocal : Date) : void {
-        if(this.outOfSync && !force){
+    private saveToSync(force: boolean, now: Date, lastSavedLocal: Date): void {
+        if (this.outOfSync && !force) {
             this.notifications.error("Sync save error - The local and sync data are out of sync, please visit the options page to resolve");
             return;
         }
@@ -93,33 +93,33 @@ class WebStorage implements IStorage {
         var gettingItems = this.loadSyncMetadata();
         gettingItems.then(item => {
             var lastSaved = new Date(item.lastSaved);
-            if(item.version > this.version){
+            if (item.version > this.version) {
                 this.notifications.error("Sync save error - The stored data is for a later version of this program, please update this addon.");
                 return;
             }
-            if((lastSaved > lastSavedLocal) && !force){
+            if ((lastSaved > lastSavedLocal) && !force) {
                 this.outOfSync = true;
                 this.notifications.error("Sync save error - Sync data is newer then load data, please visit the options page to resolve");
                 return;
             }
             browser.storage.sync.set({
-                version : this.version,
-                lastSaved : now.toDateString(),
-                storage : this.storedData
+                version: this.version,
+                lastSaved: now.toDateString(),
+                storage: this.storedData
             });
         }, error => {
             error("Sync save error", error.message);
         });
     }
 
-    private loadFromLocal() : Promise<void> {
+    private loadFromLocal(): Promise<void> {
         var loaded = browser.storage.local.get<LocalStorage>({
-            useSync : false,
-            notifyMe : false,
-            lastSaved : new Date(0).toString(),
-            version : this.version,
-            period : 30,
-            storage : []
+            useSync: false,
+            notifyMe: false,
+            lastSaved: new Date(0).toString(),
+            version: this.version,
+            period: 30,
+            storage: []
         });
         var promise = loaded.then(item => {
             this.periodMinutes = item.period;
@@ -132,8 +132,8 @@ class WebStorage implements IStorage {
         return promise;
     }
 
-    private loadFromSync(force : boolean) : Promise<void> {
-        if(this.outOfSync && !force){
+    private loadFromSync(force: boolean): Promise<void> {
+        if (this.outOfSync && !force) {
             this.notifications.error("Sync load error - The local and sync data are out of sync, please visit the options page to resolve");
             return Promise.resolve();
         }
@@ -141,19 +141,19 @@ class WebStorage implements IStorage {
         var metadata = this.loadLocalMetadata();
         return metadata.then(item => {
             var lastSaved = new Date(item.lastSaved);
-            if(item.version > this.version){
+            if (item.version > this.version) {
                 this.notifications.error("Sync load error - The stored data is for a later version of this program, please update this addon");
                 return Promise.resolve();
             }
-            if(this.lastSaved > lastSaved && !force){
+            if (this.lastSaved > lastSaved && !force) {
                 this.notifications.error("Sync load error - Local data is newer then sync data, please visit options page to resolve");
                 this.outOfSync = true;
                 return Promise.resolve();
             }
             var loaded = browser.storage.sync.get({
-                version : this.version,
-                lastSaved : new Date(0).toDateString(),
-                storage : []
+                version: this.version,
+                lastSaved: new Date(0).toDateString(),
+                storage: []
             });
             var promise = loaded.then(item => {
                 this.lastSaved = lastSaved;

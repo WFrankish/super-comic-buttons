@@ -2,89 +2,93 @@
 <html lang="en-UK">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Super Comic Buttons: Menu</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="lib/jquery-3.3.1.min.js"></script>
-  <script src="my-array.js"></script>
-  <script src="feed-model.js"></script>
-  <script src="storage.js"></script>
-  <script src="notifications.js"></script>
-  <script src="menu.js"></script>
-  <script src="util.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Comic Buttons: Menu</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="lib/jquery-3.3.1.min.js"></script>
+    <script src="my-array.js"></script>
+    <script src="feed-model.js"></script>
+    <script src="storage.js"></script>
+    <script src="notifications.js"></script>
+    <script src="menu.js"></script>
+    <script src="util.js"></script>
 </head>
 
 <body>
-  <div class="row padall fullscreenOnly centre">
-    <h1>Super Comic Buttons: Menu</h1>
-  </div>
-  <div class="row">
-    <div class="fullscreenOnly col-m-0 col-3"><br/></div>
-    <form class="light col-m-12 col-6">
-      <div class="row">
-        <div class="col-m-1 padall">
-          <label for="nameText">Name</label>
-        </div>
-        <div class="col-m-2 padall">
-          <input class="invalid" id="nameText" type="text"/>
-        </div>
-        <div class="col-m-1 padall">
-          <label for="urlText">Url</label>
-        </div>
-        <div class="col-m-3 padall">
-          <input id="urlText" type="text"/>
-        </div>
-        <div class="col-m-1 padall">
-          <label for="typeRadio">Type</label>
-        </div>
-        <div class="typeRadio">
-          <div class="col-m-2 padall">
-            <input id="xmlTypeRadio" name="type" type="radio"/>
-            <label for="xmlTypeRadio">rss/atom</label>
-          </div>
-          <div class="col-m-2 padall">
-            <input id="domTypeRadio" name="type" type="radio"/>
-            <label for="domTypeRadio">html</label>
-          </div>
-        </div>
-      </div>
-      <div class="row" id="specialRow">
-        <p class="col-m-6 padall">
-          Html mode is less reliable than rss/xml mode, so only use it as a last resort.<br/>
-          It reads a webpage until it finds the object with the id given, and then finds the first image contained within that object.<br/>
-          Please use the element inspector found in your browsers developer tools to inspect the image or comic panel on the page you wish to check for updates. If that image has an id, use that. If not, move to an outer element until you find one with an id to use.
-          If the image url is relative, you will need to provide the website's root url. If you want to open the website instead of just opening the image directly, you will need to provide a front page url.<br/>
-          If the target website is redesigned, you will probably need to find a new id.
-        </p>
-        <div class="col-m-2 padall">
-          <label for="idText">Image Id</label>
-        </div>
-        <div class="col-m-4 padall">
-          <input id="idText" type="text"/>
-        </div>
-        <div class="col-m-2 padall">
-          <label for="rootText">Root Url</label>
-        </div>
-        <div class="col-m-4 padall">
-          <input id="rootText" type="text"/>
-        </div>
-        <div class="col-m-2 padall">
-          <label for="overrideText">Front Page Url</label>
-        </div>
-        <div class="col-m-4 padall">
-          <input id="overrideText" type="text"/>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-m-2 padall">
-          <input type="button" id="createNewButton" value="Create"/>
-        </div>
-      </div>
-    </form>
-    <div class="fullscreenOnly col-m-0 col-3"><br/></div>
-  </div>
-  <div>
-    <div id="feedListDiv" class="row"></div>
-  </div>
+    <div class="row padall fullscreenOnly centre">
+        <h1>Super Comic Buttons: Menu</h1>
+    </div>
+    <div class="row">
+        <div class="fullscreenOnly col-m-0 col-3"><br /></div>
+        <form class="light col-m-12 col-6">
+            <div class="row">
+                <div class="col-m-1 padall">
+                    <label for="nameText">Name</label>
+                </div>
+                <div class="col-m-2 padall">
+                    <input class="invalid" id="nameText" type="text" />
+                </div>
+                <div class="col-m-1 padall">
+                    <label for="urlText">Url</label>
+                </div>
+                <div class="col-m-3 padall">
+                    <input id="urlText" type="text" />
+                </div>
+                <div class="col-m-1 padall">
+                    <label for="typeRadio">Type</label>
+                </div>
+                <div class="typeRadio">
+                    <div class="col-m-2 padall">
+                        <input id="xmlTypeRadio" name="type" type="radio" />
+                        <label for="xmlTypeRadio">rss/atom</label>
+                    </div>
+                    <div class="col-m-2 padall">
+                        <input id="domTypeRadio" name="type" type="radio" />
+                        <label for="domTypeRadio">html</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="specialRow">
+                <p class="col-m-6 padall">
+                    Html mode is less reliable than rss/xml mode, so only use it as a last resort.<br />
+                    It reads a webpage until it finds the object with the id given, and then finds the first image
+                    contained within that object.<br />
+                    Please use the element inspector found in your browsers developer tools to inspect the image or
+                    comic panel on the page you wish to check for updates. If that image has an id, use that. If not,
+                    move to an outer element until you find one with an id to use.
+                    If the image url is relative, you will need to provide the website's root url. If you want to open
+                    the website instead of just opening the image directly, you will need to provide a front page url.<br />
+                    If the target website is redesigned, you will probably need to find a new id.
+                </p>
+                <div class="col-m-2 padall">
+                    <label for="idText">Image Id</label>
+                </div>
+                <div class="col-m-4 padall">
+                    <input id="idText" type="text" />
+                </div>
+                <div class="col-m-2 padall">
+                    <label for="rootText">Root Url</label>
+                </div>
+                <div class="col-m-4 padall">
+                    <input id="rootText" type="text" />
+                </div>
+                <div class="col-m-2 padall">
+                    <label for="overrideText">Front Page Url</label>
+                </div>
+                <div class="col-m-4 padall">
+                    <input id="overrideText" type="text" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-m-2 padall">
+                    <input type="button" id="createNewButton" value="Create" />
+                </div>
+            </div>
+        </form>
+        <div class="fullscreenOnly col-m-0 col-3"><br /></div>
+    </div>
+    <div>
+        <div id="feedListDiv" class="row"></div>
+    </div>
 </body>

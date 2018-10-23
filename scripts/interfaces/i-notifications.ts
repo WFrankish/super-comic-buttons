@@ -1,5 +1,5 @@
 interface INotifications {
-    message(message: string) : void;
+    message(message: string): void;
 
-    error(error: string) : void;
+    error(error: string): void;
 }

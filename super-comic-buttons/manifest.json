@@ -1,54 +1,48 @@
 {
-  "manifest_version": 2,
-  "name": "Super Comic Buttons",
-  "version": "2.0",
-  "description": "Tracks the updates of your favourite webcomics (or anything with an rss feed)",
-  "homepage_url": "https://github.com/WFrankish/super-comic-buttons.git",
-  
-  "background": {
-    "page": "background.html"
-  },
-  
-  "browser_action": {
-    "default_title": "Super Comic Button",
-    "default_icon": {
-      "16": "button/icon-16.png",
-      "32": "button/icon-32.png",
-      "64": "button/icon-64.png",
-      "256": "button/icon-256.png"
+    "manifest_version": 2,
+    "name": "Super Comic Buttons",
+    "version": "2.0",
+    "description": "Tracks the updates of your favourite webcomics (or anything with an rss feed)",
+    "homepage_url": "https://github.com/WFrankish/super-comic-buttons.git",
+    "background": {
+        "page": "background.html"
     },
-    "default_popup": "popup.html"
-  },
-  
-  "icons": {
-  "48": "icons/icon-48.png",
-  "96": "icons/icon-96.png",
-  "192": "icons/icon-192.png"
-  },
-  
-  "options_ui": {
-    "chrome_style": true,
-    "browser_style": true,
-    "page": "options.html"
-  },
-  
-  "permissions": [
-    "alarms",
-    "notifications",
-    "storage",
-    "tabs",
-    "http://*/",
-    "https://*/"
-  ],
-
-  "sidebar_action": {
-    "default_icon": {
-      "16": "button/icon-16.png",
-      "32": "button/icon-32.png",
-      "64": "button/icon-64.png",
-      "256": "button/icon-256.png"
+    "browser_action": {
+        "default_title": "Super Comic Button",
+        "default_icon": {
+            "16": "button/icon-16.png",
+            "32": "button/icon-32.png",
+            "64": "button/icon-64.png",
+            "256": "button/icon-256.png"
+        },
+        "default_popup": "popup.html"
     },
-    "default_title": "Super Comic Buttons: Menu",
-    "default_panel": "menu.html"
-  }
+    "icons": {
+        "48": "icons/icon-48.png",
+        "96": "icons/icon-96.png",
+        "192": "icons/icon-192.png"
+    },
+    "options_ui": {
+        "chrome_style": true,
+        "browser_style": true,
+        "page": "options.html"
+    },
+    "permissions": [
+        "alarms",
+        "notifications",
+        "storage",
+        "tabs",
+        "http://*/",
+        "https://*/"
+    ],
+    "sidebar_action": {
+        "default_icon": {
+            "16": "button/icon-16.png",
+            "32": "button/icon-32.png",
+            "64": "button/icon-64.png",
+            "256": "button/icon-256.png"
+        },
+        "default_title": "Super Comic Buttons: Menu",
+        "default_panel": "menu.html"
+    }
 }

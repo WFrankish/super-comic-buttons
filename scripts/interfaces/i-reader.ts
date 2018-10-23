@@ -1,5 +1,5 @@
 interface IReader {
-    read(feed: FeedDto) : Promise<ReadResult[]>;
+    read(feed: FeedDto): Promise<ReadResult[]>;
 }
 
 type ReadResult = {

@@ -1,19 +1,19 @@
 $(initPopup);
 
-function initPopup() : void {
-    var backgroundPage : any = browser.extension.getBackgroundPage();
-    var background : IBackground = backgroundPage.background;
+function initPopup(): void {
+    var backgroundPage: any = browser.extension.getBackgroundPage();
+    var background: IBackground = backgroundPage.background;
     var menuButton = $("#menu-button");
     var optionsButton = $("#options-button");
     var toggleButton = $("#toggle-button");
     var readOneButton = $("#read-one-button");
     var readAllButton = $("#read-all-button");
 
-    var popup : IPopup = new Popup(
-      background,
-      toggleButton,
-      readOneButton,
-      readAllButton
+    var popup: IPopup = new Popup(
+        background,
+        toggleButton,
+        readOneButton,
+        readAllButton
     );
 
     menuButton.click(() => popup.openMenu);
@@ -28,28 +28,28 @@ function initPopup() : void {
 }
 
 class Popup implements IPopup {
-    private readonly background : IBackgroundForPopup;
+    private readonly background: IBackgroundForPopup;
     private readonly toggleButton: JQuery<HTMLElement>;
     private readonly readOneButton: JQuery<HTMLElement>;
     private readonly readAllButton: JQuery<HTMLElement>;
 
     constructor(
-      background : IBackgroundForPopup,
-      toggleButton: JQuery<HTMLElement>,
-      readOneButton: JQuery<HTMLElement>,
-      readAllButton: JQuery<HTMLElement>
-    ){
+        background: IBackgroundForPopup,
+        toggleButton: JQuery<HTMLElement>,
+        readOneButton: JQuery<HTMLElement>,
+        readAllButton: JQuery<HTMLElement>
+    ) {
         this.background = background;
         this.toggleButton = toggleButton;
         this.readOneButton = readOneButton;
         this.readAllButton = readAllButton;
     }
 
-    refresh() : void {
-        if(this.background.active){
+    refresh(): void {
+        if (this.background.active) {
             this.toggleButton.val("Deactivate");
-            browser.browserAction.setIcon({ 
-                path : {
+            browser.browserAction.setIcon({
+                path: {
                     "16": "button/enabled-16.png",
                     "32": "button/enabled-32.png",
                     "64": "button/enabled-64.png",
@@ -58,8 +58,8 @@ class Popup implements IPopup {
             });
         } else {
             this.toggleButton.val("Activate!");
-            browser.browserAction.setIcon({ 
-                path : {
+            browser.browserAction.setIcon({
+                path: {
                     "16": "button/icon-16.png",
                     "32": "button/icon-32.png",
                     "64": "button/icon-64.png",
@@ -67,20 +67,20 @@ class Popup implements IPopup {
                 }
             });
         }
-        if(this.background.unreadNo > 0){
-            this.readOneButton.prop("disabled", false);   
+        if (this.background.unreadNo > 0) {
+            this.readOneButton.prop("disabled", false);
         } else {
-            this.readOneButton.prop("disabled", true);  
+            this.readOneButton.prop("disabled", true);
         }
-        if(this.background.unreadNo > 1){
-            this.readAllButton.prop("disabled", false);  
+        if (this.background.unreadNo > 1) {
+            this.readAllButton.prop("disabled", false);
         } else {
-            this.readAllButton.prop("disabled", true);  
+            this.readAllButton.prop("disabled", true);
         }
     }
 
-    toggleActivate() : void {
-        if(this.background.active){
+    toggleActivate(): void {
+        if (this.background.active) {
             this.background.deactivate();
         } else {
             this.background.activate(false);
@@ -88,14 +88,14 @@ class Popup implements IPopup {
         this.refresh();
     }
 
-    openMenu() : void {
+    openMenu(): void {
         browser.sidebarAction.getPanel({}).then(url => {
             // can't (yet?) open sidebar programatically, so open it in a new tab
-            browser.tabs.create({url : url});
+            browser.tabs.create({ url: url });
         });
     }
 
-    openOptions() : void {
+    openOptions(): void {
         browser.runtime.openOptionsPage();
     }
 }

@@ -1,5 +1,5 @@
-var xhr : sinon.SinonFakeXMLHttpRequestStatic;
-var requests : sinon.SinonFakeXMLHttpRequest[];
+var xhr: sinon.SinonFakeXMLHttpRequestStatic;
+var requests: sinon.SinonFakeXMLHttpRequest[];
 
 QUnit.module("reader", {
     beforeEach: () => {
@@ -13,8 +13,8 @@ QUnit.module("reader", {
     }
 });
 
-function getMockBackground() : IBackgroundForReader {
-    var mockStorage : IStorage = {
+function getMockBackground(): IBackgroundForReader {
+    var mockStorage: IStorage = {
         notifyMe: false,
         outOfSync: false,
         periodMinutes: 0,
@@ -24,7 +24,7 @@ function getMockBackground() : IBackgroundForReader {
         load: (force?: boolean) => { return Promise.resolve() }
     }
 
-    var background : IBackgroundForReader = {
+    var background: IBackgroundForReader = {
         ourUrl: "file://",
         storage: mockStorage
     }
@@ -32,16 +32,16 @@ function getMockBackground() : IBackgroundForReader {
     return background;
 }
 
-function getMockFeed() : FeedDto {
-    var feed : FeedDto = {
+function getMockFeed(): FeedDto {
+    var feed: FeedDto = {
         name: "test",
         url: "",
         enabled: true,
         type: "html",
-    
+
         recent: [],
         unread: 0,
-    
+
         count: 0,
         map: [],
         firstRecord: ""
@@ -51,7 +51,7 @@ function getMockFeed() : FeedDto {
 }
 
 
-QUnit.test("rss-standard", async function ( assert: Assert) {
+QUnit.test("rss-standard", async function (assert: Assert) {
     var background = getMockBackground();
     var notifications = new ConsoleNotifications();
 
@@ -60,7 +60,8 @@ QUnit.test("rss-standard", async function ( assert: Assert) {
     var result = reader.read(getMockFeed());
 
     requests[0].respond(200, {
-        "Content-Type": "application/xml" },
+        "Content-Type": "application/xml"
+    },
         sleepless_rss_standard
     )
 
@@ -74,7 +75,7 @@ QUnit.test("rss-standard", async function ( assert: Assert) {
     });
 });
 
-QUnit.test("rss-no-dates", async function ( assert: Assert) {
+QUnit.test("rss-no-dates", async function (assert: Assert) {
     var background = getMockBackground();
     var notifications = new ConsoleNotifications();
 
@@ -83,7 +84,8 @@ QUnit.test("rss-no-dates", async function ( assert: Assert) {
     var result = reader.read(getMockFeed());
 
     requests[0].respond(200, {
-        "Content-Type": "application/xml" },
+        "Content-Type": "application/xml"
+    },
         awkward_rss_no_dates
     )
 
@@ -96,7 +98,7 @@ QUnit.test("rss-no-dates", async function ( assert: Assert) {
     });
 });
 
-QUnit.test("atom-standard", async function ( assert: Assert) {
+QUnit.test("atom-standard", async function (assert: Assert) {
     var background = getMockBackground();
     var notifications = new ConsoleNotifications();
 
@@ -105,7 +107,8 @@ QUnit.test("atom-standard", async function ( assert: Assert) {
     var result = reader.read(getMockFeed());
 
     requests[0].respond(200, {
-        "Content-Type": "application/xml" },
+        "Content-Type": "application/xml"
+    },
         xkcd_atom_standard
     )
 
@@ -119,7 +122,7 @@ QUnit.test("atom-standard", async function ( assert: Assert) {
     });
 });
 
-QUnit.test("html-no-root", async function ( assert: Assert) {
+QUnit.test("html-no-root", async function (assert: Assert) {
     var background = getMockBackground();
     var notifications = new ConsoleNotifications();
 
@@ -131,7 +134,8 @@ QUnit.test("html-no-root", async function ( assert: Assert) {
     var result = reader.read(feed);
 
     requests[0].respond(200, {
-        "Content-Type": "text/html" },
+        "Content-Type": "text/html"
+    },
         monster_html_no_root
     )
 
@@ -144,7 +148,7 @@ QUnit.test("html-no-root", async function ( assert: Assert) {
     });
 });
 
-QUnit.test("html-root", async function ( assert: Assert) {
+QUnit.test("html-root", async function (assert: Assert) {
     var background = getMockBackground();
     var notifications = new ConsoleNotifications();
 
@@ -157,7 +161,8 @@ QUnit.test("html-root", async function ( assert: Assert) {
     var result = reader.read(feed);
 
     requests[0].respond(200, {
-        "Content-Type": "text/html" },
+        "Content-Type": "text/html"
+    },
         nuzlocke_html_root
     )
 

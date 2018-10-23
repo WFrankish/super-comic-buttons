@@ -11,6 +11,7 @@
 			"**/*.js": true,
 			"**/*.map": true,
 			"**/*.zip" : true
-		}
+		},
+		"editor.detectIndentation": false
 	}
 }

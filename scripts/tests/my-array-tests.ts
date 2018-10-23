@@ -1,5 +1,5 @@
 ﻿QUnit.module("my-array");
-QUnit.test("constructor", function ( assert: Assert) {
+QUnit.test("constructor", function (assert: Assert) {
     var emptyExpect: any[] = [];
     var emptyActual = new MyArray();
     assert.deepEqual(emptyActual, emptyExpect);
@@ -22,7 +22,7 @@ QUnit.test("select", function (assert: Assert) {
 
 QUnit.test("select many", function (assert: Assert) {
     var base = [[1], [1, 2, 3], [4, 5]];
-    var expected = [1,3, 2, 1, 5, 4];
+    var expected = [1, 3, 2, 1, 5, 4];
     var actual = new MyArray(...base).selectMany(a => a.reverse());
     assert.deepEqual(actual, expected)
 });
@@ -34,7 +34,7 @@ QUnit.test("where", function (assert: Assert) {
     var actualEven = new MyArray(...base).where(n => n % 2 === 0);
     assert.deepEqual(actualEven, expectedEven);
 
-    var expectedEmpty : any[] = [];
+    var expectedEmpty: any[] = [];
     var actualEmpty = new MyArray(...base).where(n => n > 15);
     assert.deepEqual(actualEmpty, expectedEmpty, "empty result")
 });
@@ -57,10 +57,10 @@ QUnit.test("any", function (assert: Assert) {
 
     var actual = new MyArray().any();
     assert.deepEqual(actual, false);
-    
+
     var actualEven = new MyArray(...base).any(n => n % 2 === 0);
     assert.deepEqual(actualEven, true);
-    
+
     var actualEmpty = new MyArray(...base).any(n => n > 15);
     assert.deepEqual(actualEmpty, false)
 });
@@ -119,7 +119,7 @@ QUnit.test("first", function (assert: Assert) {
 
     var nullArray = [null, null, null]
     var actualNull = new MyArray(...nullArray).first();
-    assert.deepEqual(actualNull, null); 
+    assert.deepEqual(actualNull, null);
 });
 
 QUnit.test("lastOrDefault", function (assert: Assert) {
@@ -194,7 +194,7 @@ QUnit.test("except", function (assert: Assert) {
     var actual = new MyArray(...base).except(2, 3, 6, 5, 8, 2);
     assert.deepEqual(actual, expected);
 
-    var expectedEmpty : any[] = [];
+    var expectedEmpty: any[] = [];
     var actualEmpty = new MyArray(...base).except(...base);
     assert.deepEqual(actualEmpty, expectedEmpty);
 });
@@ -202,7 +202,7 @@ QUnit.test("except", function (assert: Assert) {
 QUnit.test("drop", function (assert: Assert) {
     var base = [1, 2, 3];
 
-    var expected = [2,3];
+    var expected = [2, 3];
     var actual = new MyArray(...base).drop(1);
     assert.deepEqual(actual, expected);
 });
