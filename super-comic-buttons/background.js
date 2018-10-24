@@ -1,10 +1,11 @@
 "use strict";
 $(initBackground);
+var background;
 function initBackground() {
     var ourUrl = browser.runtime.getURL("");
     var notifications = new Notifications();
-    var background = new Background(ourUrl, notifications);
-    addEventListener(background.reloaded.type, background.onReload);
+    background = new Background(ourUrl, notifications);
+    addEventListener(background.reloaded.type, () => background.onReload());
     browser.alarms.onAlarm.addListener(function (alarmInfo) {
         if (alarmInfo.name === background.readAlarm) {
             background.readAll(false);

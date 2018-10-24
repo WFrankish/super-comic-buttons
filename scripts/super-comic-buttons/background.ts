@@ -1,13 +1,13 @@
 $(initBackground);
 
-
+var background: IBackground;
 
 function initBackground() {
     var ourUrl = browser.runtime.getURL("");
     var notifications = new Notifications();
-    var background: IBackground = new Background(ourUrl, notifications);
+    background = new Background(ourUrl, notifications);
 
-    addEventListener(background.reloaded.type, background.onReload);
+    addEventListener(background.reloaded.type, () => background.onReload());
     browser.alarms.onAlarm.addListener(function (alarmInfo) {
         if (alarmInfo.name === background.readAlarm) {
             background.readAll(false);

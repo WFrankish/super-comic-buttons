@@ -6,6 +6,8 @@ menu.controller("menuCtrl", $scope => {
     var menu = new Menu(background);
     $scope.type = "rss";
     $scope.createClick = () => menu.create($scope);
+    menu.refreshFeedList($scope);
+    backgroundPage.addEventListener(background.reloaded.type, () => menu.refreshFeedList($scope));
 });
 function init() {
     // nameText.on("input", menu.refreshCreateForm);
@@ -42,64 +44,65 @@ class Menu {
         $scope.root = "";
         $scope.override = "";
     }
+    refreshFeedList($scope) {
+        $scope.$evalAsync(() => {
+            $scope.feeds = this.background.storage.storedData
+                .sort(function (a, b) {
+                var recentA = new MyArray(...a.recent);
+                var recentB = new MyArray(...b.recent);
+                var lastA = recentA.lastOrDefault();
+                var lastB = recentB.lastOrDefault();
+                var numA = lastA == null ? 0 : new Date(lastA.date).valueOf();
+                var numB = lastB == null ? 0 : new Date(lastB.date).valueOf();
+                return numB - numA;
+            })
+                .map(f => new FeedScope(this.background, f));
+        });
+    }
+}
+class FeedScope {
+    constructor(background, feed) {
+        this.background = background;
+        this.feed = feed;
+        this.name = feed.name;
+        var rand = Utils.randomHue(Utils.hashString(feed.name));
+        var hue = Math.trunc(360 * rand);
+        this.style = feed.enabled ?
+            `background-color: hsl(${hue}, 49%, 56%); color: hsl(${hue}, 92%, 20%)` :
+            "background-color: #909090; color: #484848";
+        this.unread = feed.unread;
+        this.unreadMessage = Utils.pluralise(this.unread, "update");
+        this.lastReadMessage = feed.lastRecord !== undefined ?
+            Utils.asTimeString(Date.now() - new Date(feed.lastRecord).valueOf(), 1) + " ago" :
+            "never";
+        this.lastUpdatedMessage = feed.recent.length > 0 ?
+            Utils.asTimeString(Date.now() - new Date(feed.recent[feed.recent.length - 1].date).valueOf(), 1) + " ago" :
+            "unknown";
+        this.enabled = feed.enabled;
+        this.days = [];
+    }
+    open() {
+        this.background.openThis(this.feed, true);
+    }
+    read() {
+        this.background.readThis(this.feed);
+    }
+    editMode(event) {
+        // TODO
+    }
+    toggleActiveness() {
+        this.background.toggleActiveness(this.feed);
+    }
+    delete(event) {
+        var button = $(event.target);
+        button.addClass("attention");
+        button.text("Delete!!");
+        button.unbind("click");
+        button.click(() => this.background.deleteThis(this.feed));
+    }
 }
 class OldMenu {
-    constructor(feedListDiv, bg, nameText, urlText, idText, specialRow, domTypeRadio, createNewButton, overrideText, rootText) {
-        this.feedListDiv = feedListDiv;
-        this.bg = bg;
-        this.nameText = nameText;
-        this.urlText = urlText;
-        this.idText = idText;
-        this.specialRow = specialRow;
-        this.domTypeRadio = domTypeRadio;
-        this.createNewButton = createNewButton;
-        this.overrideText = overrideText;
-        this.rootText = rootText;
-    }
-    refreshFeedList() {
-        this.feedListDiv.empty();
-        var panels = [];
-        var feeds = new MyArray(...this.bg.storage);
-        feeds.sort(function (a, b) {
-            var lastA = a.recent.last();
-            var lastB = b.recent.last();
-            var numA = lastA == null ? 0 : lastA.date;
-            var numB = lastB == null ? 0 : lastB.date;
-            return numB - numA;
-        });
-        feeds.forEach(feed => panels.push(this.createFeedPanel(feed)));
-        this.feedListDiv.append(...panels);
-    }
     createFeedPanel(feed) {
-        var panel = $("<div>", { class: "col-4 col-m-6 padall" });
-        var subPanel = $("<div>", { class: "light row" });
-        panel.append(subPanel);
-        var nameDiv = $("<div>", { class: "col-5 col-m-7 padall truncate" });
-        var name = $("<b>", { text: feed.name, class: "col-m-12 col-12 truncate" });
-        nameDiv.append(name);
-        this.styleDiv(name, feed);
-        var unreadNo = $("<div>", { text: Utils.pluralise(feed.unread, "update"), class: "col-4 col-m-5 truncate padall" });
-        var openDiv = $("<div>", { class: "col-3 col-m-6 padall" });
-        var openButton = $("<input>", { type: "button", value: "Open!" });
-        openButton.click(_ => this.bg.openThis(feed, true));
-        openDiv.append(openButton);
-        if (feed.unread > 0) {
-            openButton.addClass("attention");
-        }
-        subPanel.append(nameDiv);
-        subPanel.append(unreadNo);
-        subPanel.append(openDiv);
-        var lastReadString = feed.lastRecord !== undefined ? Utils.asTimeString(Date.now() - new Date(feed.lastRecord).valueOf(), 1) + " ago" : "never";
-        var lastRead = $("<div>", { text: "read: " + lastReadString, class: "col-4 col-m-6 truncate padall" });
-        var lastUpdateString = feed.recent.any() ? Utils.asTimeString(Date.now() - feed.recent.last().date, 1) + " ago" : "unknown";
-        var lastUpdate = $("<div>", { text: "updated: " + lastUpdateString, class: "col-5 col-m-7 truncate padall" });
-        var readDiv = $("<div>", { class: "col-3 col-m-5 padall" });
-        var readButton = $("<input>", { type: "button", value: "Read!" });
-        readButton.click(_ => this.bg.readThis(feed));
-        readDiv.append(readButton);
-        subPanel.append(lastRead);
-        subPanel.append(lastUpdate);
-        subPanel.append(readDiv);
         if (feed.enabled) {
             var map = [];
             feed.map.forEach(function (day) {
@@ -133,104 +136,6 @@ class OldMenu {
             inforow.append($("<div>", { class: "col-m-6 col-3 padall wrap", text: `${Utils.pluralise(Math.round(feed.averagePerDay * 100) / 100, "update")} per day` }));
             inforow.append($("<div>", { class: "col-m-6 col-6 padall wrap", text: `~${Utils.asTimeString(feed.averageGap, 2)} between updates` }));
         }
-        var editDiv = $("<div>", { class: "col-4 col-m-6 padall" });
-        var editButton = $("<input>", { type: "button", value: "Edit" });
-        editButton.click(event => this.editMode(feed, event));
-        editDiv.append(editButton);
-        var activateDiv = $("<div>", { class: "col-4 col-m-6 padall" });
-        var activateButton;
-        if (feed.enabled) {
-            activateButton = $("<input>", { type: "button", value: "Deactivate" });
-        }
-        else {
-            activateButton = $("<input>", { type: "button", value: "Activate" });
-        }
-        activateButton.click(_ => this.bg.toggleActiveness(feed));
-        activateDiv.append(activateButton);
-        var deleteDiv = $("<div>", { class: "col-4 col-m-6 padall" });
-        var deleteButton = $("<input>", { type: "button", value: "Delete?" });
-        deleteButton.click(event => this.confirmDelete(feed, event));
-        deleteDiv.append(deleteButton);
-        subPanel.append(editDiv);
-        subPanel.append(activateDiv);
-        subPanel.append(deleteDiv);
-        return panel;
-    }
-    refreshCreateForm() {
-        var validated = true;
-        if (this.nameText.val()) {
-            this.nameText.removeClass("invalid");
-            validated = validated && true;
-        }
-        else {
-            this.nameText.addClass("invalid");
-            validated = false;
-        }
-        if (this.urlText.val()) {
-            this.urlText.removeClass("invalid");
-            validated = validated && true;
-        }
-        else {
-            this.urlText.addClass("invalid");
-            validated = false;
-        }
-        validated = this.urlText.val() && validated;
-        var htmlMode = this.domTypeRadio.is(":checked");
-        if (htmlMode) {
-            this.specialRow.show();
-            if (this.idText.val()) {
-                this.idText.removeClass("invalid");
-                validated = validated && true;
-            }
-            else {
-                this.idText.addClass("invalid");
-                validated = false;
-            }
-            if (this.overrideText.val()) {
-                this.overrideText.removeClass("invalid");
-                validated = validated && true;
-            }
-            else {
-                this.overrideText.addClass("invalid");
-                validated = false;
-            }
-        }
-        else {
-            this.specialRow.hide();
-        }
-        if (validated) {
-            this.createNewButton.prop("disabled", false);
-        }
-        else {
-            this.createNewButton.prop("disabled", true);
-        }
-    }
-    ;
-    createNewFeed() {
-        var name = this.nameText.val();
-        var url = this.urlText.val();
-        var feed;
-        var htmlMode = this.domTypeRadio.is(":checked");
-        if (htmlMode) {
-            var id = this.idText.val();
-            var root = this.rootText.val();
-            var overrideLink = this.overrideText.val();
-            if (root) {
-                feed = new Feed({ name: name, url: url, id: id, root: root, overrideLink: overrideLink, type: "html" });
-            }
-            else {
-                feed = new Feed({ name: name, url: url, id: id, overideLink: overrideLink, type: "html" });
-            }
-        }
-        else {
-            feed = new Feed({ name: name, url: url, type: "rss" });
-        }
-        this.bg.createNewFeed(feed);
-        this.nameText.val("");
-        this.urlText.val("");
-        this.idText.val("");
-        this.rootText.val("");
-        this.overrideText.val("");
     }
     editMode(feed, event) {
         var button = $(event.target);
@@ -306,34 +211,11 @@ class OldMenu {
         this.createNewButton.val("Create");
         this.refreshCreateForm();
     }
-    confirmDelete(feed, event) {
-        var button = $(event.target);
-        button.addClass("attention");
-        button.val("Delete!!");
-        button.unbind("click");
-        button.click(_ => this.bg.deleteThis(feed));
-    }
-    ;
     colourFromNumber(num) {
         var lessThanOne = Math.min(num, 1);
         var oneToFive = Math.max(Math.min(num - 1, 5 - 1), 0);
         var hue = (120 * lessThanOne) + (15 * oneToFive);
         return hue;
-    }
-    styleDiv(div, feed) {
-        var bgColour;
-        var textColour;
-        if (feed.enabled) {
-            var rand = Utils.randomHue(Utils.hashString(feed.name));
-            var hue = Math.trunc(360 * rand);
-            bgColour = `hsl(${hue}, 49%, 56%)`;
-            textColour = `hsl(${hue}, 92%, 20%)`;
-        }
-        else {
-            bgColour = "#909090";
-            textColour = "#484848";
-        }
-        div.css({ "background-color": bgColour, "color": textColour, "border-radius": "0.2em", "padding": "0.2em", "text-align": "center" });
     }
 }
 //# sourceMappingURL=menu.js.map

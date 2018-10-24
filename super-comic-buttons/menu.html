@@ -81,14 +81,54 @@
                 </div>
                 <div class="row">
                     <div class="col-m-2 padall">
-                        <input data-ng-click="createClick()" data-ng-disabled="create.$invalid" type="button" value="Create" />
+                        <button data-ng-click="createClick()" data-ng-disabled="create.$invalid">Create</button>
                     </div>
                 </div>
             </form>
             <div class="fullscreenOnly col-m-0 col-3"><br /></div>
         </div>
-        <div>
-            <div id="feedListDiv" class="row"></div>
+        <div class="row">
+            <div data-ng-repeat="feed in feeds" class="col-4 col-m-6 padall">
+                <div class="light row">
+                    <div class="col-5 col-m-7 padall truncate">
+                        <b data-ng-bind="feed.name" data-ng-attr-style="{{feed.style}}" class="col-m-12 col-12 truncate custom"></b>
+                    </div>
+                    <div class="col-4 col-m-5 truncate padall">
+                        {{ feed.unreadMessage }}
+                    </div>
+                    <div class="col-3 col-m-6 padall">
+                        <button data-ng-click="feed.open()" ng-class="{'attention': feed.unread > 0}" >Open!</button>
+                    </div>
+                    <div class="col-4 col-m-6 truncate padall">
+                        read: {{ feed.lastReadMessage }}
+                    </div>
+                    <div class="col-5 col-m-7 truncate padall">
+                        updated: {{ feed.lastUpdatedMessage }}
+                    </div>
+                    <div class="col-3 col-m-5 padall">
+                        <button data-ng-click="feed.read()">Read!</button>
+                    </div>
+                    <div data-ng-show="feed.enabled" class="row">
+                        <table class="col-m-12, col-12">
+                            <tr>
+                                <th data-ng-repeat="day in feed.days" data-ng-attr-title="day.title" data-ng-attr-style="{{day.style}}" class="day">{{day.text}}</th>
+                            </tr>
+                            <!--TODO-->
+                        </table>
+                    </div>
+                    <div class="col-4 col-m-6 padall">
+                        <button data-ng-click="feed.editMode($event)">Edit</button>
+                    </div>
+                    <div class="col-4 col-m-6 padall">
+                        <button data-ng-click="feed.toggleActiveness()">
+                            {{ feed.enabled ? "Activate" : "Deactivate" }}
+                        </button>
+                    </div>
+                    <div class="col-4 col-m-6 padall">
+                        <button data-ng-click="feed.delete($event)">Delete?</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
