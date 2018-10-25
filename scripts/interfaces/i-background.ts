@@ -10,6 +10,7 @@ interface IBackground extends IBackgroundForPopup, IBackgroundForMenu, IBackgrou
 interface IBackgroundForPopup {
     readonly active: boolean;
     readonly unreadNo: number;
+    readonly unreadNoChange: Event;
 
     activate(silent?: boolean): void;
     deactivate(): void;

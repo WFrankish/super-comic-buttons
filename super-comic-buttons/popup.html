@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en-UK">
 
-<head>
+<head data-ng-csp>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Super Comic Buttons: Popup</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="lib/jquery-3.3.1.min.js"></script>
+    <script src="lib/angular.min.js"></script>
     <script src="popup.js"></script>
 </head>
 
 <body class="light" style="width: 8em">
-    <div class="padall">
-        <input type="button" value="placeholder" id="toggle-button" /><br />
-        <input type="button" value="Menu" id="menu-button" /><br />
-        <input type="button" value="Options" id="options-button" /><br />
-        <input type="button" value="Read 1" id="read-one-button" /><br />
-        <input type="button" value="Read All!" id="read-all-button" /><br />
+    <div data-ng-app="popup" data-ng-controller="popupCtrl" class="padall">
+        <button data-ng-click="toggleClick()">{{ background.active ? 'Deactivate' : 'Activate' }}</button><br />
+        <button data-ng-click="menuClick()">Menu</button><br />
+        <button data-ng-click="optionsClick()">Options</button><br />
+        <button data-ng-click="readOneClick()" data-ng-disabled="0 >= background.unreadNo">Read 1</button><br />
+        <button data-ng-click="readAllClick()" data-ng-disabled="1 >= background.unreadNo">Read All!</button><br />
     </div>
 </body>

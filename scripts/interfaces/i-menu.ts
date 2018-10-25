@@ -4,7 +4,7 @@ interface IMenu {
     refreshFeedList($scope: IMenuScope): void;
 }
 
-interface IMenuScope {
+interface IMenuScope extends ng.IScope {
     name: string;
     url: string;
     type: "html" | "rss";
@@ -14,8 +14,6 @@ interface IMenuScope {
     override: string;
 
     feeds: IFeedScope[];
-
-    $evalAsync(func: () => void): void;
 }
 
 interface IFeedScope {
