@@ -19,13 +19,12 @@ interface IMenuScope {
 }
 
 interface IFeedScope {
-    name: string;
-    style: string;
+    entity: FeedDto
+
     unread: number;
     unreadMessage: string;
     lastReadMessage: string;
     lastUpdatedMessage: string;
-    enabled: boolean;
     
     weekdays: IWeekDayScope[];
     hours: IHourScope[];
@@ -33,9 +32,12 @@ interface IFeedScope {
     perDay: string;
     betweenUpdates: string;
 
+    editMode: boolean;
+
+    style(): string;
     open(): void;
     read(): void;
-    editMode(event: JQuery.Event<HTMLElement>) : void;
+    edit(event: JQuery.Event<HTMLElement>) : void;
     toggleActiveness(): void;
     delete(event: JQuery.Event<HTMLElement>): void;
 }

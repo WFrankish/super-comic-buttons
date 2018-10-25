@@ -35,7 +35,7 @@
                         <input data-ng-model="url" id="url" type="text" required />
                     </div>
                     <div class="col-m-1 padall">
-                        <label for="type">Type</label>
+                        <label>Type</label>
                     </div>
                     <div class="type">
                         <div class="col-m-2 padall">
@@ -91,13 +91,15 @@
             <div data-ng-repeat="feed in feeds" class="col-4 col-m-6 padall">
                 <div class="light row">
                     <div class="col-5 col-m-7 padall truncate">
-                        <b data-ng-bind="feed.name" data-ng-attr-style="{{feed.style}}" class="col-m-12 col-12 truncate custom"></b>
+                        <b data-ng-attr-style="{{feed.style()}}" class="col-m-12 col-12 truncate custom">
+                            {{ feed.entity.name }}
+                        </b>
                     </div>
                     <div class="col-4 col-m-5 truncate padall">
                         {{ feed.unreadMessage }}
                     </div>
                     <div class="col-3 col-m-6 padall">
-                        <button data-ng-click="feed.open()" ng-class="{'attention': feed.unread > 0}" >Open!</button>
+                        <button data-ng-click="feed.open()" ng-class="{'attention': feed.unread > 0}">Open!</button>
                     </div>
                     <div class="col-4 col-m-6 truncate padall">
                         read: {{ feed.lastReadMessage }}
@@ -108,13 +110,15 @@
                     <div class="col-3 col-m-5 padall">
                         <button data-ng-click="feed.read()">Read!</button>
                     </div>
-                    <div data-ng-show="feed.enabled" class="row">
+                    <div data-ng-show="feed.entity.enabled" class="row">
                         <table class="col-m-12, col-12">
                             <tr>
-                                <th data-ng-repeat="weekday in feed.weekdays" data-ng-attr-title="{{weekday.title}}" data-ng-attr-style="{{weekday.style}}" class="day">{{weekday.text}}</th>
+                                <th data-ng-repeat="weekday in feed.weekdays" data-ng-attr-title="{{weekday.title}}"
+                                    data-ng-attr-style="{{weekday.style}}" class="day">{{weekday.text}}</th>
                             </tr>
                             <tr data-ng-repeat="hour in feed.hours">
-                                <td data-ng-repeat="day in hour.days" data-ng-attr-title="{{day.title}}" data-ng-attr-style="{{day.style}}" class="num"></td>
+                                <td data-ng-repeat="day in hour.days" data-ng-attr-title="{{day.title}}"
+                                    data-ng-attr-style="{{day.style}}" class="num"></td>
                             </tr>
                         </table>
                         <div class="col-m-6 col-3 padall wrap">
@@ -127,12 +131,68 @@
                             {{feed.betweenUpdates}} beween updates
                         </div>
                     </div>
-                    <div class="col-4 col-m-6 padall">
-                        <button data-ng-click="feed.editMode($event)">Edit</button>
+                    <form name="edit">
+                    <div data-ng-show="feed.editMode" class="row">
+                        <div class="col-m-1 padall">
+                            <label data-ng-attr-for="{{'name'+$index}}">Name</label>
+                        </div>
+                        <div class="col-m-2 padall">
+                            <input data-ng-model="feed.entity.name" data-ng-attr-id="{{'name'+$index}}" type="text"
+                                required />
+                        </div>
+                        <div class="col-m-1 padall">
+                            <label data-ng-attr-for="{{'url'+$index}}">Url</label>
+                        </div>
+                        <div class="col-m-3 padall">
+                            <input data-ng-model="feed.entity.url" data-ng-attr-id="{{'url'+$index}}" type="text"
+                                required />
+                        </div>
+                        <div class="col-m-1 padall">
+                            <label>Type</label>
+                        </div>
+                        <div class="type">
+                            <div class="col-m-2 padall">
+                                <input data-ng-value="'rss'" data-ng-model="feed.entity.type" data-ng-attr-id="{{'xml-type'+$index}}"
+                                    name="type" type="radio" />
+                                <label data-ng-attr-for="{{'xml-type'+$index}}">rss/atom</label>
+                            </div>
+                            <div class="
+                                    col-m-2 padall">
+                                <input data-ng-value="'html'" data-ng-model="feed.entity.type" data-ng-attr-id="{{'dom-type'+$index}}"
+                                    name="type" type="radio" />
+                                <label data-ng-attr-for="{{'dom-type'+$index}}">html</label>
+                            </div>
+                        </div>
+                        <div data-ng-show="feed.entity.type==='html'" class="row">
+                            <div class="col-m-2 padall">
+                                <label data-ng-attr-for="{{'id'+$index}}">Image Id</label>
+                            </div>
+                            <div class="col-m-4 padall">
+                                <input data-ng-model="feed.entity.id" data-ng-attr-id="{{'id'+$index}}" type="text"
+                                    data-ng-required="feed.entity.type==='html'" />
+                            </div>
+                            <div class="col-m-2 padall">
+                                <label data-ng-attr-for="{{'root'+$index}}">Root Url</label>
+                            </div>
+                            <div class="col-m-4 padall">
+                                <input data-ng-model="feed.entity.root" data-ng-attr-id="{{'root'+$index}}" type="text" />
+                            </div>
+                            <div class="col-m-2 padall">
+                                <label data-ng-attr-for="{{'override'+$index}}">Front Page Url</label>
+                            </div>
+                            <div class="col-m-4 padall">
+                                <input data-ng-model="feed.entity.overrideLink" data-ng-attr-id="{{'override'+$index}}"
+                                    type="text" />
+                            </div>
+                        </div>
                     </div>
                     <div class="col-4 col-m-6 padall">
+                        <button data-ng-click="feed.edit($event)" data-ng-disabled="edit.$invalid && feed.editMode">Edit</button>
+                    </div>
+                </form>
+                    <div class="col-4 col-m-6 padall">
                         <button data-ng-click="feed.toggleActiveness()">
-                            {{ feed.enabled ? "Activate" : "Deactivate" }}
+                            {{ feed.entity.enabled ? "Activate" : "Deactivate" }}
                         </button>
                     </div>
                     <div class="col-4 col-m-6 padall">
