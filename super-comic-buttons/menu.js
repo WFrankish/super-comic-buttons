@@ -9,19 +9,6 @@ menu.controller("menuCtrl", $scope => {
     menu.refreshFeedList($scope);
     backgroundPage.addEventListener(background.reloaded.type, () => menu.refreshFeedList($scope));
 });
-function init() {
-    // nameText.on("input", menu.refreshCreateForm);
-    // urlText.on("input", menu.refreshCreateForm);
-    // idText.on("input", menu.refreshCreateForm);
-    // overrideText.on("input", menu.refreshCreateForm);
-    // xmlTypeRadio.change(menu.refreshCreateForm);
-    // domTypeRadio.change(menu.refreshCreateForm);
-    // menu.refreshFeedList();
-    // menu.refreshCreateForm();
-    // createNewButton.click(menu.createNewFeed);
-    // bg.addEventListener('unreadNoChange', menu.refreshFeedList);
-}
-;
 class Menu {
     constructor(background) {
         this.background = background;
@@ -79,7 +66,20 @@ class FeedScope {
             Utils.asTimeString(Date.now() - new Date(feed.recent[feed.recent.length - 1].date).valueOf(), 1) + " ago" :
             "unknown";
         this.enabled = feed.enabled;
-        this.days = [];
+        this.weekdays = [];
+        this.hours = [];
+        var alteredMap = this.transposeAndProcessMap(feed);
+        var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        days.forEach((day, ii) => {
+            var value = alteredMap.map(h => h[ii]).reduce((a, b) => a + b);
+            this.weekdays.push(new WeekDayScope(day, value));
+        });
+        for (var ii = 0; ii < 24; ii++) {
+            this.hours.push(new HourScope(ii, days, alteredMap[ii]));
+        }
+        this.perWeek = Utils.pluralise(Math.round(this.background.feedHandler.averagePerWeek(feed) * 100) / 100, "update");
+        this.perDay = Utils.pluralise(Math.round(this.background.feedHandler.averagePerDay(feed) * 100) / 100, "update");
+        this.betweenUpdates = Utils.asTimeString(this.background.feedHandler.averageGap(feed), 2);
     }
     open() {
         this.background.openThis(this.feed, true);
@@ -100,43 +100,42 @@ class FeedScope {
         button.unbind("click");
         button.click(() => this.background.deleteThis(this.feed));
     }
+    transposeAndProcessMap(feed) {
+        // TODO
+        var result = [];
+        feed.map[0].forEach(() => {
+            result.push([]);
+        });
+        for (var ii = 0; ii < feed.map.length; ii++) {
+            for (var jj = 0; jj < feed.map[0].length; jj++) {
+                result[jj][ii] = feed.map[ii][jj] * this.background.feedHandler.averagePerWeek(feed);
+            }
+        }
+        return result;
+    }
+}
+class WeekDayScope {
+    constructor(day, value) {
+        this.text = day[0];
+        this.title = day + " - average of " + Utils.pluralise(Math.round(value * 100) / 100, "update");
+        this.style = `color: hsl(${Utils.colourFromNumber(value)}, 86%, 56%)`;
+    }
+}
+class HourScope {
+    constructor(hour, weekDays, days) {
+        this.days = [];
+        weekDays.forEach((day, ii) => {
+            this.days.push(new DayScope(day, hour, days[ii]));
+        });
+    }
+}
+class DayScope {
+    constructor(day, hour, value) {
+        this.title = `${day} ${hour.toString().padStart(2, '0')}:00 - average of ${Utils.pluralise(Math.round(value * 100) / 100, "update")}`;
+        this.style = `background-color: hsl(${Utils.colourFromNumber(value)}, 49%, 56%)`;
+    }
 }
 class OldMenu {
-    createFeedPanel(feed) {
-        if (feed.enabled) {
-            var map = [];
-            feed.map.forEach(function (day) {
-                day.forEach(hour => map.push(hour));
-            });
-            var table = $("<table>", { class: "col-m-12, col-12" });
-            subPanel.append(table);
-            var days = $("<tr>");
-            table.append(days);
-            days.append($("<th>", { text: "S", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[0] * feed.averagePerWeek)}, 86%, 56%)`, title: `Sunday - average of ${Utils.pluralise(Math.round(feed.dayMap[0] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "M", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[1] * feed.averagePerWeek)}, 86%, 56%)`, title: `Monday - average of ${Utils.pluralise(Math.round(feed.dayMap[1] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "T", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[2] * feed.averagePerWeek)}, 86%, 56%)`, title: `Tuesday - average of ${Utils.pluralise(Math.round(feed.dayMap[2] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "W", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[3] * feed.averagePerWeek)}, 86%, 56%)`, title: `Wednesday - average of ${Utils.pluralise(Math.round(feed.dayMap[3] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "T", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[4] * feed.averagePerWeek)}, 86%, 56%)`, title: `Thursday - average of ${Utils.pluralise(Math.round(feed.dayMap[4] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "F", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[5] * feed.averagePerWeek)}, 86%, 56%)`, title: `Friday - average of ${Utils.pluralise(Math.round(feed.dayMap[5] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            days.append($("<th>", { text: "S", class: "day", style: `color: hsl(${this.colourFromNumber(feed.dayMap[6] * feed.averagePerWeek)}, 86%, 56%)`, title: `Saturday - average of ${Utils.pluralise(Math.round(feed.dayMap[6] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            for (var i = 0; i < 24; i++) {
-                var t = $("<tr>"); // show as 0#
-                table.append(t);
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[0][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Sunday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[0][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[1][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Monday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[1][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[2][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Tuesday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[2][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[3][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Wednesday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[3][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[4][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Thursday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[4][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[5][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Friday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[5][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-                t.append($("<td>", { class: "num", style: `background-color: hsl(${this.colourFromNumber(map[6][i] * feed.averagePerWeek)}, 49%, 56%)`, title: `Saturday ${("0" + i).slice(-2)}:00 - average of ${Utils.pluralise(Math.round(map[6][i] * feed.averagePerWeek * 100) / 100, "update")}` }));
-            }
-            var inforow = $("<div>", { class: "row" });
-            subPanel.append(inforow);
-            inforow.append($("<div>", { class: "col-m-6 col-3 padall wrap", text: `${Utils.pluralise(Math.round(feed.averagePerWeek * 100) / 100, "update")} per week` }));
-            inforow.append($("<div>", { class: "col-m-6 col-3 padall wrap", text: `${Utils.pluralise(Math.round(feed.averagePerDay * 100) / 100, "update")} per day` }));
-            inforow.append($("<div>", { class: "col-m-6 col-6 padall wrap", text: `~${Utils.asTimeString(feed.averageGap, 2)} between updates` }));
-        }
-    }
     editMode(feed, event) {
         var button = $(event.target);
         this.createNewButton.unbind("click");
@@ -210,12 +209,6 @@ class OldMenu {
         this.createNewButton.removeClass("attention");
         this.createNewButton.val("Create");
         this.refreshCreateForm();
-    }
-    colourFromNumber(num) {
-        var lessThanOne = Math.min(num, 1);
-        var oneToFive = Math.max(Math.min(num - 1, 5 - 1), 0);
-        var hue = (120 * lessThanOne) + (15 * oneToFive);
-        return hue;
     }
 }
 //# sourceMappingURL=menu.js.map

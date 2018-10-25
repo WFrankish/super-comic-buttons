@@ -90,4 +90,11 @@ class Utils {
     static randomHue(seed: number): number {
         return (Math.sin(seed * (0.5 / Math.PI)) + 1) / 2;
     }
+
+    static colourFromNumber(num: number): number {
+        var lessThanOne = Math.min(num, 1);
+        var oneToFive = Math.max(Math.min(num - 1, 5 - 1), 0);
+        var hue = (120 * lessThanOne) + (15 * oneToFive);
+        return hue;
+    }
 }

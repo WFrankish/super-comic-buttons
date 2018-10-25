@@ -111,10 +111,21 @@
                     <div data-ng-show="feed.enabled" class="row">
                         <table class="col-m-12, col-12">
                             <tr>
-                                <th data-ng-repeat="day in feed.days" data-ng-attr-title="day.title" data-ng-attr-style="{{day.style}}" class="day">{{day.text}}</th>
+                                <th data-ng-repeat="weekday in feed.weekdays" data-ng-attr-title="{{weekday.title}}" data-ng-attr-style="{{weekday.style}}" class="day">{{weekday.text}}</th>
                             </tr>
-                            <!--TODO-->
+                            <tr data-ng-repeat="hour in feed.hours">
+                                <td data-ng-repeat="day in hour.days" data-ng-attr-title="{{day.title}}" data-ng-attr-style="{{day.style}}" class="num"></td>
+                            </tr>
                         </table>
+                        <div class="col-m-6 col-3 padall wrap">
+                            {{feed.perWeek}} per week
+                        </div>
+                        <div class="col-m-6 col-3 padall wrap">
+                            {{feed.perDay}} per day
+                        </div>
+                        <div class="col-m-6 col-3 padall wrap">
+                            {{feed.betweenUpdates}} beween updates
+                        </div>
                     </div>
                     <div class="col-4 col-m-6 padall">
                         <button data-ng-click="feed.editMode($event)">Edit</button>

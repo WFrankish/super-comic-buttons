@@ -26,7 +26,12 @@ interface IFeedScope {
     lastReadMessage: string;
     lastUpdatedMessage: string;
     enabled: boolean;
-    days: IDayScope[];
+    
+    weekdays: IWeekDayScope[];
+    hours: IHourScope[];
+    perWeek: string;
+    perDay: string;
+    betweenUpdates: string;
 
     open(): void;
     read(): void;
@@ -35,8 +40,17 @@ interface IFeedScope {
     delete(event: JQuery.Event<HTMLElement>): void;
 }
 
-interface IDayScope {
+interface IWeekDayScope {
     text: string;
+    title: string;
+    style: string;
+}
+
+interface IHourScope {
+    days: IDayScope[];
+}
+
+interface IDayScope {
     title: string;
     style: string;
 }
