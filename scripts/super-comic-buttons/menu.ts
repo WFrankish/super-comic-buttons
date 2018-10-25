@@ -64,7 +64,7 @@ class Menu implements IMenu {
 
 class FeedScope implements IFeedScope {
     private readonly background: IBackgroundForMenu;
-    
+
     entity: FeedDto;
 
     unread: number;
@@ -104,7 +104,7 @@ class FeedScope implements IFeedScope {
         var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
         days.forEach((day, ii) => {
-            var value = alteredMap.map(h => h[ii]).reduce((a, b) => a+b);
+            var value = alteredMap.map(h => h[ii]).reduce((a, b) => a + b);
             this.weekdays.push(new WeekDayScope(day, value));
         });
 
@@ -156,16 +156,20 @@ class FeedScope implements IFeedScope {
         button.click(() => this.background.deleteThis(this.entity));
     }
 
-    private transposeAndProcessMap(feed: FeedDto) : number[][]{      
-        // TODO
+    private transposeAndProcessMap(feed: FeedDto): number[][] {
+        var map = this.background.feedHandler.offSetMapForTimeZone(feed);
+
         var result: number[][] = [];
-        feed.map[0].forEach(() => {
+        map[0].forEach(() => {
             result.push([]);
         });
 
-        for(var ii = 0; ii < feed.map.length; ii++){
-            for(var jj = 0; jj < feed.map[0].length; jj++){
-                result[jj][ii] = feed.map[ii][jj] * this.background.feedHandler.averagePerWeek(feed);
+        var days = map.length;
+        var hours = map[0].length;
+
+        for (var ii = 0; ii < days; ii++) {
+            for (var jj = 0; jj < hours; jj++) {
+                result[jj][ii] = map[ii][jj] * this.background.feedHandler.averagePerWeek(feed);
             }
         }
         return result;

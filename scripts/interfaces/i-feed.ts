@@ -4,6 +4,7 @@ interface IFeedHandler {
     open(feed: FeedDto, force?: boolean): void;
     shouldRead(feed: FeedDto): boolean;
     consume(feed: FeedDto, items: ReadResult[]): void;
+    offSetMapForTimeZone(feed: FeedDto): number[][];
     averagePerDay(feed: FeedDto): number;
     averagePerWeek(feed: FeedDto): number;
     latestLink(feed: FeedDto): string | null;

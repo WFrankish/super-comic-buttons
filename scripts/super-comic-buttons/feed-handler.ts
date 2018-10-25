@@ -134,6 +134,37 @@ class FeedHandler implements IFeedHandler {
         }
     }
 
+    offSetMapForTimeZone(feed: FeedDto): number[][] {
+        var offset = Math.trunc(new Date().getTimezoneOffset() / 60);
+
+        var result: number[][] = [];
+        feed.map.forEach(() => {
+            result.push([]);
+        });
+
+        var days = feed.map.length;
+        var hours = feed.map[0].length;
+
+        for (var ii = 0; ii < days; ii++) {
+            for (var jj = 0; jj < hours; jj++) {
+                var i = ii;
+                var j = jj - offset;
+
+                if (j < 0) {
+                    i = (i + days - 1) % days;
+                }
+                if (j >= hours) {
+                    i = (i + 1) % days;
+                }
+
+                j = (hours + j) % hours;
+
+                result[i][j] = feed.map[ii][jj];
+            }
+        }
+        return result;
+    }
+
     averagePerDay(feed: FeedDto): number {
         if (feed.lastRecord === undefined) {
             return 0;

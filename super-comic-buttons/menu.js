@@ -107,14 +107,16 @@ class FeedScope {
         button.click(() => this.background.deleteThis(this.entity));
     }
     transposeAndProcessMap(feed) {
-        // TODO
+        var map = this.background.feedHandler.offSetMapForTimeZone(feed);
         var result = [];
-        feed.map[0].forEach(() => {
+        map[0].forEach(() => {
             result.push([]);
         });
-        for (var ii = 0; ii < feed.map.length; ii++) {
-            for (var jj = 0; jj < feed.map[0].length; jj++) {
-                result[jj][ii] = feed.map[ii][jj] * this.background.feedHandler.averagePerWeek(feed);
+        var days = map.length;
+        var hours = map[0].length;
+        for (var ii = 0; ii < days; ii++) {
+            for (var jj = 0; jj < hours; jj++) {
+                result[jj][ii] = map[ii][jj] * this.background.feedHandler.averagePerWeek(feed);
             }
         }
         return result;
