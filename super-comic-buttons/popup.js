@@ -1,6 +1,6 @@
 "use strict";
-var menu = angular.module("popup", []);
-menu.controller("popupCtrl", $scope => {
+var popup = angular.module("popup", []);
+popup.controller("popupCtrl", $scope => {
     var backgroundPage = browser.extension.getBackgroundPage();
     var background = backgroundPage.background;
     var popup = new Popup(background);

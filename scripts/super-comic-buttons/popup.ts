@@ -1,6 +1,6 @@
-var menu = angular.module("popup", []);
+var popup = angular.module("popup", []);
 
-menu.controller("popupCtrl", $scope => {
+popup.controller("popupCtrl", $scope => {
     var backgroundPage: any = browser.extension.getBackgroundPage();
     var background: IBackground = backgroundPage.background;
     var popup = new Popup(background);
