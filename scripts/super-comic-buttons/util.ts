@@ -17,7 +17,7 @@ class Utils {
         const week = 7 * day;
         const year = 365 * day;
         var res: string[] = [];
-        if (num >= year) {
+        if (num >= year && level > 0) {
             var years = Math.trunc(num / year);
             if (years > 0) {
                 res.push(this.pluralise(years, "year"));
