@@ -80,9 +80,9 @@ class FeedHandler {
             }
         }
         // seperate out new items
-        var unreadItems = new MyArray(...items.slice(0, i));
-        if (unreadItems.any()) {
-            feed.unreadLink = unreadItems.last().link;
+        var unreadItems = items.slice(0, i);
+        if (unreadItems.length > 0) {
+            feed.unreadLink = MyArray.last(unreadItems).link;
             feed.unread += unreadItems.length;
         }
         for (var i = unreadItems.length - 1; i >= 0; i--) {
@@ -178,9 +178,8 @@ class FeedHandler {
         return span / feed.count;
     }
     updateUnread(feed) {
-        var recent = new MyArray(...feed.recent);
-        if (recent.any()) {
-            feed.unreadLink = recent.last().link;
+        if (feed.recent.length > 0) {
+            feed.unreadLink = MyArray.last(feed.recent).link;
             feed.unread = 0;
         }
     }

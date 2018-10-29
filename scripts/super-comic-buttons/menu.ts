@@ -49,10 +49,8 @@ class Menu implements IMenu {
         $scope.$evalAsync(() => {
             $scope.feeds = this.background.storage.storedData
                 .sort(function (a, b) {
-                    var recentA = new MyArray(...a.recent);
-                    var recentB = new MyArray(...b.recent);
-                    var lastA = recentA.lastOrDefault();
-                    var lastB = recentB.lastOrDefault();
+                    var lastA = MyArray.lastOrDefault(a.recent);
+                    var lastB = MyArray.lastOrDefault(b.recent);
                     var numA = lastA == null ? 0 : new Date(lastA.date).valueOf();
                     var numB = lastB == null ? 0 : new Date(lastB.date).valueOf();
                     return numB - numA;
@@ -93,7 +91,7 @@ class FeedScope implements IFeedScope {
             Utils.asTimeString(Date.now() - new Date(feed.lastRecord).valueOf(), 1) + " ago" :
             "never";
         this.lastUpdatedMessage = feed.recent.length > 0 ?
-            Utils.asTimeString(Date.now() - new Date(feed.recent[feed.recent.length - 1].date).valueOf(), 1) + " ago" :
+            Utils.asTimeString(Date.now() - new Date(MyArray.last(feed.recent).date).valueOf(), 1) + " ago" :
             "unknown";
 
         this.weekdays = [];

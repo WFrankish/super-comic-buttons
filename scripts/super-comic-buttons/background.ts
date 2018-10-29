@@ -67,8 +67,8 @@ class Background implements IBackground {
     }
 
     openOne(): void {
-        var storedData = new MyArray(...this.storage.storedData);
-        var possibles = storedData.where(f => f.unread > 0).shuffle();
+        var storedData = this.storage.storedData;
+        var possibles = MyArray.shuffle(storedData.filter(f => f.unread > 0));
         if (possibles.length > 0) {
             this.openThis(possibles[0], false);
         }

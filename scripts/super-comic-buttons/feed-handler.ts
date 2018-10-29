@@ -94,9 +94,9 @@ class FeedHandler implements IFeedHandler {
         }
 
         // seperate out new items
-        var unreadItems = new MyArray(...items.slice(0, i));
-        if (unreadItems.any()) {
-            feed.unreadLink = unreadItems.last().link;
+        var unreadItems = items.slice(0, i);
+        if (unreadItems.length > 0) {
+            feed.unreadLink = MyArray.last(unreadItems).link;
             feed.unread += unreadItems.length;
         }
 
@@ -210,9 +210,8 @@ class FeedHandler implements IFeedHandler {
     }
 
     private updateUnread(feed: FeedDto): void {
-        var recent = new MyArray(...feed.recent);
-        if (recent.any()) {
-            feed.unreadLink = recent.last().link;
+        if (feed.recent.length > 0) {
+            feed.unreadLink = MyArray.last(feed.recent).link;
             feed.unread = 0;
         }
     }
