@@ -98,15 +98,18 @@ class WebStorage {
         });
     }
     loadFromLocal() {
-        var loaded = browser.storage.local.get({
+        return browser.storage.local.get({
             useSync: false,
             notifyMe: false,
             lastSaved: new Date(0).toString(),
             version: this.version,
             period: 30,
             storage: []
-        });
-        var promise = loaded.then(item => {
+        })
+            .then(s => {
+            return this.coerceLocalVersion(s);
+        })
+            .then(item => {
             this.periodMinutes = item.period;
             var lastSaved = new Date(item.lastSaved);
             this.lastSaved = lastSaved;
@@ -114,7 +117,19 @@ class WebStorage {
             this.notifyMe = item.notifyMe;
             this.storedData = item.storage;
         });
-        return promise;
+    }
+    async coerceLocalVersion(storage) {
+        if (storage.version === 2) {
+            return storage;
+        }
+        else if (storage.version === undefined || storage.version === 1) {
+            return this.convertLocalVersionInner();
+        }
+        else {
+            var err = "stored data is an unrecognised version";
+            this.notifications.error(err);
+            throw err;
+        }
     }
     loadFromSync(force) {
         if (this.outOfSync && !force) {
@@ -134,19 +149,124 @@ class WebStorage {
                 this.outOfSync = true;
                 return Promise.resolve();
             }
-            var loaded = browser.storage.sync.get({
+            return browser.storage.sync.get({
+                notifyMe: false,
+                lastSaved: new Date(0).toString(),
                 version: this.version,
-                lastSaved: new Date(0).toDateString(),
+                period: 30,
                 storage: []
-            });
-            var promise = loaded.then(item => {
+            })
+                .then(s => {
+                return this.coerceSyncVersion(s);
+            })
+                .then(item => {
                 this.lastSaved = lastSaved;
                 this.storedData = item.storage;
             });
-            return promise;
         }, error => {
             this.notifications.error("Sync load error - " + error.message);
         });
+    }
+    async coerceSyncVersion(storage) {
+        if (storage.version === 2) {
+            return storage;
+        }
+        else if (storage.version === undefined || storage.version === 1) {
+            return await this.convertSyncVersionInner();
+        }
+        else {
+            var err = "stored data is an unrecognised version";
+            this.notifications.error(err);
+            throw err;
+        }
+    }
+    convertLocalVersionInner() {
+        return browser.storage.local.get({
+            useSync: false,
+            notifyMe: false,
+            lastSaved: new Date(0).toString(),
+            version: this.version,
+            period: 30,
+            storage: []
+        })
+            .then(s => {
+            var converted = {
+                useSync: s.useSync,
+                notifyMe: s.notifyMe,
+                lastSaved: this.convertDate(s.lastSaved),
+                version: this.version,
+                period: s.period,
+                storage: s.storage.map(f => this.convertStorage(f))
+            };
+            return browser.storage.local.set(converted)
+                .then(() => { return converted; });
+        });
+    }
+    convertSyncVersionInner() {
+        return browser.storage.sync.get({
+            notifyMe: false,
+            lastSaved: new Date(0).toString(),
+            version: this.version,
+            period: 30,
+            storage: []
+        })
+            .then(s => {
+            var converted = {
+                notifyMe: s.notifyMe,
+                lastSaved: this.convertDate(s.lastSaved),
+                version: this.version,
+                period: s.period,
+                storage: s.storage.map(f => this.convertStorage(f))
+            };
+            return browser.storage.sync.set(converted)
+                .then(() => { return converted; });
+        });
+    }
+    convertDate(lastSaved) {
+        var asDate = new Date(lastSaved);
+        if (Number.isNaN(asDate.valueOf())) {
+            return new Date(0).toString();
+        }
+        else {
+            return asDate.toString();
+        }
+    }
+    convertStorage(storage) {
+        var result = {
+            name: storage.name,
+            url: storage.url,
+            enabled: storage.enabled === undefined ? true : storage.enabled,
+            type: storage.type,
+            overrideLink: storage.overrideLink,
+            id: storage.id,
+            recent: storage.recent.map(r => this.convertRecent(r)),
+            unreadLink: storage.unreadLink,
+            unread: storage.unread,
+            count: storage.count,
+            map: this.convertMap(storage.hourMap, storage.dayMap),
+            firstRecord: this.convertDate(storage.firstRecord),
+            lastRecord: storage.enabled === undefined ? undefined : this.convertDate(storage.lastRecord)
+        };
+        return result;
+    }
+    convertRecent(recent) {
+        var result = {
+            title: recent.title,
+            date: this.convertDate(recent.date),
+            link: recent.link
+        };
+        return result;
+    }
+    convertMap(hours, days) {
+        var result = [];
+        for (var ii = 0; ii < 7; ii++) {
+            var day = [];
+            for (var jj = 0; jj < 24; jj++) {
+                day.push(hours[jj] * days[ii]);
+            }
+            result.push(day);
+        }
+        return result;
     }
 }
 //# sourceMappingURL=storage.js.map
