@@ -1,4 +1,5 @@
 var clock: sinon.SinonFakeTimers;
+var muchEarlier = new Date("Dec 01 1999 11:00:00 GMT+0000");
 var earlier = new Date("Jan 01 2000 11:00:00 GMT+0000");
 var now = new Date("Jan 01 2000 12:00:00 GMT+0000");
 var later = new Date("Jan 01 2000 13:00:00 GMT+0000");
@@ -244,4 +245,75 @@ QUnit.test("averagePerWeek", function (assert: Assert) {
 
     feed.lastRecord = new Date("Jan 25 1999 11:00:00 GMT+0000").toString();
     assert.equal(feedHandler.averagePerWeek(feed), 0.5);
+});
+
+QUnit.test("should read - simple cases", function (assert: Assert) {
+    var feedHandler = new FeedHandler();
+
+    var neverReadfeed = feedHandler.newRssFeed("", "");
+    assert.ok(feedHandler.shouldRead(neverReadfeed));
+
+    var disabledFeed = feedHandler.newRssFeed("", "");
+    disabledFeed.enabled = false;
+    assert.notOk(feedHandler.shouldRead(disabledFeed));
+
+    var newFeed = feedHandler.newRssFeed("", "");
+    newFeed.firstRecord = earlier.toString();
+    newFeed.lastRecord = now.toString();
+    assert.ok(feedHandler.shouldRead(newFeed));
+
+    var newFeed = feedHandler.newRssFeed("", "");
+    newFeed.firstRecord = muchEarlier.toString();
+    newFeed.lastRecord = muchEarlier.toString();
+    assert.ok(feedHandler.shouldRead(newFeed));
+});
+
+var map = [
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Sun
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+function countForAverageOneADay(first: Date, last: Date): number {
+    return Math.trunc((last.valueOf() - first.valueOf()) / (1000 * 60 * 60 * 24))
+}
+
+QUnit.test("should read - wrong day", function (assert: Assert) {
+    var agesAgo = new Date("Dec 01 1999 11:00:00 GMT+0000");
+    var yesterday = new Date("Nov 30 2000 11:00:00 GMT+0000") // Thur
+    var rightNow = new Date("Dec 01 2000 11:00:00 GMT+0000"); // Fri
+
+    clock = sinon.useFakeTimers(rightNow);
+
+    var feedHandler = new FeedHandler();
+
+    var feed = feedHandler.newRssFeed("", "");
+    feed.firstRecord = agesAgo.toString();
+    feed.lastRecord = yesterday.toString();
+    feed.count = countForAverageOneADay(agesAgo, yesterday);
+    feed.map = map;
+
+    assert.notOk(feedHandler.shouldRead(feed));
+});
+
+QUnit.test("should read - right day", function (assert: Assert) {
+    var agesAgo = new Date("Dec 01 1999 11:00:00 GMT+0000");
+    var yesterday = new Date("Dec 01 2000 11:00:00 GMT+0000") // Fri
+    var rightNow = new Date("Dec 02 2000 11:00:00 GMT+0000"); // Sat
+
+    clock = sinon.useFakeTimers(rightNow);
+
+    var feedHandler = new FeedHandler();
+
+    var feed = feedHandler.newRssFeed("", "");
+    feed.firstRecord = agesAgo.toString();
+    feed.lastRecord = yesterday.toString();
+    feed.count = countForAverageOneADay(agesAgo, yesterday);
+    feed.map = map;
+
+    assert.ok(feedHandler.shouldRead(feed));
 });

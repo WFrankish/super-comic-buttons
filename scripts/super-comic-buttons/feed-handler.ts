@@ -224,7 +224,7 @@ class FeedHandler implements IFeedHandler {
         var sum = 0;
         for (var i = 0; i < hourSpan; i++) {
             var hour = (startHour + i) % 24;
-            var day = (startDay + Math.trunc(i / 24)) % 7
+            var day = (startDay + Math.trunc((startHour + i) / 24)) % 7
             sum += n * feed.map[day][hour];
         }
         return sum;
