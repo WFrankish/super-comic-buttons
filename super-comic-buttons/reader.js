@@ -130,4 +130,3 @@ class Reader {
         return null;
     }
 }
-//# sourceMappingURL=reader.js.map

@@ -65,4 +65,3 @@ class Popup {
         browser.runtime.openOptionsPage();
     }
 }
-//# sourceMappingURL=popup.js.map

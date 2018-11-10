@@ -96,4 +96,3 @@ class Utils {
         return hue;
     }
 }
-//# sourceMappingURL=util.js.map

@@ -141,4 +141,3 @@ class DayScope {
         this.style = `background-color: hsl(${Utils.colourFromNumber(value)}, 49%, 56%)`;
     }
 }
-//# sourceMappingURL=menu.js.map

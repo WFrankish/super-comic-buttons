@@ -107,4 +107,3 @@ class Background {
         }
     }
 }
-//# sourceMappingURL=background.js.map

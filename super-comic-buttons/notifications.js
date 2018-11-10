@@ -38,4 +38,3 @@ class Notifications {
         });
     }
 }
-//# sourceMappingURL=notifications.js.map

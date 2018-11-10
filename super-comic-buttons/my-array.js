@@ -27,4 +27,3 @@ class MyArray extends Array {
         return results;
     }
 }
-//# sourceMappingURL=my-array.js.map

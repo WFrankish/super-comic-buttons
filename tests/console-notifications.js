@@ -7,4 +7,3 @@ class ConsoleNotifications {
         console.log("error:" + error);
     }
 }
-//# sourceMappingURL=console-notifications.js.map

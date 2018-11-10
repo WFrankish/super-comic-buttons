@@ -269,4 +269,3 @@ class WebStorage {
         return result;
     }
 }
-//# sourceMappingURL=storage.js.map

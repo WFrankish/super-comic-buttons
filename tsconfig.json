@@ -7,8 +7,7 @@
         "strictPropertyInitialization": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
-        "sourceMap": true,
-        "sourceRoot": "./scripts",
+        "sourceMap": false,
         "strictNullChecks": true,
         "target": "esnext",
         "typeRoots": [

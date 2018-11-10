@@ -27,4 +27,3 @@ QUnit.test("shuffle", function (assert) {
     var shuffled = MyArray.shuffle(base);
     assert.notEqual(shuffled, base);
 });
-//# sourceMappingURL=my-array-tests.js.map

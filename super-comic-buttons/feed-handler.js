@@ -229,4 +229,3 @@ class FeedHandler {
         ];
     }
 }
-//# sourceMappingURL=feed-handler.js.map

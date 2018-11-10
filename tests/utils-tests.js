@@ -20,4 +20,3 @@ QUnit.test("as time string", function (assert) {
     actual = Utils.asTimeString(656835, 10);
     assert.equal(actual, "10 minutes, 56 seconds, 835 milliseconds");
 });
-//# sourceMappingURL=utils-tests.js.map

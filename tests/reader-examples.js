@@ -810,4 +810,3 @@ $("i.close").click(function(){
 </body>
 </html>
 `;
-//# sourceMappingURL=reader-examples.js.map

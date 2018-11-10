@@ -227,4 +227,3 @@ QUnit.test("should read - right day", function (assert) {
     feed.map = map;
     assert.ok(feedHandler.shouldRead(feed));
 });
-//# sourceMappingURL=feed-handler-tests.js.map
